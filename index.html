@@ -3,27 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>7D ZONE — ADMIN PANEL</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<title>7D ZONE — ADMIN PANEL v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Nunito:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
+/* ===== ROOT VARIABLES ===== */
 :root {
-  --bg: #050510;
-  --surface: #0d0d22;
-  --card: #111128;
-  --border: #1e1e4a;
-  --accent: #00f5ff;
-  --accent2: #ff00ff;
-  --accent3: #00ff88;
-  --warn: #ff9900;
-  --danger: #ff3355;
-  --text: #e0e8ff;
-  --text2: #6677aa;
-  --glow: rgba(0,245,255,0.2);
-  --glow2: rgba(255,0,255,0.15);
+  --bg:      #020209;
+  --surface: #08080f;
+  --card:    #0d0d1a;
+  --card2:   #111125;
+  --border:  #1a1a3a;
+  --border2: #252550;
+  --accent:  #00f5ff;
+  --accent2: #bf00ff;
+  --accent3: #00ff99;
+  --warn:    #ff9900;
+  --danger:  #ff2255;
+  --info:    #4488ff;
+  --text:    #dde4ff;
+  --text2:   #5566aa;
+  --text3:   #334488;
+  --glow:    rgba(0,245,255,0.18);
+  --glow2:   rgba(191,0,255,0.13);
+  --glow3:   rgba(0,255,153,0.15);
+  --sidebar-w: 240px;
 }
 
+/* ===== RESET ===== */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior:smooth; font-size:16px; }
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:10px; }
+::-webkit-scrollbar-thumb:hover { background:var(--accent); }
 
 body {
   background: var(--bg);
@@ -31,613 +43,1071 @@ body {
   font-family: 'Nunito', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
+  line-height: 1.5;
 }
 
-/* Animated background grid */
+/* Animated grid background */
 body::before {
   content: '';
   position: fixed; inset: 0;
   background-image:
-    linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-  z-index: 0;
+    linear-gradient(rgba(0,245,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,255,0.025) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none; z-index: 0;
+  animation: gridMove 20s linear infinite;
+}
+@keyframes gridMove {
+  0%   { background-position: 0 0; }
+  100% { background-position: 50px 50px; }
 }
 
-/* ====== AUTH SCREEN ====== */
+/* Ambient glow orbs */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 40% 30% at 15% 20%, rgba(0,245,255,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 25% at 85% 80%, rgba(191,0,255,0.04) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ===== AUTH SCREEN ===== */
 #authScreen {
   position: fixed; inset: 0; z-index: 9999;
   background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
-  padding: 1rem;
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+}
+.auth-wrap {
+  width: 100%; max-width: 400px;
+  position: relative; z-index: 1;
 }
 .auth-card {
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 2.5rem 2rem;
-  width: 100%; max-width: 360px;
-  text-align: center;
-  box-shadow: 0 0 60px var(--glow), 0 0 120px var(--glow2);
-  position: relative;
-  overflow: hidden;
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 2.8rem 2.2rem 2.2rem;
+  box-shadow: 0 0 80px var(--glow), 0 0 40px var(--glow2), 0 40px 60px rgba(0,0,0,0.5);
+  position: relative; overflow: hidden;
+  animation: authAppear 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes authAppear {
+  from { opacity:0; transform:scale(0.85) translateY(30px); }
+  to   { opacity:1; transform:none; }
 }
 .auth-card::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+  background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3), var(--accent), var(--accent2));
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
 }
-.auth-logo {
+@keyframes shimmer {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+.auth-icon {
+  text-align: center; font-size: 2.8rem; margin-bottom: 0.5rem;
+  animation: iconBob 2s ease-in-out infinite;
+}
+@keyframes iconBob {
+  0%,100% { transform: translateY(0) rotate(-5deg); }
+  50%     { transform: translateY(-6px) rotate(5deg); }
+}
+.auth-title {
   font-family: 'Orbitron', sans-serif;
-  font-size: 1.1rem; font-weight: 900;
-  color: var(--accent);
-  text-shadow: 0 0 20px var(--accent);
-  margin-bottom: 0.2rem;
-  letter-spacing: 0.1em;
+  font-size: 1.2rem; font-weight: 900;
+  color: var(--accent); text-align: center;
+  text-shadow: 0 0 25px var(--accent);
+  letter-spacing: 0.15em; margin-bottom: 0.25rem;
 }
 .auth-sub {
-  font-size: 0.75rem; color: var(--text2);
+  text-align: center;
   font-family: 'Share Tech Mono', monospace;
-  margin-bottom: 2rem;
+  font-size: 0.62rem; color: var(--text2);
+  letter-spacing: 0.08em; margin-bottom: 2rem;
 }
-.auth-label {
-  text-align: left; font-size: 0.7rem;
-  font-family: 'Share Tech Mono', monospace;
-  color: var(--text2); margin-bottom: 0.3rem;
-  text-transform: uppercase; letter-spacing: 0.1em;
+.form-group { margin-bottom: 1rem; }
+.form-label {
+  display: block; font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.4rem;
 }
 .auth-input {
   width: 100%; background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px; padding: 0.75rem 1rem;
+  border: 1px solid var(--border2);
+  border-radius: 10px; padding: 0.8rem 1rem;
   color: var(--text); font-family: 'Share Tech Mono', monospace;
-  font-size: 0.9rem; margin-bottom: 1rem; outline: none;
-  transition: border 0.2s, box-shadow 0.2s;
+  font-size: 0.88rem; outline: none;
+  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
 }
 .auth-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 12px var(--glow);
+  box-shadow: 0 0 0 3px rgba(0,245,255,0.1), 0 0 20px var(--glow);
+  background: rgba(0,245,255,0.02);
 }
 .auth-btn {
-  width: 100%; padding: 0.8rem;
-  background: transparent;
+  width: 100%; margin-top: 0.5rem;
+  padding: 0.85rem;
+  background: linear-gradient(135deg, rgba(0,245,255,0.08), rgba(0,245,255,0.03));
   border: 1px solid var(--accent);
-  border-radius: 8px; color: var(--accent);
-  font-family: 'Orbitron', sans-serif; font-size: 0.7rem;
-  font-weight: 700; cursor: pointer; letter-spacing: 0.15em;
-  transition: all 0.2s; text-transform: uppercase;
+  border-radius: 10px; color: var(--accent);
+  font-family: 'Orbitron', sans-serif; font-size: 0.68rem;
+  font-weight: 700; cursor: pointer;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  transition: all 0.25s; position: relative; overflow: hidden;
 }
-.auth-btn:hover {
-  background: var(--accent); color: var(--bg);
-  box-shadow: 0 0 20px var(--glow);
+.auth-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--accent); opacity: 0;
+  transition: opacity 0.25s;
 }
+.auth-btn:hover { color: var(--bg); box-shadow: 0 0 30px var(--glow); }
+.auth-btn:hover::before { opacity: 1; }
+.auth-btn span { position: relative; z-index: 1; }
 .auth-err {
-  font-size: 0.78rem; color: var(--danger);
-  min-height: 1.2rem; margin-top: 0.5rem;
-  font-family: 'Share Tech Mono', monospace;
+  min-height: 1.4rem; margin-top: 0.6rem; text-align: center;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+  color: var(--danger); animation: errShake 0.3s ease;
+}
+@keyframes errShake {
+  0%,100% { transform: none; }
+  25%     { transform: translateX(-6px); }
+  75%     { transform: translateX(6px); }
+}
+.auth-attempts {
+  text-align: center; font-size: 0.65rem; color: var(--text2);
+  font-family: 'Share Tech Mono', monospace; margin-top: 0.4rem;
 }
 
-/* ====== MAIN LAYOUT ====== */
-#app { display: none; position: relative; z-index: 1; }
+/* ===== MAIN APP ===== */
+#app { display: none; position: relative; z-index: 1; min-height: 100vh; }
 
-/* Sidebar */
+/* ===== SIDEBAR ===== */
 .sidebar {
   position: fixed; left: 0; top: 0; bottom: 0;
-  width: 220px; background: var(--surface);
+  width: var(--sidebar-w);
+  background: var(--surface);
   border-right: 1px solid var(--border);
   display: flex; flex-direction: column;
-  z-index: 100; padding: 1.5rem 0;
-  transition: transform 0.3s;
+  z-index: 200; transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 4px 0 40px rgba(0,0,0,0.4);
+  overflow-y: auto; overflow-x: hidden;
 }
-.sidebar-logo {
-  padding: 0 1.2rem 1.5rem;
+.sidebar-header {
+  padding: 1.4rem 1.3rem 1.2rem;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 1rem;
+  position: relative;
 }
-.sidebar-logo .logo-main {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 0.8rem; font-weight: 900;
-  color: var(--accent); letter-spacing: 0.1em;
-  text-shadow: 0 0 15px var(--accent);
+.sidebar-logo-row {
+  display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.3rem;
 }
-.sidebar-logo .logo-sub {
+.logo-icon { font-size: 1.6rem; }
+.logo-text { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 900; color: var(--accent); text-shadow: 0 0 12px var(--accent); letter-spacing: 0.08em; }
+.logo-badge { font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; color: var(--accent2); letter-spacing: 0.06em; opacity: 0.8; }
+.sidebar-ver { font-family: 'Share Tech Mono', monospace; font-size: 0.5rem; color: var(--text3); margin-top: 0.2rem; }
+
+.nav-section {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 0.6rem; color: var(--accent2);
-  margin-top: 0.2rem; opacity: 0.8;
+  font-size: 0.52rem; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.18em;
+  padding: 1.1rem 1.3rem 0.35rem;
 }
 .nav-item {
   display: flex; align-items: center; gap: 0.7rem;
-  padding: 0.65rem 1.2rem; color: var(--text2);
-  font-size: 0.82rem; font-weight: 700;
-  cursor: pointer; transition: all 0.2s;
+  padding: 0.62rem 1.3rem; color: var(--text2);
+  font-size: 0.83rem; font-weight: 700;
+  cursor: pointer; transition: all 0.18s;
   border-left: 2px solid transparent;
-  text-decoration: none;
+  position: relative; user-select: none;
 }
-.nav-item:hover { color: var(--text); background: rgba(0,245,255,0.04); }
-.nav-item.on {
+.nav-item:hover { color: var(--text); background: rgba(0,245,255,0.04); border-left-color: var(--border2); }
+.nav-item.active {
   color: var(--accent); border-left-color: var(--accent);
   background: rgba(0,245,255,0.07);
 }
-.nav-icon { font-size: 1rem; min-width: 1.2rem; text-align: center; }
-.nav-section {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.55rem; color: var(--text2);
-  text-transform: uppercase; letter-spacing: 0.15em;
-  padding: 1rem 1.2rem 0.4rem; opacity: 0.6;
+.nav-item.active .nav-icon { filter: drop-shadow(0 0 5px var(--accent)); }
+.nav-icon { font-size: 1rem; min-width: 1.3rem; text-align: center; transition: filter 0.2s; }
+.nav-badge {
+  margin-left: auto; background: var(--danger);
+  color: #fff; font-size: 0.55rem; font-weight: 900;
+  padding: 0.1rem 0.4rem; border-radius: 100px;
+  min-width: 18px; text-align: center;
 }
-.sidebar-bottom {
-  margin-top: auto; padding: 0 1.2rem;
-  border-top: 1px solid var(--border); padding-top: 1rem;
+
+.sidebar-footer {
+  margin-top: auto; border-top: 1px solid var(--border);
+  padding: 1rem 1.3rem;
 }
-.admin-badge {
-  display: flex; align-items: center; gap: 0.5rem;
-  font-size: 0.72rem; color: var(--text2);
-  font-family: 'Share Tech Mono', monospace;
+.admin-info {
+  display: flex; align-items: center; gap: 0.55rem;
+  margin-bottom: 0.7rem;
 }
-.admin-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--accent3);
-  box-shadow: 0 0 8px var(--accent3);
-  animation: pulse 2s infinite;
+.admin-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 900; color: var(--bg);
+  flex-shrink: 0;
 }
-@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
-.logout-btn {
-  margin-top: 0.5rem; width: 100%;
-  padding: 0.5rem; border: 1px solid var(--border);
-  border-radius: 6px; background: transparent;
-  color: var(--danger); font-family: 'Nunito', sans-serif;
-  font-size: 0.78rem; font-weight: 700;
+.admin-name { font-size: 0.78rem; font-weight: 700; color: var(--text); }
+.admin-role { font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; color: var(--accent3); }
+.online-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent3); box-shadow: 0 0 8px var(--accent3);
+  animation: pulse 2s infinite; margin-left: auto; flex-shrink: 0;
+}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+
+.sidebar-logout {
+  width: 100%; padding: 0.55rem;
+  border: 1px solid var(--border2); border-radius: 8px;
+  background: transparent; color: var(--text2);
+  font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700;
   cursor: pointer; transition: all 0.2s;
 }
-.logout-btn:hover { border-color: var(--danger); background: rgba(255,51,85,0.08); }
+.sidebar-logout:hover { border-color: var(--danger); color: var(--danger); background: rgba(255,34,85,0.06); }
 
-/* Main content */
+/* ===== TOPBAR ===== */
+.topbar {
+  position: fixed; top: 0; left: var(--sidebar-w); right: 0; z-index: 100;
+  background: rgba(2,2,9,0.9);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  padding: 0 1.8rem;
+  height: 58px; display: flex; align-items: center; justify-content: space-between;
+}
+.topbar-left { display: flex; align-items: center; gap: 0.8rem; }
+.page-title {
+  font-family: 'Orbitron', sans-serif; font-size: 0.85rem;
+  font-weight: 900; color: var(--accent); letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.breadcrumb {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
+  color: var(--text3); letter-spacing: 0.06em; margin-top: 0.15rem;
+}
+.topbar-right { display: flex; align-items: center; gap: 0.6rem; }
+.status-pill {
+  display: flex; align-items: center; gap: 0.35rem;
+  background: rgba(0,255,153,0.07); border: 1px solid rgba(0,255,153,0.2);
+  border-radius: 100px; padding: 0.3rem 0.8rem;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.56rem; color: var(--accent3);
+}
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); box-shadow: 0 0 6px var(--accent3); animation: pulse 1s infinite; }
+.clock-display { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--text2); }
+.topbar-btn {
+  background: none; border: 1px solid var(--border2); border-radius: 8px;
+  color: var(--text2); padding: 0.38rem 0.75rem;
+  font-size: 0.78rem; cursor: pointer; transition: all 0.2s;
+}
+.topbar-btn:hover { border-color: var(--accent); color: var(--accent); }
+.hamburger-btn {
+  display: none; background: none; border: 1px solid var(--border2);
+  border-radius: 8px; padding: 0.4rem 0.6rem; cursor: pointer;
+  flex-direction: column; gap: 4px; transition: border 0.2s;
+}
+.hamburger-btn:hover { border-color: var(--accent); }
+.hamburger-btn span { display: block; width: 18px; height: 2px; background: var(--accent); border-radius: 2px; }
+
+/* ===== MAIN CONTENT ===== */
 .main {
-  margin-left: 220px;
-  padding: 1.5rem 2rem 3rem;
+  margin-left: var(--sidebar-w);
+  padding: 58px 0 0;
   min-height: 100vh;
 }
-.top-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.8rem;
-}
-.page-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.1rem; font-weight: 900;
-  color: var(--accent); letter-spacing: 0.08em;
-}
-.page-subtitle { font-size: 0.78rem; color: var(--text2); margin-top: 0.2rem; }
-.status-pill {
-  display: flex; align-items: center; gap: 0.4rem;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 100px; padding: 0.3rem 0.8rem;
-  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
-  color: var(--accent3);
-}
-#liveIndicator { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); box-shadow: 0 0 6px var(--accent3); animation: pulse 1s infinite; }
+.main-inner { padding: 1.6rem 1.8rem 3rem; }
 
-/* Pages */
-.page { display: none; animation: fadeIn 0.3s ease; }
+/* ===== PAGES ===== */
+.page { display: none; animation: fadeInUp 0.3s ease; }
 .page.active { display: block; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:none;} }
-
-/* Cards */
-.card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 1.3rem;
-  margin-bottom: 1.2rem; position: relative; overflow: hidden;
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:none; }
 }
-.card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  opacity: 0.3;
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.4rem;
+  margin-bottom: 1.3rem; position: relative; overflow: hidden;
+}
+.card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--accent) 30%, var(--accent2) 70%, transparent 100%);
+  opacity: 0.25;
+}
+.card:hover { border-color: var(--border2); }
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.1rem; flex-wrap: wrap; gap: 0.5rem;
 }
 .card-title {
-  font-family: 'Orbitron', sans-serif; font-size: 0.65rem;
-  font-weight: 700; color: var(--accent); letter-spacing: 0.15em;
-  text-transform: uppercase; margin-bottom: 1rem;
-  display: flex; align-items: center; gap: 0.5rem;
+  font-family: 'Orbitron', sans-serif; font-size: 0.62rem;
+  font-weight: 700; color: var(--accent); letter-spacing: 0.18em;
+  text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem;
 }
+.card-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
-/* Stats grid */
+/* ===== STAT BOXES ===== */
 .stats-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
   gap: 1rem; margin-bottom: 1.5rem;
 }
 .stat-box {
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 1.2rem;
-  position: relative; overflow: hidden; transition: all 0.2s;
+  border-radius: 14px; padding: 1.3rem 1.3rem 1.1rem;
+  position: relative; overflow: hidden; cursor: default;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
-.stat-box:hover { border-color: var(--accent); box-shadow: 0 0 20px var(--glow); }
+.stat-box:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+.stat-box::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 60%, rgba(0,245,255,0.03) 100%);
+}
+.stat-box-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.stat-icon-wrap {
+  width: 42px; height: 42px; border-radius: 10px;
+  background: rgba(0,245,255,0.07); border: 1px solid rgba(0,245,255,0.15);
+  display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  flex-shrink: 0;
+}
 .stat-val {
-  font-family: 'Orbitron', sans-serif; font-size: 2rem;
+  font-family: 'Orbitron', sans-serif; font-size: 1.9rem;
   font-weight: 900; color: var(--accent);
-  text-shadow: 0 0 20px var(--glow);
+  text-shadow: 0 0 20px rgba(0,245,255,0.4);
+  line-height: 1; margin: 0.6rem 0 0.2rem;
 }
-.stat-label { font-size: 0.72rem; color: var(--text2); margin-top: 0.3rem; }
-.stat-icon { position: absolute; right: 1rem; top: 1rem; font-size: 1.8rem; opacity: 0.3; }
+.stat-label { font-size: 0.72rem; color: var(--text2); font-weight: 700; }
+.stat-trend { font-family: 'Share Tech Mono', monospace; font-size: 0.55rem; color: var(--accent3); margin-top: 0.3rem; }
 
-/* Tables */
-.table-wrap { overflow-x: auto; margin-top: 0.5rem; }
-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+/* Colored stat boxes */
+.stat-box.purple .stat-icon-wrap { background:rgba(191,0,255,0.07); border-color:rgba(191,0,255,0.2); }
+.stat-box.purple .stat-val { color:var(--accent2); text-shadow:0 0 20px rgba(191,0,255,0.4); }
+.stat-box.green .stat-icon-wrap { background:rgba(0,255,153,0.07); border-color:rgba(0,255,153,0.2); }
+.stat-box.green .stat-val { color:var(--accent3); text-shadow:0 0 20px rgba(0,255,153,0.4); }
+.stat-box.orange .stat-icon-wrap { background:rgba(255,153,0,0.07); border-color:rgba(255,153,0,0.2); }
+.stat-box.orange .stat-val { color:var(--warn); text-shadow:0 0 20px rgba(255,153,0,0.4); }
+
+/* ===== TWO COLUMN GRID ===== */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+/* ===== TABLES ===== */
+.table-wrap { overflow-x: auto; border-radius: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+thead { position: sticky; top: 0; z-index: 1; }
 thead th {
-  text-align: left; padding: 0.6rem 0.8rem;
-  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+  text-align: left; padding: 0.65rem 0.9rem;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.57rem;
   color: var(--text2); text-transform: uppercase; letter-spacing: 0.1em;
-  border-bottom: 1px solid var(--border);
+  background: var(--card2); border-bottom: 1px solid var(--border2);
+  white-space: nowrap;
 }
-tbody tr { border-bottom: 1px solid rgba(30,30,74,0.5); transition: background 0.15s; }
-tbody tr:hover { background: rgba(0,245,255,0.03); }
-tbody td { padding: 0.65rem 0.8rem; vertical-align: middle; }
-.mono { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; }
-.pill {
-  display: inline-block; padding: 0.15rem 0.6rem;
-  border-radius: 100px; font-size: 0.65rem; font-weight: 700;
-}
-.pill-green { background: rgba(0,255,136,0.1); color: var(--accent3); border: 1px solid rgba(0,255,136,0.3); }
-.pill-blue { background: rgba(0,245,255,0.1); color: var(--accent); border: 1px solid rgba(0,245,255,0.3); }
-.pill-red { background: rgba(255,51,85,0.1); color: var(--danger); border: 1px solid rgba(255,51,85,0.3); }
-.pill-orange { background: rgba(255,153,0,0.1); color: var(--warn); border: 1px solid rgba(255,153,0,0.3); }
+thead th:first-child { border-radius: 8px 0 0 0; }
+thead th:last-child { border-radius: 0 8px 0 0; }
+tbody tr { border-bottom: 1px solid rgba(26,26,58,0.7); transition: background 0.12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(0,245,255,0.025); }
+tbody td { padding: 0.68rem 0.9rem; vertical-align: middle; }
+.td-center { text-align: center; }
+.mono { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--text2); }
+.td-name { font-weight: 900; color: var(--text); }
 
-/* Action buttons */
+/* ===== PILLS / BADGES ===== */
+.pill {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  padding: 0.18rem 0.6rem; border-radius: 100px;
+  font-size: 0.63rem; font-weight: 700; white-space: nowrap;
+}
+.pill-cyan   { background:rgba(0,245,255,0.1); color:var(--accent);  border:1px solid rgba(0,245,255,0.25); }
+.pill-purple { background:rgba(191,0,255,0.1); color:var(--accent2); border:1px solid rgba(191,0,255,0.25); }
+.pill-green  { background:rgba(0,255,153,0.1); color:var(--accent3); border:1px solid rgba(0,255,153,0.25); }
+.pill-orange { background:rgba(255,153,0,0.1); color:var(--warn);    border:1px solid rgba(255,153,0,0.25); }
+.pill-red    { background:rgba(255,34,85,0.1);  color:var(--danger);  border:1px solid rgba(255,34,85,0.25); }
+.pill-grey   { background:rgba(85,102,170,0.1); color:var(--text2);   border:1px solid rgba(85,102,170,0.2); }
+
+/* ===== BUTTONS ===== */
 .btn {
-  padding: 0.4rem 0.9rem; border-radius: 6px; border: 1px solid var(--border);
-  background: transparent; color: var(--text); font-family: 'Nunito', sans-serif;
-  font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  padding: 0.42rem 0.95rem; border-radius: 7px;
+  border: 1px solid var(--border2); background: transparent;
+  color: var(--text); font-family: 'Nunito', sans-serif;
+  font-size: 0.79rem; font-weight: 700; cursor: pointer;
+  transition: all 0.18s; white-space: nowrap; display: inline-flex;
+  align-items: center; gap: 0.35rem;
 }
 .btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn:active { transform: scale(0.97); }
 .btn-accent { border-color: var(--accent); color: var(--accent); }
-.btn-accent:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 12px var(--glow); }
+.btn-accent:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 16px var(--glow); }
+.btn-purple { border-color: var(--accent2); color: var(--accent2); }
+.btn-purple:hover { background: var(--accent2); color: var(--bg); box-shadow: 0 0 16px var(--glow2); }
+.btn-green  { border-color: var(--accent3); color: var(--accent3); }
+.btn-green:hover  { background: var(--accent3); color: var(--bg); }
 .btn-danger { border-color: var(--danger); color: var(--danger); }
 .btn-danger:hover { background: var(--danger); color: #fff; }
-.btn-warn { border-color: var(--warn); color: var(--warn); }
-.btn-warn:hover { background: var(--warn); color: var(--bg); }
-.btn-sm { padding: 0.25rem 0.6rem; font-size: 0.7rem; }
-.btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.8rem; }
+.btn-warn   { border-color: var(--warn); color: var(--warn); }
+.btn-warn:hover   { background: var(--warn); color: var(--bg); }
+.btn-sm { padding: 0.28rem 0.65rem; font-size: 0.71rem; border-radius: 6px; }
+.btn-xs { padding: 0.18rem 0.48rem; font-size: 0.63rem; border-radius: 5px; }
+.btn-wide { width: 100%; justify-content: center; padding: 0.72rem; }
+.btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
-/* Inputs */
+/* ===== INPUTS ===== */
 .inp {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 6px; padding: 0.5rem 0.8rem;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 0.5rem 0.85rem;
   color: var(--text); font-family: 'Nunito', sans-serif;
-  font-size: 0.85rem; outline: none; transition: border 0.2s;
+  font-size: 0.85rem; outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
 }
-.inp:focus { border-color: var(--accent); box-shadow: 0 0 8px var(--glow); }
-.inp-sm { padding: 0.3rem 0.6rem; font-size: 0.78rem; width: 80px; }
+.inp:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,245,255,0.08); }
+.inp-sm { padding: 0.3rem 0.6rem; font-size: 0.78rem; }
+.inp-xs { padding: 0.2rem 0.5rem; font-size: 0.72rem; width: 72px; }
+.inp-full { width: 100%; }
+.inp-num { width: 80px; text-align: center; font-family: 'Share Tech Mono', monospace; }
 
-/* Toast */
-#toast {
-  position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
-  background: var(--card); border: 1px solid var(--accent3);
-  border-radius: 10px; padding: 0.8rem 1.2rem;
-  font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
-  color: var(--accent3); box-shadow: 0 0 20px rgba(0,255,136,0.2);
-  transform: translateY(20px); opacity: 0;
-  transition: all 0.3s; pointer-events: none; max-width: 300px;
-}
-#toast.show { transform: none; opacity: 1; }
-#toast.err { border-color: var(--danger); color: var(--danger); box-shadow: 0 0 20px rgba(255,51,85,0.2); }
-
-/* Modal */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 8000;
-  background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
-  display: flex; align-items: center; justify-content: center;
-  padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-}
-.modal-overlay.open { opacity: 1; pointer-events: all; }
-.modal-box {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 16px; padding: 1.8rem; width: 100%; max-width: 480px;
-  max-height: 85vh; overflow-y: auto;
-  box-shadow: 0 0 60px var(--glow);
-  transform: scale(0.9); transition: transform 0.3s;
-}
-.modal-overlay.open .modal-box { transform: scale(1); }
-.modal-title {
-  font-family: 'Orbitron', sans-serif; font-size: 0.8rem;
-  color: var(--accent); margin-bottom: 1.2rem;
-  padding-bottom: 0.8rem; border-bottom: 1px solid var(--border);
-}
-.form-row { margin-bottom: 0.9rem; }
-.form-label { font-size: 0.7rem; color: var(--text2); margin-bottom: 0.3rem; font-family: 'Share Tech Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; display: block; }
-.form-inp { width: 100%; }
-
-/* Loading */
-.loading {
-  text-align: center; padding: 2rem;
-  font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
-  color: var(--text2); animation: blink 1s infinite;
-}
-@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-
-/* Leaderboard bars */
-.lb-bar-wrap { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; }
-.lb-bar-bg { flex: 1; height: 10px; background: var(--border); border-radius: 100px; overflow: hidden; }
-.lb-bar-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
-.lb-name { min-width: 120px; font-size: 0.82rem; font-weight: 700; }
-.lb-count { min-width: 30px; text-align: right; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--accent); }
-
-/* Search bar */
-.search-bar {
+/* ===== SEARCH BAR ===== */
+.search-row {
   display: flex; gap: 0.6rem; flex-wrap: wrap;
   align-items: center; margin-bottom: 1rem;
 }
 .search-inp {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 8px; padding: 0.5rem 1rem;
-  color: var(--text); font-family: 'Nunito', sans-serif;
-  font-size: 0.85rem; outline: none; transition: border 0.2s;
-  min-width: 200px; flex: 1;
+  flex: 1; min-width: 200px;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 0.52rem 1rem 0.52rem 2.2rem;
+  color: var(--text); font-family: 'Nunito', sans-serif; font-size: 0.85rem;
+  outline: none; transition: border 0.2s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235566aa' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: 0.65rem center; background-size: 15px;
 }
 .search-inp:focus { border-color: var(--accent); }
 
-/* Vote rank medal */
-.rank-1 { color: #ffd700; }
-.rank-2 { color: #c0c0c0; }
-.rank-3 { color: #cd7f32; }
+/* ===== LEADERBOARD BARS ===== */
+.lb-row { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.6rem; }
+.lb-rank {
+  min-width: 2rem; text-align: center;
+  font-family: 'Orbitron', sans-serif; font-size: 0.65rem; font-weight: 900;
+}
+.rank-1-col { color: #ffd700; }
+.rank-2-col { color: #c0c0c0; }
+.rank-3-col { color: #cd7f32; }
+.rank-n-col { color: var(--text2); }
+.lb-name { min-width: 110px; font-size: 0.82rem; font-weight: 700; color: var(--text); }
+.lb-bar-track { flex: 1; height: 10px; background: var(--border2); border-radius: 100px; overflow: hidden; }
+.lb-bar-fill {
+  height: 100%; border-radius: 100px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  transition: width 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+.lb-count { min-width: 28px; text-align: right; font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--accent); font-weight: 700; }
 
-/* Confirm delete row */
-.del-confirm {
+/* ===== VOTE GRID ===== */
+.vote-grid {
+  display: grid; gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.vote-row {
+  display: grid; grid-template-columns: 120px 1fr auto auto auto;
+  align-items: center; gap: 0.5rem;
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 0.6rem 0.8rem;
+  transition: border-color 0.2s;
+}
+.vote-row:hover { border-color: var(--border2); }
+.vote-person { font-size: 0.82rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vote-bar-mini { height: 6px; background: var(--border2); border-radius: 100px; overflow: hidden; }
+.vote-bar-mini-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent3)); border-radius: 100px; transition: width 0.5s ease; }
+.vote-actions { display: flex; gap: 0.3rem; }
+
+/* ===== JSON EDITOR ===== */
+.json-area {
+  width: 100%; min-height: 220px;
+  background: #030308; border: 1px solid var(--border2);
+  border-radius: 10px; padding: 0.9rem;
+  color: #7ec8e3; font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem; outline: none; resize: vertical;
+  transition: border 0.2s; line-height: 1.7;
+}
+.json-area:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,245,255,0.06); }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 7000;
+  background: rgba(0,0,0,0.88); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 18px; padding: 2rem;
+  width: 100%; max-width: 500px; max-height: 88vh; overflow-y: auto;
+  box-shadow: 0 0 80px var(--glow), 0 40px 60px rgba(0,0,0,0.6);
+  transform: scale(0.88) translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative;
+}
+.modal-overlay.open .modal-box { transform: scale(1) translateY(0); }
+.modal-box::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  border-radius: 18px 18px 0 0;
+}
+.modal-title {
+  font-family: 'Orbitron', sans-serif; font-size: 0.78rem;
+  color: var(--accent); margin-bottom: 1.5rem;
+  padding-bottom: 0.9rem; border-bottom: 1px solid var(--border2);
   display: flex; align-items: center; gap: 0.5rem;
-  background: rgba(255,51,85,0.08); border: 1px solid rgba(255,51,85,0.2);
-  border-radius: 8px; padding: 0.5rem 0.8rem; margin-top: 0.4rem;
-  font-size: 0.78rem;
 }
+.modal-close {
+  position: absolute; top: 1rem; right: 1rem;
+  background: none; border: 1px solid var(--border2); border-radius: 6px;
+  color: var(--text2); width: 28px; height: 28px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.modal-close:hover { border-color: var(--danger); color: var(--danger); }
+.form-row { margin-bottom: 1rem; }
+.form-label {
+  display: block; font-family: 'Share Tech Mono', monospace;
+  font-size: 0.57rem; color: var(--text2); text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 0.38rem;
+}
+.form-hint { font-size: 0.68rem; color: var(--text3); margin-top: 0.25rem; }
 
-/* Responsive */
-@media(max-width: 720px) {
-  .sidebar { transform: translateX(-220px); }
-  .sidebar.open { transform: none; }
-  .main { margin-left: 0; padding: 1rem; }
-  .hamburger { display: flex !important; }
+/* ===== DANGER ZONE ===== */
+.danger-zone {
+  border: 1px solid rgba(255,34,85,0.25);
+  border-radius: 10px; padding: 1rem 1.1rem;
+  background: rgba(255,34,85,0.04); margin-top: 1rem;
 }
-.hamburger {
-  display: none; position: fixed; top: 1rem; left: 1rem; z-index: 200;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 8px; padding: 0.5rem; cursor: pointer;
-  flex-direction: column; gap: 4px;
+.danger-zone-title {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
+  color: var(--danger); text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.4rem;
 }
-.hamburger span { display: block; width: 20px; height: 2px; background: var(--accent); border-radius: 2px; }
+.confirm-delete-row {
+  display: none; align-items: center; gap: 0.5rem;
+  background: rgba(255,34,85,0.08); border: 1px solid rgba(255,34,85,0.2);
+  border-radius: 8px; padding: 0.6rem 0.8rem;
+  font-size: 0.78rem; color: var(--danger); flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.confirm-delete-row.show { display: flex; }
 
-/* Section divider */
+/* ===== TOAST ===== */
+#toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+  background: var(--card2); border-radius: 12px;
+  padding: 0.9rem 1.3rem;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
+  max-width: 320px; line-height: 1.5;
+  transform: translateX(120%); opacity: 0;
+  transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none; box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+#toast.show  { transform: none; opacity: 1; border:1px solid rgba(0,255,153,0.3); color:var(--accent3); box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 20px var(--glow3); }
+#toast.error { transform: none; opacity: 1; border:1px solid rgba(255,34,85,0.3);  color:var(--danger);  box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+#toast.warn  { transform: none; opacity: 1; border:1px solid rgba(255,153,0,0.3);  color:var(--warn);    box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+
+/* ===== ACTIVITY LOG ===== */
+.log-entry {
+  display: flex; align-items: flex-start; gap: 0.7rem;
+  padding: 0.6rem 0; border-bottom: 1px solid rgba(26,26,58,0.5);
+  font-size: 0.8rem;
+}
+.log-entry:last-child { border-bottom: none; }
+.log-icon { font-size: 1rem; min-width: 1.3rem; text-align: center; margin-top: 0.1rem; }
+.log-text { flex: 1; color: var(--text); line-height: 1.4; }
+.log-time { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--text3); white-space: nowrap; }
+
+/* ===== QUICK ACTIONS ===== */
+.quick-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.7rem; }
+.quick-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+  padding: 1rem 0.8rem; border-radius: 12px;
+  border: 1px solid var(--border2); background: var(--card2);
+  cursor: pointer; transition: all 0.2s; text-decoration: none; color: var(--text2);
+}
+.quick-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+.quick-btn-icon { font-size: 1.6rem; }
+.quick-btn-label { font-size: 0.72rem; font-weight: 700; text-align: center; }
+
+/* ===== SETTINGS / DB ===== */
+.path-chip {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.28rem 0.75rem; border-radius: 100px;
+  border: 1px solid var(--border2); background: var(--card2);
+  font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+  color: var(--text2); cursor: pointer; transition: all 0.2s;
+}
+.path-chip:hover { border-color: var(--accent); color: var(--accent); }
+.chips-row { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+
+/* ===== DIVIDER ===== */
 .divider { height: 1px; background: var(--border); margin: 1.2rem 0; }
 
-/* JSON editor */
-.json-area {
-  width: 100%; min-height: 200px; background: #050510;
-  border: 1px solid var(--border); border-radius: 8px;
-  padding: 0.8rem; color: var(--accent3);
-  font-family: 'Share Tech Mono', monospace; font-size: 0.78rem;
-  outline: none; resize: vertical; transition: border 0.2s;
-  line-height: 1.6;
+/* ===== LOADING ===== */
+.loading-row {
+  text-align: center; padding: 2.5rem 1rem;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+  color: var(--text3);
 }
-.json-area:focus { border-color: var(--accent); }
-
-/* Refresh btn */
-.refresh-btn {
-  background: none; border: 1px solid var(--border); border-radius: 6px;
-  color: var(--text2); padding: 0.35rem 0.7rem; cursor: pointer;
-  font-size: 0.8rem; transition: all 0.2s;
+.loading-spinner {
+  display: inline-block; width: 20px; height: 20px;
+  border: 2px solid var(--border2); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  vertical-align: middle; margin-right: 0.5rem;
 }
-.refresh-btn:hover { border-color: var(--accent3); color: var(--accent3); }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* Inline number edit */
-.num-edit-wrap { display: flex; align-items: center; gap: 0.4rem; }
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr; }
+  .three-col { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 680px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { transform: translateX(-240px); --sidebar-w: 240px; box-shadow: none; }
+  .sidebar.open { transform: none; box-shadow: 8px 0 40px rgba(0,0,0,0.7); }
+  .topbar { left: 0; }
+  .hamburger-btn { display: flex !important; }
+  .main { margin-left: 0; }
+  .main-inner { padding: 1rem 1rem 3rem; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .three-col { grid-template-columns: 1fr; }
+  .vote-row { grid-template-columns: 1fr auto auto; }
+  .vote-row .lb-bar-track { display: none; }
+}
+
+/* ===== SCROLLABLE TABLE CONTAINER ===== */
+.scroll-table { max-height: 420px; overflow-y: auto; border-radius: 8px; }
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center; padding: 2rem;
+  color: var(--text3); font-size: 0.82rem;
+}
+.empty-state-icon { font-size: 2rem; margin-bottom: 0.4rem; }
 </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
+<!-- ==================== AUTH SCREEN ==================== -->
 <div id="authScreen">
-  <div class="auth-card">
-    <div class="auth-logo">7D ZONE</div>
-    <div class="auth-sub">ADMIN PANEL — RESTRICTED ACCESS</div>
-    <div class="auth-label">Admin Username</div>
-    <input class="auth-input" id="adminUser" type="text" placeholder="admin username" autocomplete="off" onkeydown="if(event.key==='Enter')adminLogin()">
-    <div class="auth-label">Passwort</div>
-    <input class="auth-input" id="adminPass" type="password" placeholder="passwort" onkeydown="if(event.key==='Enter')adminLogin()">
-    <button class="auth-btn" onclick="adminLogin()">▶ EINLOGGEN</button>
-    <div class="auth-err" id="adminErr"></div>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-icon">🛡️</div>
+      <div class="auth-title">7D ADMIN</div>
+      <div class="auth-sub">RESTRICTED — AUTHORIZED ONLY</div>
+      <div class="form-group">
+        <label class="form-label">Admin Username</label>
+        <input class="auth-input" id="loginUser" type="text" placeholder="username eingeben" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Passwort</label>
+        <input class="auth-input" id="loginPass" type="password" placeholder="passwort eingeben" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="auth-btn" onclick="doLogin()"><span>▶ EINLOGGEN</span></button>
+      <div class="auth-err" id="loginErr"></div>
+      <div class="auth-attempts" id="loginAttempts"></div>
+    </div>
   </div>
 </div>
 
-<!-- HAMBURGER (mobile) -->
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()">
-  <span></span><span></span><span></span>
-</button>
-
-<!-- MAIN APP -->
+<!-- ==================== MAIN APP ==================== -->
 <div id="app">
+
   <!-- SIDEBAR -->
   <nav class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-main">7D ADMIN</div>
-      <div class="logo-sub">CONTROL PANEL v1.0</div>
+    <div class="sidebar-header">
+      <div class="sidebar-logo-row">
+        <div class="logo-icon">⚡</div>
+        <div>
+          <div class="logo-text">7D ZONE</div>
+          <div class="logo-badge">ADMIN PANEL</div>
+        </div>
+      </div>
+      <div class="sidebar-ver">v2.0 — Firebase RT DB</div>
     </div>
     <div class="nav-section">Dashboard</div>
-    <div class="nav-item on" onclick="goPage('dashboard',this)"><span class="nav-icon">📊</span> Übersicht</div>
+    <div class="nav-item active" onclick="goPage('dashboard',this)" id="nav-dashboard">
+      <span class="nav-icon">📊</span> Übersicht
+    </div>
     <div class="nav-section">Verwaltung</div>
-    <div class="nav-item" onclick="goPage('users',this)"><span class="nav-icon">👤</span> Benutzer</div>
-    <div class="nav-item" onclick="goPage('votes',this)"><span class="nav-icon">⭐</span> Voting</div>
-    <div class="nav-item" onclick="goPage('db',this)"><span class="nav-icon">🗄️</span> Datenbank</div>
-    <div class="sidebar-bottom">
-      <div class="admin-badge"><div class="admin-dot"></div><span id="sidebarUser">admin</span></div>
-      <button class="logout-btn" onclick="adminLogout()">🚪 Logout</button>
+    <div class="nav-item" onclick="goPage('users',this)" id="nav-users">
+      <span class="nav-icon">👤</span> Benutzer
+      <span class="nav-badge" id="userCountBadge">—</span>
+    </div>
+    <div class="nav-item" onclick="goPage('votes',this)" id="nav-votes">
+      <span class="nav-icon">⭐</span> Voting
+    </div>
+    <div class="nav-section">Werkzeuge</div>
+    <div class="nav-item" onclick="goPage('db',this)" id="nav-db">
+      <span class="nav-icon">🗄️</span> Datenbank
+    </div>
+    <div class="nav-item" onclick="goPage('log',this)" id="nav-log">
+      <span class="nav-icon">📋</span> Aktivitäts-Log
+    </div>
+    <div class="sidebar-footer">
+      <div class="admin-info">
+        <div class="admin-avatar" id="adminAvatar">H</div>
+        <div>
+          <div class="admin-name" id="adminNameDisplay">halil</div>
+          <div class="admin-role">Super Admin</div>
+        </div>
+        <div class="online-dot"></div>
+      </div>
+      <button class="sidebar-logout" onclick="doLogout()">🚪 Logout</button>
     </div>
   </nav>
 
-  <!-- MAIN -->
-  <main class="main">
-    <div class="top-bar">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger-btn" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+      </button>
       <div>
         <div class="page-title" id="pageTitle">ÜBERSICHT</div>
-        <div class="page-subtitle" id="pageSub">Firebase Echtzeit-Dashboard</div>
-      </div>
-      <div style="display:flex;gap:0.6rem;align-items:center;">
-        <div class="status-pill"><div id="liveIndicator"></div> LIVE</div>
-        <button class="refresh-btn" onclick="reloadAll()">↻ Refresh</button>
+        <div class="breadcrumb" id="pageBreadcrumb">Admin / Dashboard</div>
       </div>
     </div>
-
-    <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
-      <div class="stats-grid" id="statsGrid">
-        <div class="stat-box"><div class="stat-icon">👤</div><div class="stat-val" id="statUsers">—</div><div class="stat-label">Registrierte User</div></div>
-        <div class="stat-box"><div class="stat-icon">⭐</div><div class="stat-val" id="statVotes">—</div><div class="stat-label">Votes Diese Woche</div></div>
-        <div class="stat-box"><div class="stat-icon">🏆</div><div class="stat-val" id="statTop">—</div><div class="stat-label">Meiste Votes</div></div>
-        <div class="stat-box"><div class="stat-icon">🗓️</div><div class="stat-val" id="statWeek">—</div><div class="stat-label">Aktuelle Woche</div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-        <div class="card">
-          <div class="card-title">🏆 TOP 5 VOTES</div>
-          <div id="dashTopVotes"><div class="loading">Lädt...</div></div>
-        </div>
-        <div class="card">
-          <div class="card-title">👤 LETZTE USER</div>
-          <div id="dashUsers"><div class="loading">Lädt...</div></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">⚡ SCHNELL-AKTIONEN</div>
-        <div class="btn-row">
-          <button class="btn btn-danger" onclick="if(confirm('ALLE VOTES ZURÜCKSETZEN? Das kann nicht rückgängig gemacht werden!'))resetAllVotes()">🗑️ Alle Votes Löschen</button>
-          <button class="btn btn-warn" onclick="goPage('users',document.querySelector('.nav-item:nth-of-type(2)'))">👤 User Verwalten</button>
-          <button class="btn btn-accent" onclick="reloadAll()">↻ Alles Neu Laden</button>
-        </div>
-      </div>
+    <div class="topbar-right">
+      <span class="clock-display" id="clockDisplay">—</span>
+      <div class="status-pill"><div class="live-dot"></div>LIVE</div>
+      <button class="topbar-btn" onclick="reloadCurrentPage()" title="Neu laden">↻</button>
     </div>
+  </div>
 
-    <!-- USERS -->
-    <div class="page" id="page-users">
-      <div class="card">
-        <div class="card-title">👤 ALLE BENUTZER</div>
-        <div class="search-bar">
-          <input class="search-inp" id="userSearch" type="text" placeholder="🔍 Username suchen..." oninput="filterUsers()">
-          <button class="btn btn-accent" onclick="loadUsers()">↻ Neu laden</button>
-        </div>
-        <div class="table-wrap">
-          <table id="usersTable">
-            <thead><tr>
-              <th>Username</th>
-              <th>UID</th>
-              <th>Vote (diese Woche)</th>
-              <th>Aktionen</th>
-            </tr></thead>
-            <tbody id="usersBody"><tr><td colspan="4"><div class="loading">Lädt...</div></td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="main-inner">
 
-    <!-- VOTES -->
-    <div class="page" id="page-votes">
-      <div class="card">
-        <div class="card-title">⭐ VOTING — PUNKTE BEARBEITEN</div>
-        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;">
-          <button class="btn btn-danger" onclick="if(confirm('Wirklich ALLE Votes löschen?'))resetAllVotes()">🗑️ Alle Votes Zurücksetzen</button>
-          <button class="btn btn-accent" onclick="loadVotes()">↻ Neu laden</button>
-        </div>
-        <div id="votesList"><div class="loading">Lädt...</div></div>
-      </div>
-      <div class="card">
-        <div class="card-title">🏆 LEADERBOARD VORSCHAU</div>
-        <div id="votesLeaderboard"><div class="loading">Lädt...</div></div>
-      </div>
-    </div>
-
-    <!-- DATABASE -->
-    <div class="page" id="page-db">
-      <div class="card">
-        <div class="card-title">🗄️ ROHE DATENBANK — DIREKTZUGRIFF</div>
-        <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem;">⚠️ Vorsicht! Hier kannst du direkt Firebase-Daten lesen und überschreiben.</p>
-        <div class="form-row">
-          <label class="form-label">Firebase Pfad (z.B. users, votes7d, usernames)</label>
-          <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
-            <input class="inp form-inp" id="dbPath" type="text" placeholder="votes7d" style="flex:1;">
-            <button class="btn btn-accent" onclick="dbRead()">📖 Lesen</button>
-            <button class="btn btn-danger" onclick="dbDelete()">🗑️ Pfad Löschen</button>
+      <!-- ====== PAGE: DASHBOARD ====== -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-box-top">
+              <div class="stat-icon-wrap">👤</div>
+            </div>
+            <div class="stat-val" id="sUser">—</div>
+            <div class="stat-label">Registrierte User</div>
+            <div class="stat-trend" id="sTrend1">Firebase Auth DB</div>
+          </div>
+          <div class="stat-box purple">
+            <div class="stat-box-top"><div class="stat-icon-wrap" style="background:rgba(191,0,255,0.07);border-color:rgba(191,0,255,0.2);">⭐</div></div>
+            <div class="stat-val" id="sVotes">—</div>
+            <div class="stat-label">Votes diese Woche</div>
+            <div class="stat-trend" id="sTrend2">Woche: <span id="sWeek">—</span></div>
+          </div>
+          <div class="stat-box orange">
+            <div class="stat-box-top"><div class="stat-icon-wrap" style="background:rgba(255,153,0,0.07);border-color:rgba(255,153,0,0.2);">🏆</div></div>
+            <div class="stat-val" id="sTop" style="font-size:1.1rem;margin-top:0.9rem;">—</div>
+            <div class="stat-label">Führt das Voting an</div>
+            <div class="stat-trend" id="sTopVotes">— Stimmen</div>
+          </div>
+          <div class="stat-box green">
+            <div class="stat-box-top"><div class="stat-icon-wrap" style="background:rgba(0,255,153,0.07);border-color:rgba(0,255,153,0.2);">📊</div></div>
+            <div class="stat-val" id="sNames">—</div>
+            <div class="stat-label">Namen im Voting</div>
+            <div class="stat-trend">Aktive Kandidaten</div>
           </div>
         </div>
-        <div class="form-row">
-          <label class="form-label">JSON Daten (zum Schreiben/Überschreiben)</label>
-          <textarea class="json-area" id="dbJson" placeholder='{"name":"Wert","punkte":42}'></textarea>
+
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🏆 TOP-10 LEADERBOARD</div>
+              <div class="card-actions">
+                <button class="btn btn-sm" onclick="loadDashboard()">↻</button>
+              </div>
+            </div>
+            <div id="dashLeaderboard"><div class="loading-row"><span class="loading-spinner"></span>Lädt...</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">👤 LETZTE BENUTZER</div>
+              <div class="card-actions">
+                <button class="btn btn-accent btn-sm" onclick="goPage('users',document.getElementById('nav-users'))">Alle →</button>
+              </div>
+            </div>
+            <div id="dashRecentUsers"><div class="loading-row"><span class="loading-spinner"></span>Lädt...</div></div>
+          </div>
         </div>
-        <div class="btn-row">
-          <button class="btn btn-accent" onclick="dbWrite()">💾 Schreiben (SET)</button>
-          <button class="btn btn-warn" onclick="dbPatch()">🔧 Aktualisieren (PATCH)</button>
+
+        <div class="card">
+          <div class="card-title">⚡ SCHNELL-AKTIONEN</div>
+          <div class="quick-grid">
+            <div class="quick-btn" onclick="goPage('users',document.getElementById('nav-users'))">
+              <div class="quick-btn-icon">👤</div>
+              <div class="quick-btn-label">User verwalten</div>
+            </div>
+            <div class="quick-btn" onclick="goPage('votes',document.getElementById('nav-votes'))">
+              <div class="quick-btn-icon">⭐</div>
+              <div class="quick-btn-label">Votes bearbeiten</div>
+            </div>
+            <div class="quick-btn" onclick="resetAllVotesConfirm()">
+              <div class="quick-btn-icon">🗑️</div>
+              <div class="quick-btn-label">Alle Votes löschen</div>
+            </div>
+            <div class="quick-btn" onclick="goPage('db',document.getElementById('nav-db'))">
+              <div class="quick-btn-icon">🗄️</div>
+              <div class="quick-btn-label">Datenbank</div>
+            </div>
+            <div class="quick-btn" onclick="reloadCurrentPage()">
+              <div class="quick-btn-icon">↻</div>
+              <div class="quick-btn-label">Alles neu laden</div>
+            </div>
+            <div class="quick-btn" onclick="goPage('log',document.getElementById('nav-log'))">
+              <div class="quick-btn-icon">📋</div>
+              <div class="quick-btn-label">Aktivitäts-Log</div>
+            </div>
+          </div>
         </div>
-        <div id="dbResult" style="margin-top:1rem;"></div>
       </div>
 
-      <!-- Pre-set quick paths -->
-      <div class="card">
-        <div class="card-title">⚡ SCHNELLZUGRIFF-PFADE</div>
-        <div class="btn-row">
-          <button class="btn" onclick="quickPath('votes7d')">⭐ votes7d</button>
-          <button class="btn" onclick="quickPath('users')">👤 users</button>
-          <button class="btn" onclick="quickPath('usernames')">🔑 usernames</button>
+      <!-- ====== PAGE: USERS ====== -->
+      <div class="page" id="page-users">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">👤 ALLE BENUTZER</div>
+            <div class="card-actions">
+              <button class="btn btn-accent btn-sm" onclick="loadUsers()">↻ Neu laden</button>
+            </div>
+          </div>
+          <div class="search-row">
+            <input class="search-inp" id="userSearch" type="text" placeholder="Username oder UID suchen..." oninput="filterUsers()">
+            <select class="inp inp-sm" id="userVoteFilter" onchange="filterUsers()">
+              <option value="all">Alle anzeigen</option>
+              <option value="voted">Nur mit Vote</option>
+              <option value="novote">Nur ohne Vote</option>
+            </select>
+          </div>
+          <div style="font-family:'Share Tech Mono';font-size:0.58rem;color:var(--text2);margin-bottom:0.7rem;" id="userCountInfo">Lädt...</div>
+          <div class="scroll-table table-wrap">
+            <table>
+              <thead><tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>UID</th>
+                <th>Vote (diese Woche)</th>
+                <th>Status</th>
+                <th>Aktionen</th>
+              </tr></thead>
+              <tbody id="usersBody">
+                <tr><td colspan="6"><div class="loading-row"><span class="loading-spinner"></span>Lädt...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
 
-  </main>
-</div>
+      <!-- ====== PAGE: VOTES ====== -->
+      <div class="page" id="page-votes">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⭐ VOTING — PUNKTE BEARBEITEN</div>
+            <div class="card-actions">
+              <button class="btn btn-danger btn-sm" onclick="resetAllVotesConfirm()">🗑️ Alle zurücksetzen</button>
+              <button class="btn btn-accent btn-sm" onclick="loadVotes()">↻</button>
+            </div>
+          </div>
+          <div style="font-size:0.8rem;color:var(--text2);margin-bottom:1rem;">
+            📅 Aktuelle Woche: <span style="color:var(--accent);font-family:'Share Tech Mono';" id="voteWeekDisplay">—</span>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            ⭐ Gesamt Votes: <span style="color:var(--accent3);font-family:'Share Tech Mono';" id="voteTotalDisplay">—</span>
+          </div>
+          <div class="search-row" style="margin-bottom:0.8rem;">
+            <input class="search-inp" id="voteSearch" type="text" placeholder="Person suchen..." oninput="filterVotes()" style="max-width:280px;">
+          </div>
+          <div id="votesGrid"><div class="loading-row"><span class="loading-spinner"></span>Lädt...</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🏆 LEADERBOARD</div>
+          <div id="votesLeaderboard"><div class="loading-row"><span class="loading-spinner"></span>Lädt...</div></div>
+        </div>
+      </div>
 
-<!-- EDIT USER MODAL -->
-<div class="modal-overlay" id="editUserModal">
+      <!-- ====== PAGE: DATABASE ====== -->
+      <div class="page" id="page-db">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🗄️ FIREBASE DIREKTZUGRIFF</div>
+          </div>
+          <p style="font-size:0.8rem;color:var(--text2);margin-bottom:1rem;line-height:1.6;">
+            ⚠️ <b style="color:var(--warn);">Vorsicht!</b> Hier kannst du beliebige Firebase-Pfade direkt lesen, schreiben und löschen. Falsche Eingaben können Daten zerstören!
+          </p>
+          <div class="form-row">
+            <label class="form-label">Firebase Pfad</label>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+              <input class="inp inp-full" id="dbPath" type="text" placeholder="z.B. votes7d oder users/UID/username" style="flex:1;">
+              <button class="btn btn-accent" onclick="dbRead()">📖 Lesen</button>
+              <button class="btn btn-danger" onclick="dbDeleteConfirm()">🗑️ Löschen</button>
+            </div>
+          </div>
+          <div class="chips-row" id="quickPaths">
+            <span class="path-chip" onclick="quickPath('votes7d')">⭐ votes7d</span>
+            <span class="path-chip" onclick="quickPath('users')">👤 users</span>
+            <span class="path-chip" onclick="quickPath('usernames')">🔑 usernames</span>
+            <span class="path-chip" onclick="quickPath('votes7d')">📅 votes7d (Woche)</span>
+          </div>
+          <div class="form-row" style="margin-top:0.5rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem;">
+              <label class="form-label" style="margin:0;">JSON Daten</label>
+              <div style="display:flex;gap:0.4rem;">
+                <button class="btn btn-xs" onclick="formatJson()">Format</button>
+                <button class="btn btn-xs" onclick="clearJson()">Leeren</button>
+              </div>
+            </div>
+            <textarea class="json-area" id="dbJson" placeholder='// Hier erscheinen die gelesenen Daten&#10;// Oder eigene JSON-Daten eingeben&#10;{&#10;  "schluessel": "wert"&#10;}'></textarea>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-accent" onclick="dbWrite()">💾 Schreiben (SET — überschreibt alles)</button>
+            <button class="btn btn-warn" onclick="dbPatch()">🔧 Aktualisieren (PATCH — zusammenführen)</button>
+          </div>
+          <div id="dbResult" style="margin-top:1rem;min-height:1.5rem;"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">⚡ VORDEFINIERTE AKTIONEN</div>
+          <div class="btn-row">
+            <button class="btn btn-danger" onclick="resetAllVotesConfirm()">🗑️ Alle Votes löschen</button>
+            <button class="btn btn-warn" onclick="clearAllUserVotes()">🔄 Alle User-Votes (wöchentlich) zurücksetzen</button>
+            <button class="btn btn-sm" onclick="readAllData()">📖 Gesamte DB laden</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== PAGE: LOG ====== -->
+      <div class="page" id="page-log">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 AKTIVITÄTS-LOG</div>
+            <div class="card-actions">
+              <button class="btn btn-danger btn-sm" onclick="clearLog()">🗑️ Log leeren</button>
+            </div>
+          </div>
+          <p style="font-size:0.78rem;color:var(--text2);margin-bottom:1rem;">Alle Aktionen dieser Session werden hier aufgezeichnet.</p>
+          <div id="logList">
+            <div class="empty-state"><div class="empty-state-icon">📋</div>Noch keine Aktivitäten</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-inner -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ====== EDIT USER MODAL ====== -->
+<div class="modal-overlay" id="modalEditUser">
   <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalEditUser')">✕</button>
     <div class="modal-title">✏️ BENUTZER BEARBEITEN</div>
     <input type="hidden" id="editUid">
     <div class="form-row">
-      <label class="form-label">Username (Anzeige)</label>
-      <input class="inp form-inp" id="editUsername" type="text">
+      <label class="form-label">UID (nur lesen)</label>
+      <input class="inp inp-full mono" id="editUidDisplay" type="text" readonly style="color:var(--text3);cursor:default;">
     </div>
     <div class="form-row">
-      <label class="form-label">Vote Diese Woche (Inhalt ändern)</label>
-      <input class="inp form-inp" id="editVote" type="text" placeholder="leer lassen = kein vote">
+      <label class="form-label">Username</label>
+      <input class="inp inp-full" id="editUsername" type="text" placeholder="Username eingeben">
+      <div class="form-hint">⚠️ Ändert den Namen in der Datenbank. Bisheriger Username-Key bleibt bestehen.</div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Vote dieser Woche (leer = kein Vote)</label>
+      <input class="inp inp-full" id="editVoteValue" type="text" placeholder="z.B. Roman, Halil, ...">
+      <div class="form-hint">Hier siehst du wen der User gewählt hat. Ändern oder leer lassen zum Löschen.</div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-accent" onclick="saveEditUser()">💾 Speichern</button>
-      <button class="btn" onclick="closeModal('editUserModal')">✕ Abbrechen</button>
+      <button class="btn btn-accent btn-wide" style="flex:1;" onclick="saveUser()">💾 Änderungen Speichern</button>
+      <button class="btn btn-wide" style="width:auto;" onclick="closeModal('modalEditUser')">✕</button>
     </div>
-    <div class="divider"></div>
-    <div>
-      <div style="font-family:'Share Tech Mono';font-size:0.6rem;color:var(--danger);margin-bottom:0.5rem;">⚠️ GEFAHRENZONE</div>
-      <button class="btn btn-danger btn-sm" onclick="confirmDeleteUser()">🗑️ User komplett löschen</button>
-      <div id="deleteConfirmRow" style="display:none;" class="del-confirm">
-        <span style="color:var(--danger);">Wirklich löschen?</span>
-        <button class="btn btn-danger btn-sm" onclick="deleteUserConfirmed()">JA, LÖSCHEN</button>
-        <button class="btn btn-sm" onclick="document.getElementById('deleteConfirmRow').style.display='none'">Nein</button>
+    <div class="danger-zone">
+      <div class="danger-zone-title">⚠️ GEFAHRENZONE</div>
+      <p style="font-size:0.75rem;color:var(--text2);margin-bottom:0.6rem;">User aus der Datenbank entfernen (nicht rückgängig):</p>
+      <button class="btn btn-danger btn-sm" onclick="showDeleteConfirm()">🗑️ User löschen</button>
+      <div class="confirm-delete-row" id="deleteConfirmRow">
+        <span>Wirklich <b id="deleteConfirmName">?</b> löschen?</span>
+        <button class="btn btn-danger btn-sm" onclick="executeDeleteUser()">✅ JA, LÖSCHEN</button>
+        <button class="btn btn-sm" onclick="hideDeleteConfirm()">✕ Nein</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== VOTE EDIT MODAL (single person) ====== -->
+<div class="modal-overlay" id="modalEditVote">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalEditVote')">✕</button>
+    <div class="modal-title">⭐ VOTE BEARBEITEN</div>
+    <input type="hidden" id="voteEditName">
+    <div style="text-align:center;margin-bottom:1.2rem;">
+      <div style="font-size:2rem;" id="voteEditEmoji">⭐</div>
+      <div style="font-size:1.1rem;font-weight:900;color:var(--text);" id="voteEditDisplayName">—</div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Aktuelle Stimmen</label>
+      <input class="inp inp-full inp-num" id="voteEditCount" type="number" min="0" value="0">
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+      <button class="btn btn-sm btn-accent" onclick="voteEditDelta(+1)">+1</button>
+      <button class="btn btn-sm btn-accent" onclick="voteEditDelta(+5)">+5</button>
+      <button class="btn btn-sm btn-accent" onclick="voteEditDelta(+10)">+10</button>
+      <button class="btn btn-sm btn-danger" onclick="voteEditDelta(-1)">-1</button>
+      <button class="btn btn-sm btn-danger" onclick="voteEditDelta(-5)">-5</button>
+      <button class="btn btn-sm" onclick="document.getElementById('voteEditCount').value=0">Auf 0</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-accent btn-wide" style="flex:1;" onclick="saveVoteEdit()">💾 Stimmen Speichern</button>
+      <button class="btn btn-danger btn-sm" onclick="clearOneVoteConfirm()">🗑️ Löschen</button>
     </div>
   </div>
 </div>
 
 <!-- TOAST -->
-<div id="toast">✅ Erfolgreich!</div>
+<div id="toast"></div>
 
 <script>
-// ====== FIREBASE LOADER ======
+// ===========================
+// FIREBASE CONFIGURATION
+// ===========================
 const FB_CONFIG = {
-  apiKey: "AIzaSyAm-_eGrLsHnzsdiDAi1XTFU0fP_1AN8Lk",
-  authDomain: "dzone-9946c.firebaseapp.com",
+  apiKey:      "AIzaSyAm-_eGrLsHnzsdiDAi1XTFU0fP_1AN8Lk",
+  authDomain:  "dzone-9946c.firebaseapp.com",
   databaseURL: "https://dzone-9946c-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "dzone-9946c",
+  projectId:   "dzone-9946c",
 };
 
-// Admin credentials (stored client-side — secure this via Firebase Rules in production)
-const ADMIN_CREDS = {
-  "admin": "7dzone2024!!",
-  "halil": "halilAdmin7D",
-  "roman": "romanAdmin7D",
+// ===========================
+// ADMIN CREDENTIALS
+// ===========================
+const ADMINS = {
+  "halil": "elazigliadmin",
 };
 
-let fbApp, fbAuth, fbDb, currentAdmin = null;
-let allUsersData = {};
+// ===========================
+// GLOBAL STATE
+// ===========================
+let fbDb = null;
+let currentAdmin = null;
+let loginAttempts = 0;
+let lockUntil = 0;
+let allUsersArr = [];
+let allVotesData = {};
+let activityLog = [];
+let currentPageName = 'dashboard';
 
+// ===========================
+// FIREBASE INIT
+// ===========================
 function loadScript(src) {
   return new Promise((res, rej) => {
     const s = document.createElement('script');
@@ -647,193 +1117,316 @@ function loadScript(src) {
 }
 
 (async () => {
-  await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
-  await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js');
-  await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js');
-  fbApp = firebase.initializeApp(FB_CONFIG);
-  fbAuth = firebase.auth();
-  fbDb = firebase.database();
-  console.log('Firebase ready');
+  try {
+    await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js');
+    firebase.initializeApp(FB_CONFIG);
+    fbDb = firebase.database();
+    console.log('[7D Admin] Firebase initialisiert ✓');
+  } catch (e) {
+    console.error('[7D Admin] Firebase Fehler:', e);
+  }
 })();
 
-// ====== AUTH ======
-function adminLogin() {
-  const u = document.getElementById('adminUser').value.trim().toLowerCase();
-  const p = document.getElementById('adminPass').value;
-  const err = document.getElementById('adminErr');
-  if (!u || !p) { err.textContent = 'Bitte ausfüllen!'; return; }
-  if (ADMIN_CREDS[u] && ADMIN_CREDS[u] === p) {
+// ===========================
+// CLOCK
+// ===========================
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  const el = document.getElementById('clockDisplay');
+  if (el) el.textContent = h + ':' + m + ':' + s;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ===========================
+// AUTH
+// ===========================
+function doLogin() {
+  const now = Date.now();
+  if (now < lockUntil) {
+    const sek = Math.ceil((lockUntil - now) / 1000);
+    document.getElementById('loginErr').textContent = '⏳ Gesperrt! Warte ' + sek + ' Sekunden.';
+    return;
+  }
+  const u = document.getElementById('loginUser').value.trim().toLowerCase();
+  const p = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginErr');
+
+  if (!u || !p) { errEl.textContent = '❌ Alle Felder ausfüllen!'; return; }
+
+  if (ADMINS[u] && ADMINS[u] === p) {
+    loginAttempts = 0;
     currentAdmin = u;
     document.getElementById('authScreen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    document.getElementById('sidebarUser').textContent = '👑 ' + u;
-    initDashboard();
+    const initials = u.charAt(0).toUpperCase();
+    document.getElementById('adminAvatar').textContent = initials;
+    document.getElementById('adminNameDisplay').textContent = u;
+    addLog('🔐', 'Admin "' + u + '" eingeloggt');
+    loadDashboard();
   } else {
-    err.textContent = '❌ Falsche Zugangsdaten!!';
+    loginAttempts++;
+    const remaining = Math.max(0, 5 - loginAttempts);
+    if (loginAttempts >= 5) {
+      lockUntil = Date.now() + 30000;
+      errEl.textContent = '🔒 Zu viele Versuche! 30 Sekunden gesperrt.';
+      document.getElementById('loginAttempts').textContent = '';
+    } else {
+      errEl.textContent = '❌ Falscher Username oder falsches Passwort!';
+      document.getElementById('loginAttempts').textContent = 'Verbleibende Versuche: ' + remaining;
+    }
   }
 }
 
-function adminLogout() {
+function doLogout() {
+  if (!confirm('Wirklich ausloggen?')) return;
+  addLog('🚪', 'Admin "' + currentAdmin + '" ausgeloggt');
   currentAdmin = null;
   document.getElementById('authScreen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
-  document.getElementById('adminUser').value = '';
-  document.getElementById('adminPass').value = '';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginErr').textContent = '';
+  document.getElementById('loginAttempts').textContent = '';
 }
 
-// ====== NAVIGATION ======
-const pageTitles = {
-  dashboard: { t: 'ÜBERSICHT', s: 'Firebase Echtzeit-Dashboard' },
-  users:     { t: 'BENUTZER', s: 'Alle registrierten User verwalten' },
-  votes:     { t: 'VOTING', s: 'Punkte & Votes bearbeiten' },
-  db:        { t: 'DATENBANK', s: 'Direkter Firebase-Zugriff' },
+// ===========================
+// NAVIGATION
+// ===========================
+const PAGE_INFO = {
+  dashboard: { t: 'ÜBERSICHT',       b: 'Admin / Dashboard' },
+  users:     { t: 'BENUTZER',         b: 'Admin / Benutzer verwalten' },
+  votes:     { t: 'VOTING',           b: 'Admin / Voting & Punkte' },
+  db:        { t: 'DATENBANK',        b: 'Admin / Firebase Direktzugriff' },
+  log:       { t: 'AKTIVITÄTS-LOG',   b: 'Admin / Session-Log' },
 };
 
-function goPage(name, btn) {
+function goPage(name, navEl) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('on'));
-  document.getElementById('page-' + name).classList.add('active');
-  if (btn) btn.classList.add('on');
-  const info = pageTitles[name];
-  if (info) {
-    document.getElementById('pageTitle').textContent = info.t;
-    document.getElementById('pageSub').textContent = info.s;
-  }
-  if (name === 'users') loadUsers();
-  if (name === 'votes') loadVotes();
-  if (name === 'dashboard') refreshDashboard();
-  // Close sidebar on mobile
-  if (window.innerWidth <= 720) document.getElementById('sidebar').classList.remove('open');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('page-' + name);
+  if (pg) pg.classList.add('active');
+  if (navEl) navEl.classList.add('active');
+  const info = PAGE_INFO[name] || { t: name.toUpperCase(), b: 'Admin' };
+  document.getElementById('pageTitle').textContent = info.t;
+  document.getElementById('pageBreadcrumb').textContent = info.b;
+  currentPageName = name;
+  if (window.innerWidth <= 680) document.getElementById('sidebar').classList.remove('open');
+  if (name === 'users')     loadUsers();
+  if (name === 'votes')     loadVotes();
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'log')       renderLog();
 }
 
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
 }
 
-// ====== FIREBASE HELPERS ======
+function reloadCurrentPage() {
+  if (currentPageName === 'dashboard') loadDashboard();
+  else if (currentPageName === 'users') loadUsers();
+  else if (currentPageName === 'votes') loadVotes();
+  showToast('↻ Neu geladen!');
+}
+
+// ===========================
+// FIREBASE HELPERS
+// ===========================
+async function fbGet(path) {
+  if (!fbDb) throw new Error('Firebase nicht bereit');
+  const snap = await fbDb.ref(path).once('value');
+  return snap.val();
+}
+async function fbSet(path, val) {
+  if (!fbDb) throw new Error('Firebase nicht bereit');
+  await fbDb.ref(path).set(val);
+}
+async function fbUpdate(path, val) {
+  if (!fbDb) throw new Error('Firebase nicht bereit');
+  await fbDb.ref(path).update(val);
+}
+async function fbRemove(path) {
+  if (!fbDb) throw new Error('Firebase nicht bereit');
+  await fbDb.ref(path).remove();
+}
+
 function getWeekKey() {
   const d = new Date();
   const day = d.getDay();
   const offset = day === 0 ? -6 : 1 - day;
   const mon = new Date(d.getFullYear(), d.getMonth(), d.getDate() + offset);
-  return mon.getFullYear() + '-' + String(mon.getMonth()+1).padStart(2,'0') + '-' + String(mon.getDate()).padStart(2,'0');
+  const y = mon.getFullYear();
+  const m = String(mon.getMonth() + 1).padStart(2, '0');
+  const dd = String(mon.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + dd;
 }
 
-async function fbGet(path) {
-  const snap = await fbDb.ref(path).once('value');
-  return snap.val();
-}
-
-async function fbSet(path, val) {
-  await fbDb.ref(path).set(val);
-}
-
-async function fbUpdate(path, val) {
-  await fbDb.ref(path).update(val);
-}
-
-async function fbRemove(path) {
-  await fbDb.ref(path).remove();
-}
-
-// ====== TOAST ======
-function showToast(msg, isErr = false) {
+// ===========================
+// TOAST
+// ===========================
+let _toastTimer = null;
+function showToast(msg, type = 'ok') {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = 'show' + (isErr ? ' err' : '');
-  clearTimeout(t._timeout);
-  t._timeout = setTimeout(() => t.classList.remove('show', 'err'), 3000);
+  t.className = type === 'error' ? 'error' : type === 'warn' ? 'warn' : 'show';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { t.className = ''; }, 3500);
 }
 
-// ====== DASHBOARD ======
-async function initDashboard() {
-  await refreshDashboard();
+// ===========================
+// ACTIVITY LOG
+// ===========================
+function addLog(icon, text) {
+  const now = new Date();
+  const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
+  activityLog.unshift({ icon, text, time });
+  if (activityLog.length > 100) activityLog.pop();
+  const badge = document.getElementById('logBadge');
+  if (badge) badge.textContent = activityLog.length;
+}
+function renderLog() {
+  const el = document.getElementById('logList');
+  if (!el) return;
+  if (activityLog.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div>Noch keine Aktivitäten</div>';
+    return;
+  }
+  el.innerHTML = activityLog.map(e => `
+    <div class="log-entry">
+      <div class="log-icon">${e.icon}</div>
+      <div class="log-text">${esc(e.text)}</div>
+      <div class="log-time">${e.time}</div>
+    </div>
+  `).join('');
+}
+function clearLog() {
+  activityLog = [];
+  renderLog();
+  showToast('📋 Log geleert');
 }
 
-async function refreshDashboard() {
+// ===========================
+// DASHBOARD
+// ===========================
+async function loadDashboard() {
   try {
     const [usersData, votesData] = await Promise.all([
       fbGet('users'),
       fbGet('votes7d'),
     ]);
-
-    allUsersData = usersData || {};
-    const userCount = Object.keys(allUsersData).length;
+    const users = usersData || {};
     const votes = votesData || {};
-    const totalVotes = Object.values(votes).reduce((a, b) => a + (b || 0), 0);
-    const topEntry = Object.entries(votes).sort((a, b) => b[1] - a[1])[0];
+    allVotesData = votes;
 
-    document.getElementById('statUsers').textContent = userCount;
-    document.getElementById('statVotes').textContent = totalVotes;
-    document.getElementById('statTop').textContent = topEntry ? topEntry[0] : '—';
-    document.getElementById('statWeek').textContent = getWeekKey();
+    const userCount = Object.keys(users).length;
+    const totalVotes = Object.values(votes).reduce((a, b) => a + (Number(b) || 0), 0);
+    const sorted = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+    const topEntry = sorted[0];
+    const namesWithVotes = sorted.filter(x => x[1] > 0).length;
 
-    // Top 5 votes
-    const sorted = Object.entries(votes).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    document.getElementById('sUser').textContent = userCount;
+    document.getElementById('sVotes').textContent = totalVotes;
+    document.getElementById('sTop').textContent = topEntry ? topEntry[0] : '—';
+    document.getElementById('sTopVotes').textContent = topEntry ? topEntry[1] + ' Stimmen' : '—';
+    document.getElementById('sWeek').textContent = getWeekKey();
+    document.getElementById('sNames').textContent = namesWithVotes;
+    document.getElementById('userCountBadge').textContent = userCount;
+
+    // Leaderboard top 10
     const maxV = sorted[0]?.[1] || 1;
-    document.getElementById('dashTopVotes').innerHTML = sorted.length === 0
-      ? '<div style="color:var(--text2);font-size:0.82rem;">Noch keine Votes 🗳️</div>'
-      : sorted.map(([name, count], i) => `
-          <div class="lb-bar-wrap">
-            <div class="lb-name">${['🥇','🥈','🥉','4.','5.'][i]} ${name}</div>
-            <div class="lb-bar-bg"><div class="lb-bar-fill" style="width:${Math.round(count/maxV*100)}%"></div></div>
-            <div class="lb-count">${count}</div>
-          </div>
-        `).join('');
+    const lbEl = document.getElementById('dashLeaderboard');
+    if (sorted.filter(x => x[1] > 0).length === 0) {
+      lbEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⭐</div>Noch keine Votes</div>';
+    } else {
+      lbEl.innerHTML = sorted.filter(x => x[1] > 0).slice(0, 10).map(([name, count], i) => `
+        <div class="lb-row">
+          <div class="lb-rank ${i < 3 ? 'rank-' + (i+1) + '-col' : 'rank-n-col'}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</div>
+          <div class="lb-name">${esc(name)}</div>
+          <div class="lb-bar-track"><div class="lb-bar-fill" style="width:${Math.round(count/maxV*100)}%"></div></div>
+          <div class="lb-count">${count}</div>
+        </div>
+      `).join('');
+    }
 
-    // Last users
-    const users = Object.entries(allUsersData).slice(0, 5);
-    document.getElementById('dashUsers').innerHTML = users.length === 0
-      ? '<div style="color:var(--text2);font-size:0.82rem;">Keine User gefunden</div>'
-      : users.map(([uid, data]) => `
-          <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.8rem;">
-            <span>${data?.username || '—'}</span>
-            <span class="mono" style="color:var(--text2);font-size:0.65rem;">${uid.slice(0,10)}...</span>
-          </div>
-        `).join('');
+    // Recent users
+    const userArr = Object.entries(users).slice(0, 8);
+    const week = getWeekKey();
+    const ruEl = document.getElementById('dashRecentUsers');
+    if (userArr.length === 0) {
+      ruEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👤</div>Keine User</div>';
+    } else {
+      ruEl.innerHTML = `<div class="table-wrap"><table>
+        <thead><tr><th>Username</th><th>Vote</th><th>Aktion</th></tr></thead>
+        <tbody>
+          ${userArr.map(([uid, data]) => `
+            <tr>
+              <td class="td-name">${esc(data?.username || '—')}</td>
+              <td>${data?.voted?.[week] ? '<span class="pill pill-green">✓</span>' : '<span class="pill pill-grey">—</span>'}</td>
+              <td><button class="btn btn-accent btn-xs" onclick="openEditUser('${esc(uid)}')">✏️</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table></div>`;
+      allUsersArr = Object.entries(users).map(([uid, data]) => ({
+        uid, username: data?.username || '—', vote: data?.voted?.[week] || null, data
+      }));
+    }
+    addLog('📊', 'Dashboard geladen (' + userCount + ' User, ' + totalVotes + ' Votes)');
   } catch (e) {
-    showToast('Fehler: ' + e.message, true);
+    showToast('Fehler beim Laden: ' + e.message, 'error');
+    addLog('❌', 'Dashboard-Fehler: ' + e.message);
   }
 }
 
-// ====== USERS ======
-let allUsersArr = [];
-
+// ===========================
+// USERS
+// ===========================
 async function loadUsers() {
-  document.getElementById('usersBody').innerHTML = '<tr><td colspan="4"><div class="loading">Lädt...</div></td></tr>';
+  document.getElementById('usersBody').innerHTML = '<tr><td colspan="6"><div class="loading-row"><span class="loading-spinner"></span>Lädt...</div></td></tr>';
+  document.getElementById('userCountInfo').textContent = 'Lädt...';
   try {
-    const [usersData, usernamesData] = await Promise.all([
-      fbGet('users'),
-      fbGet('usernames'),
-    ]);
-    allUsersData = usersData || {};
+    const usersData = await fbGet('users') || {};
     const week = getWeekKey();
-    allUsersArr = Object.entries(allUsersData).map(([uid, data]) => ({
+    allUsersArr = Object.entries(usersData).map(([uid, data]) => ({
       uid,
       username: data?.username || '—',
       vote: data?.voted?.[week] || null,
+      data: data || {}
     }));
+    document.getElementById('userCountBadge').textContent = allUsersArr.length;
     renderUsersTable(allUsersArr);
+    addLog('👤', 'Benutzerliste geladen (' + allUsersArr.length + ' User)');
   } catch (e) {
-    showToast('Fehler beim Laden der User: ' + e.message, true);
+    document.getElementById('usersBody').innerHTML = `<tr><td colspan="6"><div class="empty-state">❌ Fehler: ${esc(e.message)}</div></td></tr>`;
+    showToast('Fehler: ' + e.message, 'error');
+    addLog('❌', 'User-Ladefehler: ' + e.message);
   }
 }
 
 function renderUsersTable(arr) {
   const tbody = document.getElementById('usersBody');
+  const info = document.getElementById('userCountInfo');
+  info.textContent = arr.length + ' User angezeigt';
   if (arr.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text2);padding:2rem;">Keine User gefunden</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">👤</div>Keine User gefunden</div></td></tr>';
     return;
   }
-  tbody.innerHTML = arr.map(u => `
+  tbody.innerHTML = arr.map((u, i) => `
     <tr>
-      <td><b>${esc(u.username)}</b></td>
-      <td><span class="mono">${esc(u.uid)}</span></td>
-      <td>${u.vote ? `<span class="pill pill-green">${esc(u.vote)}</span>` : '<span class="pill pill-orange">Kein Vote</span>'}</td>
+      <td class="mono" style="color:var(--text3);">${i + 1}</td>
+      <td class="td-name">${esc(u.username)}</td>
+      <td><span class="mono" style="font-size:0.65rem;">${esc(u.uid.slice(0, 16))}...</span></td>
+      <td>${u.vote ? `<span class="pill pill-green" title="${esc(u.vote)}">✓ ${esc(u.vote.slice(0, 18))}${u.vote.length > 18 ? '…' : ''}</span>` : '<span class="pill pill-grey">Kein Vote</span>'}</td>
+      <td><span class="pill pill-cyan">Aktiv</span></td>
       <td>
-        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
-          <button class="btn btn-accent btn-sm" onclick="openEditUser('${esc(u.uid)}')">✏️ Bearbeiten</button>
-          <button class="btn btn-danger btn-sm" onclick="quickDeleteUser('${esc(u.uid)}','${esc(u.username)}')">🗑️</button>
+        <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
+          <button class="btn btn-accent btn-xs" onclick="openEditUser('${esc(u.uid)}')">✏️ Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="quickDeleteUser('${esc(u.uid)}','${esc(u.username)}')">🗑️</button>
         </div>
       </td>
     </tr>
@@ -842,242 +1435,319 @@ function renderUsersTable(arr) {
 
 function filterUsers() {
   const q = document.getElementById('userSearch').value.toLowerCase();
-  const filtered = allUsersArr.filter(u => u.username.toLowerCase().includes(q) || u.uid.toLowerCase().includes(q));
+  const vf = document.getElementById('userVoteFilter').value;
+  let filtered = allUsersArr.filter(u =>
+    u.username.toLowerCase().includes(q) || u.uid.toLowerCase().includes(q)
+  );
+  if (vf === 'voted')  filtered = filtered.filter(u => u.vote);
+  if (vf === 'novote') filtered = filtered.filter(u => !u.vote);
   renderUsersTable(filtered);
 }
 
 function openEditUser(uid) {
   const u = allUsersArr.find(x => x.uid === uid);
-  if (!u) return;
+  if (!u) { showToast('User nicht gefunden', 'error'); return; }
   document.getElementById('editUid').value = uid;
+  document.getElementById('editUidDisplay').value = uid;
   document.getElementById('editUsername').value = u.username;
-  document.getElementById('editVote').value = u.vote || '';
-  document.getElementById('deleteConfirmRow').style.display = 'none';
-  openModal('editUserModal');
+  document.getElementById('editVoteValue').value = u.vote || '';
+  document.getElementById('deleteConfirmRow').classList.remove('show');
+  document.getElementById('deleteConfirmName').textContent = u.username;
+  openModal('modalEditUser');
 }
 
-async function saveEditUser() {
+async function saveUser() {
   const uid = document.getElementById('editUid').value;
-  const username = document.getElementById('editUsername').value.trim();
-  const vote = document.getElementById('editVote').value.trim();
+  const uname = document.getElementById('editUsername').value.trim();
+  const vote = document.getElementById('editVoteValue').value.trim();
   if (!uid) return;
+  if (!uname) { showToast('Username darf nicht leer sein!', 'error'); return; }
   try {
     const week = getWeekKey();
-    const updates = {};
-    if (username) updates['users/' + uid + '/username'] = username;
-    if (vote) updates['users/' + uid + '/voted/' + week] = vote;
-    else updates['users/' + uid + '/voted/' + week] = null;
-    await fbDb.ref().update(updates);
-    if (username) {
-      // update usernames mapping too
-      await fbSet('usernames/' + username, uid);
-    }
-    showToast('✅ User gespeichert!');
-    closeModal('editUserModal');
+    const upd = {};
+    upd['users/' + uid + '/username'] = uname;
+    if (vote) upd['users/' + uid + '/voted/' + week] = vote;
+    else upd['users/' + uid + '/voted/' + week] = null;
+    await fbDb.ref().update(upd);
+    showToast('✅ User "' + uname + '" gespeichert!');
+    addLog('✏️', 'User "' + uname + '" bearbeitet (UID: ' + uid.slice(0,10) + '...)');
+    closeModal('modalEditUser');
     loadUsers();
-    refreshDashboard();
+    loadDashboard();
   } catch (e) {
-    showToast('Fehler: ' + e.message, true);
+    showToast('Fehler: ' + e.message, 'error');
+    addLog('❌', 'User-Speicherfehler: ' + e.message);
   }
 }
 
-function confirmDeleteUser() {
-  document.getElementById('deleteConfirmRow').style.display = 'flex';
+function showDeleteConfirm() {
+  document.getElementById('deleteConfirmRow').classList.add('show');
+}
+function hideDeleteConfirm() {
+  document.getElementById('deleteConfirmRow').classList.remove('show');
 }
 
-async function deleteUserConfirmed() {
+async function executeDeleteUser() {
   const uid = document.getElementById('editUid').value;
   const uname = document.getElementById('editUsername').value;
   if (!uid) return;
   try {
     await fbRemove('users/' + uid);
-    await fbRemove('usernames/' + uname.toLowerCase());
-    // Also delete Firebase Auth user — requires Admin SDK, so we just clean DB
-    showToast('✅ User aus Datenbank gelöscht! (Auth-Account bleibt ggf. bestehen)');
-    closeModal('editUserModal');
+    await fbRemove('usernames/' + uname.toLowerCase()).catch(() => {});
+    showToast('✅ User "' + uname + '" gelöscht!');
+    addLog('🗑️', 'User "' + uname + '" aus DB gelöscht (UID: ' + uid.slice(0,10) + '...)');
+    closeModal('modalEditUser');
     loadUsers();
-    refreshDashboard();
+    loadDashboard();
   } catch (e) {
-    showToast('Fehler: ' + e.message, true);
+    showToast('Fehler: ' + e.message, 'error');
+    addLog('❌', 'User-Löschfehler: ' + e.message);
   }
 }
 
-function quickDeleteUser(uid, username) {
-  if (!confirm(`User "${username}" wirklich aus der Datenbank löschen?`)) return;
+function quickDeleteUser(uid, uname) {
+  if (!confirm('User "' + uname + '" wirklich löschen? Nicht rückgängig machbar!')) return;
   fbRemove('users/' + uid).then(() => {
-    fbRemove('usernames/' + username.toLowerCase()).catch(() => {});
-    showToast('✅ User gelöscht!');
-    loadUsers();
-    refreshDashboard();
-  }).catch(e => showToast('Fehler: ' + e.message, true));
+    fbRemove('usernames/' + uname.toLowerCase()).catch(() => {});
+    showToast('✅ "' + uname + '" gelöscht!');
+    addLog('🗑️', 'User "' + uname + '" schnell gelöscht');
+    loadUsers(); loadDashboard();
+  }).catch(e => { showToast('Fehler: ' + e.message, 'error'); });
 }
 
-// ====== VOTES ======
-const hofMembers = ['Alessia','Roman','Annika','Halil','Emir','Finn','Joscha','Cornelius','Jonas','Theodor','Mara','Frida','Malena','Jolie','Joline','Vanessa','Jood','Kiara','Clara','Danelle','Tori','Helene','Emily','Emilie','Emma'];
+// ===========================
+// VOTES
+// ===========================
+const HOF_MEMBERS = [
+  { name: 'Alessia',   emoji: '🌸' }, { name: 'Roman',    emoji: '🦫' },
+  { name: 'Annika',    emoji: '🌟' }, { name: 'Halil',    emoji: '🐱' },
+  { name: 'Emir',      emoji: '⚡' }, { name: 'Finn',     emoji: '🏄' },
+  { name: 'Joscha',    emoji: '🎯' }, { name: 'Cornelius',emoji: '🦁' },
+  { name: 'Jonas',     emoji: '🚀' }, { name: 'Theodor',  emoji: '🎸' },
+  { name: 'Mara',      emoji: '🦋' }, { name: 'Frida',    emoji: '🎨' },
+  { name: 'Malena',    emoji: '💫' }, { name: 'Jolie',    emoji: '🌈' },
+  { name: 'Joline',    emoji: '🍀' }, { name: 'Vanessa',  emoji: '👑' },
+  { name: 'Jood',      emoji: '🔥' }, { name: 'Kiara',    emoji: '🐆' },
+  { name: 'Clara',     emoji: '🌙' }, { name: 'Danelle',  emoji: '💎' },
+  { name: 'Tori',      emoji: '🎪' }, { name: 'Helene',   emoji: '☀️' },
+  { name: 'Emily',     emoji: '🎵' }, { name: 'Emilie',   emoji: '🌺' },
+  { name: 'Emma',      emoji: '🦄' },
+];
+
+let filteredVotes = [...HOF_MEMBERS];
 
 async function loadVotes() {
-  document.getElementById('votesList').innerHTML = '<div class="loading">Lädt...</div>';
+  document.getElementById('votesGrid').innerHTML = '<div class="loading-row"><span class="loading-spinner"></span>Lädt...</div>';
+  document.getElementById('votesLeaderboard').innerHTML = '<div class="loading-row"><span class="loading-spinner"></span>Lädt...</div>';
   try {
     const data = await fbGet('votes7d') || {};
-    renderVotesList(data);
+    allVotesData = data;
+    document.getElementById('voteWeekDisplay').textContent = getWeekKey();
+    const total = Object.values(data).reduce((a, b) => a + (Number(b) || 0), 0);
+    document.getElementById('voteTotalDisplay').textContent = total;
+    filteredVotes = [...HOF_MEMBERS];
+    renderVotesGrid(data);
     renderVotesLeaderboard(data);
+    addLog('⭐', 'Voting geladen (Gesamt: ' + total + ' Stimmen)');
   } catch (e) {
-    showToast('Fehler: ' + e.message, true);
+    showToast('Fehler beim Laden: ' + e.message, 'error');
+    addLog('❌', 'Vote-Ladefehler: ' + e.message);
   }
 }
 
-function renderVotesList(data) {
-  const html = `
-    <table>
-      <thead><tr><th>Name</th><th>Aktuell</th><th>Punkte Setzen</th><th>Aktionen</th></tr></thead>
-      <tbody>
-        ${hofMembers.map(name => `
-          <tr>
-            <td><b>${esc(name)}</b></td>
-            <td><span class="pill ${(data[name]||0) > 0 ? 'pill-green' : 'pill-orange'}">${data[name] || 0}</span></td>
-            <td>
-              <div class="num-edit-wrap">
-                <input class="inp inp-sm" id="vi-${esc(name)}" type="number" min="0" value="${data[name] || 0}">
-                <button class="btn btn-accent btn-sm" onclick="setVote('${esc(name)}')">💾</button>
-              </div>
-            </td>
-            <td>
-              <button class="btn btn-danger btn-sm" onclick="clearVote('${esc(name)}')">🗑️ Löschen</button>
-              <button class="btn btn-sm" onclick="addVote('${esc(name)}',1)">+1</button>
-              <button class="btn btn-sm" onclick="addVote('${esc(name)}',-1)">-1</button>
-            </td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
-  document.getElementById('votesList').innerHTML = html;
+function filterVotes() {
+  const q = document.getElementById('voteSearch').value.toLowerCase();
+  filteredVotes = HOF_MEMBERS.filter(m => m.name.toLowerCase().includes(q));
+  renderVotesGrid(allVotesData);
+}
+
+function renderVotesGrid(data) {
+  const maxV = Math.max(...HOF_MEMBERS.map(m => Number(data[m.name]) || 0), 1);
+  const el = document.getElementById('votesGrid');
+  el.innerHTML = `<div class="vote-grid">` + filteredVotes.map(m => {
+    const count = Number(data[m.name]) || 0;
+    const pct = Math.round(count / maxV * 100);
+    return `
+      <div class="vote-row">
+        <div class="vote-person">${m.emoji} ${esc(m.name)}</div>
+        <div class="lb-bar-track" style="height:8px;">
+          <div class="lb-bar-fill" style="width:${pct}%;"></div>
+        </div>
+        <div class="lb-count" style="min-width:40px;">${count}</div>
+        <div class="vote-actions">
+          <button class="btn btn-accent btn-xs" onclick="openVoteEdit('${esc(m.name)}','${esc(m.emoji)}',${count})">✏️</button>
+          <button class="btn btn-danger btn-xs" onclick="clearOneVote('${esc(m.name)}')">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join('') + `</div>`;
 }
 
 function renderVotesLeaderboard(data) {
-  const sorted = hofMembers
-    .map(n => ({ name: n, votes: data[n] || 0 }))
-    .filter(x => x.votes > 0)
+  const sorted = HOF_MEMBERS
+    .map(m => ({ ...m, votes: Number(data[m.name]) || 0 }))
+    .filter(m => m.votes > 0)
     .sort((a, b) => b.votes - a.votes);
   const maxV = sorted[0]?.votes || 1;
-  document.getElementById('votesLeaderboard').innerHTML = sorted.length === 0
-    ? '<div style="color:var(--text2);">Noch keine Votes</div>'
-    : sorted.map((m, i) => `
-        <div class="lb-bar-wrap">
-          <div class="lb-name" class="${i<3?'rank-'+(i+1):''}">
-            ${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)} ${esc(m.name)}
-          </div>
-          <div class="lb-bar-bg"><div class="lb-bar-fill" style="width:${Math.round(m.votes/maxV*100)}%"></div></div>
-          <div class="lb-count">${m.votes}</div>
-        </div>
-      `).join('');
+  const el = document.getElementById('votesLeaderboard');
+  if (sorted.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⭐</div>Noch keine Votes</div>';
+    return;
+  }
+  el.innerHTML = sorted.map((m, i) => `
+    <div class="lb-row">
+      <div class="lb-rank ${i < 3 ? 'rank-' + (i+1) + '-col' : 'rank-n-col'}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</div>
+      <div class="lb-name">${m.emoji} ${esc(m.name)}</div>
+      <div class="lb-bar-track"><div class="lb-bar-fill" style="width:${Math.round(m.votes/maxV*100)}%"></div></div>
+      <div class="lb-count">${m.votes}</div>
+    </div>
+  `).join('');
 }
 
-async function setVote(name) {
-  const inp = document.getElementById('vi-' + name);
-  if (!inp) return;
-  const val = parseInt(inp.value);
-  if (isNaN(val) || val < 0) { showToast('Ungültiger Wert!', true); return; }
+function openVoteEdit(name, emoji, currentCount) {
+  document.getElementById('voteEditName').value = name;
+  document.getElementById('voteEditEmoji').textContent = emoji;
+  document.getElementById('voteEditDisplayName').textContent = name;
+  document.getElementById('voteEditCount').value = currentCount;
+  openModal('modalEditVote');
+}
+
+function voteEditDelta(d) {
+  const inp = document.getElementById('voteEditCount');
+  const newVal = Math.max(0, (parseInt(inp.value) || 0) + d);
+  inp.value = newVal;
+}
+
+async function saveVoteEdit() {
+  const name = document.getElementById('voteEditName').value;
+  const count = parseInt(document.getElementById('voteEditCount').value);
+  if (!name) return;
+  if (isNaN(count) || count < 0) { showToast('Ungültiger Wert!', 'error'); return; }
   try {
-    if (val === 0) await fbRemove('votes7d/' + name);
-    else await fbSet('votes7d/' + name, val);
-    showToast(`✅ ${name} = ${val} Votes`);
+    if (count === 0) await fbRemove('votes7d/' + name);
+    else await fbSet('votes7d/' + name, count);
+    allVotesData[name] = count || null;
+    showToast('✅ ' + name + ' → ' + count + ' Stimmen');
+    addLog('✏️', 'Vote gesetzt: "' + name + '" = ' + count);
+    closeModal('modalEditVote');
     loadVotes();
-    refreshDashboard();
+    loadDashboard();
   } catch (e) {
-    showToast('Fehler: ' + e.message, true);
+    showToast('Fehler: ' + e.message, 'error');
+    addLog('❌', 'Vote-Speicherfehler: ' + e.message);
   }
 }
 
-async function addVote(name, delta) {
-  const inp = document.getElementById('vi-' + name);
-  if (!inp) return;
-  const cur = parseInt(inp.value) || 0;
-  const newVal = Math.max(0, cur + delta);
-  inp.value = newVal;
-  if (newVal === 0) await fbRemove('votes7d/' + name).catch(()=>{});
-  else await fbSet('votes7d/' + name, newVal).catch(()=>{});
-  showToast(`✅ ${name} → ${newVal}`);
-  loadVotes();
-  refreshDashboard();
+function clearOneVoteConfirm() {
+  const name = document.getElementById('voteEditName').value;
+  if (!confirm('Votes für "' + name + '" wirklich auf 0 setzen?')) return;
+  clearOneVote(name);
+  closeModal('modalEditVote');
 }
 
-async function clearVote(name) {
-  if (!confirm(`Votes für "${name}" wirklich löschen?`)) return;
+async function clearOneVote(name) {
   try {
     await fbRemove('votes7d/' + name);
-    showToast(`✅ ${name} Votes gelöscht`);
-    loadVotes();
-    refreshDashboard();
+    delete allVotesData[name];
+    showToast('✅ Votes für "' + name + '" gelöscht');
+    addLog('🗑️', 'Votes gelöscht: "' + name + '"');
+    loadVotes(); loadDashboard();
   } catch (e) {
-    showToast('Fehler: ' + e.message, true);
+    showToast('Fehler: ' + e.message, 'error');
+    addLog('❌', 'Vote-Löschfehler: ' + e.message);
   }
+}
+
+function resetAllVotesConfirm() {
+  if (!confirm('⚠️ ALLE VOTES FÜR DIESE WOCHE LÖSCHEN?\n\nDiese Aktion kann nicht rückgängig gemacht werden!')) return;
+  resetAllVotes();
 }
 
 async function resetAllVotes() {
   try {
     await fbSet('votes7d', null);
+    allVotesData = {};
     showToast('✅ Alle Votes zurückgesetzt!');
-    loadVotes();
-    refreshDashboard();
+    addLog('🗑️', 'ALLE VOTES GELÖSCHT (Woche: ' + getWeekKey() + ')');
+    loadVotes(); loadDashboard();
   } catch (e) {
-    showToast('Fehler: ' + e.message, true);
+    showToast('Fehler: ' + e.message, 'error');
+    addLog('❌', 'Reset-Fehler: ' + e.message);
   }
 }
 
-// ====== DATABASE (Raw) ======
+// ===========================
+// DATABASE (Raw Access)
+// ===========================
 async function dbRead() {
   const path = document.getElementById('dbPath').value.trim();
-  if (!path) { showToast('Pfad eingeben!', true); return; }
+  if (!path) { showToast('Bitte einen Pfad eingeben!', 'warn'); return; }
+  const resultEl = document.getElementById('dbResult');
+  resultEl.innerHTML = '<div class="loading-row"><span class="loading-spinner"></span>Lese...</div>';
   try {
     const data = await fbGet(path);
-    document.getElementById('dbJson').value = JSON.stringify(data, null, 2);
-    document.getElementById('dbResult').innerHTML = `<div class="pill pill-green">✅ Gelesen: /${path}</div>`;
+    const json = JSON.stringify(data, null, 2);
+    document.getElementById('dbJson').value = json;
+    const size = new Blob([json]).size;
+    resultEl.innerHTML = `<span class="pill pill-green">✅ Gelesen: /${path} (${size} Bytes)</span>`;
+    addLog('📖', 'DB gelesen: /' + path + ' (' + size + ' Bytes)');
   } catch (e) {
-    showToast('Fehler: ' + e.message, true);
+    resultEl.innerHTML = `<span class="pill pill-red">❌ ${esc(e.message)}</span>`;
+    showToast('Fehler: ' + e.message, 'error');
+    addLog('❌', 'DB-Lesefehler: ' + e.message);
   }
 }
 
 async function dbWrite() {
   const path = document.getElementById('dbPath').value.trim();
   const raw = document.getElementById('dbJson').value.trim();
-  if (!path || !raw) { showToast('Pfad und JSON eingeben!', true); return; }
-  if (!confirm(`Wirklich /${path} ÜBERSCHREIBEN mit diesen Daten?`)) return;
+  if (!path || !raw) { showToast('Pfad und JSON eingeben!', 'warn'); return; }
+  if (!confirm('⚠️ /' + path + ' wirklich KOMPLETT ÜBERSCHREIBEN?\n\nAlle vorhandenen Daten gehen verloren!')) return;
   try {
     const val = JSON.parse(raw);
     await fbSet(path, val);
-    showToast(`✅ /${path} gespeichert!`);
-    document.getElementById('dbResult').innerHTML = `<div class="pill pill-green">✅ SET: /${path}</div>`;
+    document.getElementById('dbResult').innerHTML = `<span class="pill pill-green">✅ Gespeichert: /${path}</span>`;
+    showToast('✅ /' + path + ' gespeichert!');
+    addLog('💾', 'DB geschrieben (SET): /' + path);
   } catch (e) {
-    showToast('Ungültiges JSON oder Fehler: ' + e.message, true);
+    showToast('Ungültiges JSON oder Fehler: ' + e.message, 'error');
+    addLog('❌', 'DB-Schreibfehler: ' + e.message);
   }
 }
 
 async function dbPatch() {
   const path = document.getElementById('dbPath').value.trim();
   const raw = document.getElementById('dbJson').value.trim();
-  if (!path || !raw) { showToast('Pfad und JSON eingeben!', true); return; }
+  if (!path || !raw) { showToast('Pfad und JSON eingeben!', 'warn'); return; }
   try {
     const val = JSON.parse(raw);
     await fbUpdate(path, val);
-    showToast(`✅ /${path} aktualisiert!`);
-    document.getElementById('dbResult').innerHTML = `<div class="pill pill-green">✅ PATCH: /${path}</div>`;
+    document.getElementById('dbResult').innerHTML = `<span class="pill pill-cyan">✅ Aktualisiert: /${path}</span>`;
+    showToast('✅ /' + path + ' aktualisiert!');
+    addLog('🔧', 'DB aktualisiert (PATCH): /' + path);
   } catch (e) {
-    showToast('Ungültiges JSON oder Fehler: ' + e.message, true);
+    showToast('Ungültiges JSON oder Fehler: ' + e.message, 'error');
+    addLog('❌', 'DB-PATCH-Fehler: ' + e.message);
   }
 }
 
-async function dbDelete() {
+function dbDeleteConfirm() {
   const path = document.getElementById('dbPath').value.trim();
-  if (!path) { showToast('Pfad eingeben!', true); return; }
-  if (!confirm(`Wirklich /${path} KOMPLETT LÖSCHEN? Nicht rückgängig machbar!`)) return;
+  if (!path) { showToast('Bitte einen Pfad eingeben!', 'warn'); return; }
+  if (!confirm('⚠️ /' + path + ' wirklich KOMPLETT LÖSCHEN?\n\nNicht rückgängig machbar!')) return;
+  dbExecuteDelete(path);
+}
+
+async function dbExecuteDelete(path) {
   try {
     await fbRemove(path);
-    showToast(`✅ /${path} gelöscht!`);
     document.getElementById('dbJson').value = '';
-    document.getElementById('dbResult').innerHTML = `<div class="pill pill-red">🗑️ Gelöscht: /${path}</div>`;
+    document.getElementById('dbResult').innerHTML = `<span class="pill pill-red">🗑️ Gelöscht: /${path}</span>`;
+    showToast('✅ /' + path + ' gelöscht!');
+    addLog('🗑️', 'DB gelöscht: /' + path);
   } catch (e) {
-    showToast('Fehler: ' + e.message, true);
+    showToast('Fehler: ' + e.message, 'error');
+    addLog('❌', 'DB-Löschfehler: ' + e.message);
   }
 }
 
@@ -1086,7 +1756,59 @@ function quickPath(p) {
   dbRead();
 }
 
-// ====== MODAL HELPERS ======
+function formatJson() {
+  const el = document.getElementById('dbJson');
+  try {
+    el.value = JSON.stringify(JSON.parse(el.value), null, 2);
+    showToast('✅ JSON formatiert');
+  } catch (e) {
+    showToast('Ungültiges JSON!', 'error');
+  }
+}
+function clearJson() {
+  document.getElementById('dbJson').value = '';
+  document.getElementById('dbResult').innerHTML = '';
+}
+
+async function readAllData() {
+  document.getElementById('dbPath').value = '/';
+  document.getElementById('dbResult').innerHTML = '<div class="loading-row"><span class="loading-spinner"></span>Lade gesamte Datenbank...</div>';
+  try {
+    const snap = await fbDb.ref('/').once('value');
+    const data = snap.val();
+    const json = JSON.stringify(data, null, 2);
+    document.getElementById('dbJson').value = json;
+    const size = new Blob([json]).size;
+    document.getElementById('dbResult').innerHTML = `<span class="pill pill-green">✅ Gesamte DB geladen (${Math.round(size/1024*10)/10} KB)</span>`;
+    addLog('📖', 'Gesamte DB geladen (' + Math.round(size/1024*10)/10 + ' KB)');
+  } catch (e) {
+    showToast('Fehler: ' + e.message, 'error');
+    addLog('❌', 'DB-Lesefehler: ' + e.message);
+  }
+}
+
+async function clearAllUserVotes() {
+  if (!confirm('⚠️ ALLE User-Votes (voted/ Pfade) für diese Woche zurücksetzen?\n\nDas betrifft alle Nutzer-Einträge, nicht das Gesamt-Voting!')) return;
+  try {
+    const usersData = await fbGet('users') || {};
+    const week = getWeekKey();
+    const updates = {};
+    Object.keys(usersData).forEach(uid => {
+      updates['users/' + uid + '/voted/' + week] = null;
+    });
+    await fbDb.ref('/').update(updates);
+    showToast('✅ Alle User-Votes zurückgesetzt!');
+    addLog('🔄', 'Alle User-Votes zurückgesetzt (Woche: ' + week + ')');
+    loadUsers();
+  } catch (e) {
+    showToast('Fehler: ' + e.message, 'error');
+    addLog('❌', 'User-Vote-Reset-Fehler: ' + e.message);
+  }
+}
+
+// ===========================
+// MODAL HELPERS
+// ===========================
 function openModal(id) {
   document.getElementById(id).classList.add('open');
 }
@@ -1099,26 +1821,43 @@ document.addEventListener('click', e => {
   }
 });
 
-// ====== RELOAD ALL ======
-async function reloadAll() {
-  await refreshDashboard();
-  const activePage = document.querySelector('.page.active');
-  if (activePage?.id === 'page-users') loadUsers();
-  if (activePage?.id === 'page-votes') loadVotes();
-  showToast('↻ Alles neu geladen!');
-}
-
-// ====== UTILS ======
+// ===========================
+// UTILITIES
+// ===========================
 function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
-// Keyboard shortcut: Enter on auth
+// Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
   }
+  if (e.key === 'Enter' && document.getElementById('authScreen').style.display !== 'none') {
+    doLogin();
+  }
 });
+
+// Click outside sidebar to close on mobile
+document.addEventListener('click', e => {
+  const sb = document.getElementById('sidebar');
+  const hb = document.querySelector('.hamburger-btn');
+  if (window.innerWidth <= 680 && sb.classList.contains('open')) {
+    if (!sb.contains(e.target) && (!hb || !hb.contains(e.target))) {
+      sb.classList.remove('open');
+    }
+  }
+});
+
+// ===========================
+// INIT
+// ===========================
+console.log('[7D Admin] Panel v2.0 geladen. Login mit halil / elazigliadmin');
 </script>
 </body>
 </html>
