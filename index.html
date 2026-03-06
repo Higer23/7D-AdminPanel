@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7D ZONE — ADMIN PANEL</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050510;
+  --surface: #0d0d22;
+  --card: #111128;
+  --border: #1e1e4a;
+  --accent: #00f5ff;
+  --accent2: #ff00ff;
+  --accent3: #00ff88;
+  --warn: #ff9900;
+  --danger: #ff3355;
+  --text: #e0e8ff;
+  --text2: #6677aa;
+  --glow: rgba(0,245,255,0.2);
+  --glow2: rgba(255,0,255,0.15);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated background grid */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ====== AUTH SCREEN ====== */
+#authScreen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.auth-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  width: 100%; max-width: 360px;
+  text-align: center;
+  box-shadow: 0 0 60px var(--glow), 0 0 120px var(--glow2);
+  position: relative;
+  overflow: hidden;
+}
+.auth-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+}
+.auth-logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem; font-weight: 900;
+  color: var(--accent);
+  text-shadow: 0 0 20px var(--accent);
+  margin-bottom: 0.2rem;
+  letter-spacing: 0.1em;
+}
+.auth-sub {
+  font-size: 0.75rem; color: var(--text2);
+  font-family: 'Share Tech Mono', monospace;
+  margin-bottom: 2rem;
+}
+.auth-label {
+  text-align: left; font-size: 0.7rem;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text2); margin-bottom: 0.3rem;
+  text-transform: uppercase; letter-spacing: 0.1em;
+}
+.auth-input {
+  width: 100%; background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.75rem 1rem;
+  color: var(--text); font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem; margin-bottom: 1rem; outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.auth-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--glow);
+}
+.auth-btn {
+  width: 100%; padding: 0.8rem;
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 8px; color: var(--accent);
+  font-family: 'Orbitron', sans-serif; font-size: 0.7rem;
+  font-weight: 700; cursor: pointer; letter-spacing: 0.15em;
+  transition: all 0.2s; text-transform: uppercase;
+}
+.auth-btn:hover {
+  background: var(--accent); color: var(--bg);
+  box-shadow: 0 0 20px var(--glow);
+}
+.auth-err {
+  font-size: 0.78rem; color: var(--danger);
+  min-height: 1.2rem; margin-top: 0.5rem;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* ====== MAIN LAYOUT ====== */
+#app { display: none; position: relative; z-index: 1; }
+
+/* Sidebar */
+.sidebar {
+  position: fixed; left: 0; top: 0; bottom: 0;
+  width: 220px; background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  z-index: 100; padding: 1.5rem 0;
+  transition: transform 0.3s;
+}
+.sidebar-logo {
+  padding: 0 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+.sidebar-logo .logo-main {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem; font-weight: 900;
+  color: var(--accent); letter-spacing: 0.1em;
+  text-shadow: 0 0 15px var(--accent);
+}
+.sidebar-logo .logo-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; color: var(--accent2);
+  margin-top: 0.2rem; opacity: 0.8;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.65rem 1.2rem; color: var(--text2);
+  font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  border-left: 2px solid transparent;
+  text-decoration: none;
+}
+.nav-item:hover { color: var(--text); background: rgba(0,245,255,0.04); }
+.nav-item.on {
+  color: var(--accent); border-left-color: var(--accent);
+  background: rgba(0,245,255,0.07);
+}
+.nav-icon { font-size: 1rem; min-width: 1.2rem; text-align: center; }
+.nav-section {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.15em;
+  padding: 1rem 1.2rem 0.4rem; opacity: 0.6;
+}
+.sidebar-bottom {
+  margin-top: auto; padding: 0 1.2rem;
+  border-top: 1px solid var(--border); padding-top: 1rem;
+}
+.admin-badge {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.72rem; color: var(--text2);
+  font-family: 'Share Tech Mono', monospace;
+}
+.admin-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent3);
+  box-shadow: 0 0 8px var(--accent3);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+.logout-btn {
+  margin-top: 0.5rem; width: 100%;
+  padding: 0.5rem; border: 1px solid var(--border);
+  border-radius: 6px; background: transparent;
+  color: var(--danger); font-family: 'Nunito', sans-serif;
+  font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+}
+.logout-btn:hover { border-color: var(--danger); background: rgba(255,51,85,0.08); }
+
+/* Main content */
+.main {
+  margin-left: 220px;
+  padding: 1.5rem 2rem 3rem;
+  min-height: 100vh;
+}
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.8rem;
+}
+.page-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem; font-weight: 900;
+  color: var(--accent); letter-spacing: 0.08em;
+}
+.page-subtitle { font-size: 0.78rem; color: var(--text2); margin-top: 0.2rem; }
+.status-pill {
+  display: flex; align-items: center; gap: 0.4rem;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 100px; padding: 0.3rem 0.8rem;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+  color: var(--accent3);
+}
+#liveIndicator { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); box-shadow: 0 0 6px var(--accent3); animation: pulse 1s infinite; }
+
+/* Pages */
+.page { display: none; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:none;} }
+
+/* Cards */
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.3rem;
+  margin-bottom: 1.2rem; position: relative; overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.3;
+}
+.card-title {
+  font-family: 'Orbitron', sans-serif; font-size: 0.65rem;
+  font-weight: 700; color: var(--accent); letter-spacing: 0.15em;
+  text-transform: uppercase; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem; margin-bottom: 1.5rem;
+}
+.stat-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.2rem;
+  position: relative; overflow: hidden; transition: all 0.2s;
+}
+.stat-box:hover { border-color: var(--accent); box-shadow: 0 0 20px var(--glow); }
+.stat-val {
+  font-family: 'Orbitron', sans-serif; font-size: 2rem;
+  font-weight: 900; color: var(--accent);
+  text-shadow: 0 0 20px var(--glow);
+}
+.stat-label { font-size: 0.72rem; color: var(--text2); margin-top: 0.3rem; }
+.stat-icon { position: absolute; right: 1rem; top: 1rem; font-size: 1.8rem; opacity: 0.3; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; margin-top: 0.5rem; }
+table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+thead th {
+  text-align: left; padding: 0.6rem 0.8rem;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+  color: var(--text2); text-transform: uppercase; letter-spacing: 0.1em;
+  border-bottom: 1px solid var(--border);
+}
+tbody tr { border-bottom: 1px solid rgba(30,30,74,0.5); transition: background 0.15s; }
+tbody tr:hover { background: rgba(0,245,255,0.03); }
+tbody td { padding: 0.65rem 0.8rem; vertical-align: middle; }
+.mono { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; }
+.pill {
+  display: inline-block; padding: 0.15rem 0.6rem;
+  border-radius: 100px; font-size: 0.65rem; font-weight: 700;
+}
+.pill-green { background: rgba(0,255,136,0.1); color: var(--accent3); border: 1px solid rgba(0,255,136,0.3); }
+.pill-blue { background: rgba(0,245,255,0.1); color: var(--accent); border: 1px solid rgba(0,245,255,0.3); }
+.pill-red { background: rgba(255,51,85,0.1); color: var(--danger); border: 1px solid rgba(255,51,85,0.3); }
+.pill-orange { background: rgba(255,153,0,0.1); color: var(--warn); border: 1px solid rgba(255,153,0,0.3); }
+
+/* Action buttons */
+.btn {
+  padding: 0.4rem 0.9rem; border-radius: 6px; border: 1px solid var(--border);
+  background: transparent; color: var(--text); font-family: 'Nunito', sans-serif;
+  font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn-accent { border-color: var(--accent); color: var(--accent); }
+.btn-accent:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 12px var(--glow); }
+.btn-danger { border-color: var(--danger); color: var(--danger); }
+.btn-danger:hover { background: var(--danger); color: #fff; }
+.btn-warn { border-color: var(--warn); color: var(--warn); }
+.btn-warn:hover { background: var(--warn); color: var(--bg); }
+.btn-sm { padding: 0.25rem 0.6rem; font-size: 0.7rem; }
+.btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.8rem; }
+
+/* Inputs */
+.inp {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 0.5rem 0.8rem;
+  color: var(--text); font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem; outline: none; transition: border 0.2s;
+}
+.inp:focus { border-color: var(--accent); box-shadow: 0 0 8px var(--glow); }
+.inp-sm { padding: 0.3rem 0.6rem; font-size: 0.78rem; width: 80px; }
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+  background: var(--card); border: 1px solid var(--accent3);
+  border-radius: 10px; padding: 0.8rem 1.2rem;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
+  color: var(--accent3); box-shadow: 0 0 20px rgba(0,255,136,0.2);
+  transform: translateY(20px); opacity: 0;
+  transition: all 0.3s; pointer-events: none; max-width: 300px;
+}
+#toast.show { transform: none; opacity: 1; }
+#toast.err { border-color: var(--danger); color: var(--danger); box-shadow: 0 0 20px rgba(255,51,85,0.2); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 8000;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 1.8rem; width: 100%; max-width: 480px;
+  max-height: 85vh; overflow-y: auto;
+  box-shadow: 0 0 60px var(--glow);
+  transform: scale(0.9); transition: transform 0.3s;
+}
+.modal-overlay.open .modal-box { transform: scale(1); }
+.modal-title {
+  font-family: 'Orbitron', sans-serif; font-size: 0.8rem;
+  color: var(--accent); margin-bottom: 1.2rem;
+  padding-bottom: 0.8rem; border-bottom: 1px solid var(--border);
+}
+.form-row { margin-bottom: 0.9rem; }
+.form-label { font-size: 0.7rem; color: var(--text2); margin-bottom: 0.3rem; font-family: 'Share Tech Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; display: block; }
+.form-inp { width: 100%; }
+
+/* Loading */
+.loading {
+  text-align: center; padding: 2rem;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
+  color: var(--text2); animation: blink 1s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+/* Leaderboard bars */
+.lb-bar-wrap { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; }
+.lb-bar-bg { flex: 1; height: 10px; background: var(--border); border-radius: 100px; overflow: hidden; }
+.lb-bar-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.lb-name { min-width: 120px; font-size: 0.82rem; font-weight: 700; }
+.lb-count { min-width: 30px; text-align: right; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--accent); }
+
+/* Search bar */
+.search-bar {
+  display: flex; gap: 0.6rem; flex-wrap: wrap;
+  align-items: center; margin-bottom: 1rem;
+}
+.search-inp {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 1rem;
+  color: var(--text); font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem; outline: none; transition: border 0.2s;
+  min-width: 200px; flex: 1;
+}
+.search-inp:focus { border-color: var(--accent); }
+
+/* Vote rank medal */
+.rank-1 { color: #ffd700; }
+.rank-2 { color: #c0c0c0; }
+.rank-3 { color: #cd7f32; }
+
+/* Confirm delete row */
+.del-confirm {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: rgba(255,51,85,0.08); border: 1px solid rgba(255,51,85,0.2);
+  border-radius: 8px; padding: 0.5rem 0.8rem; margin-top: 0.4rem;
+  font-size: 0.78rem;
+}
+
+/* Responsive */
+@media(max-width: 720px) {
+  .sidebar { transform: translateX(-220px); }
+  .sidebar.open { transform: none; }
+  .main { margin-left: 0; padding: 1rem; }
+  .hamburger { display: flex !important; }
+}
+.hamburger {
+  display: none; position: fixed; top: 1rem; left: 1rem; z-index: 200;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem; cursor: pointer;
+  flex-direction: column; gap: 4px;
+}
+.hamburger span { display: block; width: 20px; height: 2px; background: var(--accent); border-radius: 2px; }
+
+/* Section divider */
+.divider { height: 1px; background: var(--border); margin: 1.2rem 0; }
+
+/* JSON editor */
+.json-area {
+  width: 100%; min-height: 200px; background: #050510;
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.8rem; color: var(--accent3);
+  font-family: 'Share Tech Mono', monospace; font-size: 0.78rem;
+  outline: none; resize: vertical; transition: border 0.2s;
+  line-height: 1.6;
+}
+.json-area:focus { border-color: var(--accent); }
+
+/* Refresh btn */
+.refresh-btn {
+  background: none; border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text2); padding: 0.35rem 0.7rem; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.refresh-btn:hover { border-color: var(--accent3); color: var(--accent3); }
+
+/* Inline number edit */
+.num-edit-wrap { display: flex; align-items: center; gap: 0.4rem; }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="auth-logo">7D ZONE</div>
+    <div class="auth-sub">ADMIN PANEL — RESTRICTED ACCESS</div>
+    <div class="auth-label">Admin Username</div>
+    <input class="auth-input" id="adminUser" type="text" placeholder="admin username" autocomplete="off" onkeydown="if(event.key==='Enter')adminLogin()">
+    <div class="auth-label">Passwort</div>
+    <input class="auth-input" id="adminPass" type="password" placeholder="passwort" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="auth-btn" onclick="adminLogin()">▶ EINLOGGEN</button>
+    <div class="auth-err" id="adminErr"></div>
+  </div>
+</div>
+
+<!-- HAMBURGER (mobile) -->
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- MAIN APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-main">7D ADMIN</div>
+      <div class="logo-sub">CONTROL PANEL v1.0</div>
+    </div>
+    <div class="nav-section">Dashboard</div>
+    <div class="nav-item on" onclick="goPage('dashboard',this)"><span class="nav-icon">📊</span> Übersicht</div>
+    <div class="nav-section">Verwaltung</div>
+    <div class="nav-item" onclick="goPage('users',this)"><span class="nav-icon">👤</span> Benutzer</div>
+    <div class="nav-item" onclick="goPage('votes',this)"><span class="nav-icon">⭐</span> Voting</div>
+    <div class="nav-item" onclick="goPage('db',this)"><span class="nav-icon">🗄️</span> Datenbank</div>
+    <div class="sidebar-bottom">
+      <div class="admin-badge"><div class="admin-dot"></div><span id="sidebarUser">admin</span></div>
+      <button class="logout-btn" onclick="adminLogout()">🚪 Logout</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="top-bar">
+      <div>
+        <div class="page-title" id="pageTitle">ÜBERSICHT</div>
+        <div class="page-subtitle" id="pageSub">Firebase Echtzeit-Dashboard</div>
+      </div>
+      <div style="display:flex;gap:0.6rem;align-items:center;">
+        <div class="status-pill"><div id="liveIndicator"></div> LIVE</div>
+        <button class="refresh-btn" onclick="reloadAll()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-box"><div class="stat-icon">👤</div><div class="stat-val" id="statUsers">—</div><div class="stat-label">Registrierte User</div></div>
+        <div class="stat-box"><div class="stat-icon">⭐</div><div class="stat-val" id="statVotes">—</div><div class="stat-label">Votes Diese Woche</div></div>
+        <div class="stat-box"><div class="stat-icon">🏆</div><div class="stat-val" id="statTop">—</div><div class="stat-label">Meiste Votes</div></div>
+        <div class="stat-box"><div class="stat-icon">🗓️</div><div class="stat-val" id="statWeek">—</div><div class="stat-label">Aktuelle Woche</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="card">
+          <div class="card-title">🏆 TOP 5 VOTES</div>
+          <div id="dashTopVotes"><div class="loading">Lädt...</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">👤 LETZTE USER</div>
+          <div id="dashUsers"><div class="loading">Lädt...</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚡ SCHNELL-AKTIONEN</div>
+        <div class="btn-row">
+          <button class="btn btn-danger" onclick="if(confirm('ALLE VOTES ZURÜCKSETZEN? Das kann nicht rückgängig gemacht werden!'))resetAllVotes()">🗑️ Alle Votes Löschen</button>
+          <button class="btn btn-warn" onclick="goPage('users',document.querySelector('.nav-item:nth-of-type(2)'))">👤 User Verwalten</button>
+          <button class="btn btn-accent" onclick="reloadAll()">↻ Alles Neu Laden</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="page" id="page-users">
+      <div class="card">
+        <div class="card-title">👤 ALLE BENUTZER</div>
+        <div class="search-bar">
+          <input class="search-inp" id="userSearch" type="text" placeholder="🔍 Username suchen..." oninput="filterUsers()">
+          <button class="btn btn-accent" onclick="loadUsers()">↻ Neu laden</button>
+        </div>
+        <div class="table-wrap">
+          <table id="usersTable">
+            <thead><tr>
+              <th>Username</th>
+              <th>UID</th>
+              <th>Vote (diese Woche)</th>
+              <th>Aktionen</th>
+            </tr></thead>
+            <tbody id="usersBody"><tr><td colspan="4"><div class="loading">Lädt...</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VOTES -->
+    <div class="page" id="page-votes">
+      <div class="card">
+        <div class="card-title">⭐ VOTING — PUNKTE BEARBEITEN</div>
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;">
+          <button class="btn btn-danger" onclick="if(confirm('Wirklich ALLE Votes löschen?'))resetAllVotes()">🗑️ Alle Votes Zurücksetzen</button>
+          <button class="btn btn-accent" onclick="loadVotes()">↻ Neu laden</button>
+        </div>
+        <div id="votesList"><div class="loading">Lädt...</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏆 LEADERBOARD VORSCHAU</div>
+        <div id="votesLeaderboard"><div class="loading">Lädt...</div></div>
+      </div>
+    </div>
+
+    <!-- DATABASE -->
+    <div class="page" id="page-db">
+      <div class="card">
+        <div class="card-title">🗄️ ROHE DATENBANK — DIREKTZUGRIFF</div>
+        <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem;">⚠️ Vorsicht! Hier kannst du direkt Firebase-Daten lesen und überschreiben.</p>
+        <div class="form-row">
+          <label class="form-label">Firebase Pfad (z.B. users, votes7d, usernames)</label>
+          <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+            <input class="inp form-inp" id="dbPath" type="text" placeholder="votes7d" style="flex:1;">
+            <button class="btn btn-accent" onclick="dbRead()">📖 Lesen</button>
+            <button class="btn btn-danger" onclick="dbDelete()">🗑️ Pfad Löschen</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">JSON Daten (zum Schreiben/Überschreiben)</label>
+          <textarea class="json-area" id="dbJson" placeholder='{"name":"Wert","punkte":42}'></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-accent" onclick="dbWrite()">💾 Schreiben (SET)</button>
+          <button class="btn btn-warn" onclick="dbPatch()">🔧 Aktualisieren (PATCH)</button>
+        </div>
+        <div id="dbResult" style="margin-top:1rem;"></div>
+      </div>
+
+      <!-- Pre-set quick paths -->
+      <div class="card">
+        <div class="card-title">⚡ SCHNELLZUGRIFF-PFADE</div>
+        <div class="btn-row">
+          <button class="btn" onclick="quickPath('votes7d')">⭐ votes7d</button>
+          <button class="btn" onclick="quickPath('users')">👤 users</button>
+          <button class="btn" onclick="quickPath('usernames')">🔑 usernames</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- EDIT USER MODAL -->
+<div class="modal-overlay" id="editUserModal">
+  <div class="modal-box">
+    <div class="modal-title">✏️ BENUTZER BEARBEITEN</div>
+    <input type="hidden" id="editUid">
+    <div class="form-row">
+      <label class="form-label">Username (Anzeige)</label>
+      <input class="inp form-inp" id="editUsername" type="text">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Vote Diese Woche (Inhalt ändern)</label>
+      <input class="inp form-inp" id="editVote" type="text" placeholder="leer lassen = kein vote">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-accent" onclick="saveEditUser()">💾 Speichern</button>
+      <button class="btn" onclick="closeModal('editUserModal')">✕ Abbrechen</button>
+    </div>
+    <div class="divider"></div>
+    <div>
+      <div style="font-family:'Share Tech Mono';font-size:0.6rem;color:var(--danger);margin-bottom:0.5rem;">⚠️ GEFAHRENZONE</div>
+      <button class="btn btn-danger btn-sm" onclick="confirmDeleteUser()">🗑️ User komplett löschen</button>
+      <div id="deleteConfirmRow" style="display:none;" class="del-confirm">
+        <span style="color:var(--danger);">Wirklich löschen?</span>
+        <button class="btn btn-danger btn-sm" onclick="deleteUserConfirmed()">JA, LÖSCHEN</button>
+        <button class="btn btn-sm" onclick="document.getElementById('deleteConfirmRow').style.display='none'">Nein</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">✅ Erfolgreich!</div>
+
+<script>
+// ====== FIREBASE LOADER ======
+const FB_CONFIG = {
+  apiKey: "AIzaSyAm-_eGrLsHnzsdiDAi1XTFU0fP_1AN8Lk",
+  authDomain: "dzone-9946c.firebaseapp.com",
+  databaseURL: "https://dzone-9946c-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "dzone-9946c",
+};
+
+// Admin credentials (stored client-side — secure this via Firebase Rules in production)
+const ADMIN_CREDS = {
+  "admin": "7dzone2024!!",
+  "halil": "halilAdmin7D",
+  "roman": "romanAdmin7D",
+};
+
+let fbApp, fbAuth, fbDb, currentAdmin = null;
+let allUsersData = {};
+
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+(async () => {
+  await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+  await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js');
+  await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js');
+  fbApp = firebase.initializeApp(FB_CONFIG);
+  fbAuth = firebase.auth();
+  fbDb = firebase.database();
+  console.log('Firebase ready');
+})();
+
+// ====== AUTH ======
+function adminLogin() {
+  const u = document.getElementById('adminUser').value.trim().toLowerCase();
+  const p = document.getElementById('adminPass').value;
+  const err = document.getElementById('adminErr');
+  if (!u || !p) { err.textContent = 'Bitte ausfüllen!'; return; }
+  if (ADMIN_CREDS[u] && ADMIN_CREDS[u] === p) {
+    currentAdmin = u;
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('sidebarUser').textContent = '👑 ' + u;
+    initDashboard();
+  } else {
+    err.textContent = '❌ Falsche Zugangsdaten!!';
+  }
+}
+
+function adminLogout() {
+  currentAdmin = null;
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('adminUser').value = '';
+  document.getElementById('adminPass').value = '';
+}
+
+// ====== NAVIGATION ======
+const pageTitles = {
+  dashboard: { t: 'ÜBERSICHT', s: 'Firebase Echtzeit-Dashboard' },
+  users:     { t: 'BENUTZER', s: 'Alle registrierten User verwalten' },
+  votes:     { t: 'VOTING', s: 'Punkte & Votes bearbeiten' },
+  db:        { t: 'DATENBANK', s: 'Direkter Firebase-Zugriff' },
+};
+
+function goPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('on'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (btn) btn.classList.add('on');
+  const info = pageTitles[name];
+  if (info) {
+    document.getElementById('pageTitle').textContent = info.t;
+    document.getElementById('pageSub').textContent = info.s;
+  }
+  if (name === 'users') loadUsers();
+  if (name === 'votes') loadVotes();
+  if (name === 'dashboard') refreshDashboard();
+  // Close sidebar on mobile
+  if (window.innerWidth <= 720) document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ====== FIREBASE HELPERS ======
+function getWeekKey() {
+  const d = new Date();
+  const day = d.getDay();
+  const offset = day === 0 ? -6 : 1 - day;
+  const mon = new Date(d.getFullYear(), d.getMonth(), d.getDate() + offset);
+  return mon.getFullYear() + '-' + String(mon.getMonth()+1).padStart(2,'0') + '-' + String(mon.getDate()).padStart(2,'0');
+}
+
+async function fbGet(path) {
+  const snap = await fbDb.ref(path).once('value');
+  return snap.val();
+}
+
+async function fbSet(path, val) {
+  await fbDb.ref(path).set(val);
+}
+
+async function fbUpdate(path, val) {
+  await fbDb.ref(path).update(val);
+}
+
+async function fbRemove(path) {
+  await fbDb.ref(path).remove();
+}
+
+// ====== TOAST ======
+function showToast(msg, isErr = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isErr ? ' err' : '');
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(() => t.classList.remove('show', 'err'), 3000);
+}
+
+// ====== DASHBOARD ======
+async function initDashboard() {
+  await refreshDashboard();
+}
+
+async function refreshDashboard() {
+  try {
+    const [usersData, votesData] = await Promise.all([
+      fbGet('users'),
+      fbGet('votes7d'),
+    ]);
+
+    allUsersData = usersData || {};
+    const userCount = Object.keys(allUsersData).length;
+    const votes = votesData || {};
+    const totalVotes = Object.values(votes).reduce((a, b) => a + (b || 0), 0);
+    const topEntry = Object.entries(votes).sort((a, b) => b[1] - a[1])[0];
+
+    document.getElementById('statUsers').textContent = userCount;
+    document.getElementById('statVotes').textContent = totalVotes;
+    document.getElementById('statTop').textContent = topEntry ? topEntry[0] : '—';
+    document.getElementById('statWeek').textContent = getWeekKey();
+
+    // Top 5 votes
+    const sorted = Object.entries(votes).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const maxV = sorted[0]?.[1] || 1;
+    document.getElementById('dashTopVotes').innerHTML = sorted.length === 0
+      ? '<div style="color:var(--text2);font-size:0.82rem;">Noch keine Votes 🗳️</div>'
+      : sorted.map(([name, count], i) => `
+          <div class="lb-bar-wrap">
+            <div class="lb-name">${['🥇','🥈','🥉','4.','5.'][i]} ${name}</div>
+            <div class="lb-bar-bg"><div class="lb-bar-fill" style="width:${Math.round(count/maxV*100)}%"></div></div>
+            <div class="lb-count">${count}</div>
+          </div>
+        `).join('');
+
+    // Last users
+    const users = Object.entries(allUsersData).slice(0, 5);
+    document.getElementById('dashUsers').innerHTML = users.length === 0
+      ? '<div style="color:var(--text2);font-size:0.82rem;">Keine User gefunden</div>'
+      : users.map(([uid, data]) => `
+          <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.8rem;">
+            <span>${data?.username || '—'}</span>
+            <span class="mono" style="color:var(--text2);font-size:0.65rem;">${uid.slice(0,10)}...</span>
+          </div>
+        `).join('');
+  } catch (e) {
+    showToast('Fehler: ' + e.message, true);
+  }
+}
+
+// ====== USERS ======
+let allUsersArr = [];
+
+async function loadUsers() {
+  document.getElementById('usersBody').innerHTML = '<tr><td colspan="4"><div class="loading">Lädt...</div></td></tr>';
+  try {
+    const [usersData, usernamesData] = await Promise.all([
+      fbGet('users'),
+      fbGet('usernames'),
+    ]);
+    allUsersData = usersData || {};
+    const week = getWeekKey();
+    allUsersArr = Object.entries(allUsersData).map(([uid, data]) => ({
+      uid,
+      username: data?.username || '—',
+      vote: data?.voted?.[week] || null,
+    }));
+    renderUsersTable(allUsersArr);
+  } catch (e) {
+    showToast('Fehler beim Laden der User: ' + e.message, true);
+  }
+}
+
+function renderUsersTable(arr) {
+  const tbody = document.getElementById('usersBody');
+  if (arr.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text2);padding:2rem;">Keine User gefunden</td></tr>';
+    return;
+  }
+  tbody.innerHTML = arr.map(u => `
+    <tr>
+      <td><b>${esc(u.username)}</b></td>
+      <td><span class="mono">${esc(u.uid)}</span></td>
+      <td>${u.vote ? `<span class="pill pill-green">${esc(u.vote)}</span>` : '<span class="pill pill-orange">Kein Vote</span>'}</td>
+      <td>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+          <button class="btn btn-accent btn-sm" onclick="openEditUser('${esc(u.uid)}')">✏️ Bearbeiten</button>
+          <button class="btn btn-danger btn-sm" onclick="quickDeleteUser('${esc(u.uid)}','${esc(u.username)}')">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterUsers() {
+  const q = document.getElementById('userSearch').value.toLowerCase();
+  const filtered = allUsersArr.filter(u => u.username.toLowerCase().includes(q) || u.uid.toLowerCase().includes(q));
+  renderUsersTable(filtered);
+}
+
+function openEditUser(uid) {
+  const u = allUsersArr.find(x => x.uid === uid);
+  if (!u) return;
+  document.getElementById('editUid').value = uid;
+  document.getElementById('editUsername').value = u.username;
+  document.getElementById('editVote').value = u.vote || '';
+  document.getElementById('deleteConfirmRow').style.display = 'none';
+  openModal('editUserModal');
+}
+
+async function saveEditUser() {
+  const uid = document.getElementById('editUid').value;
+  const username = document.getElementById('editUsername').value.trim();
+  const vote = document.getElementById('editVote').value.trim();
+  if (!uid) return;
+  try {
+    const week = getWeekKey();
+    const updates = {};
+    if (username) updates['users/' + uid + '/username'] = username;
+    if (vote) updates['users/' + uid + '/voted/' + week] = vote;
+    else updates['users/' + uid + '/voted/' + week] = null;
+    await fbDb.ref().update(updates);
+    if (username) {
+      // update usernames mapping too
+      await fbSet('usernames/' + username, uid);
+    }
+    showToast('✅ User gespeichert!');
+    closeModal('editUserModal');
+    loadUsers();
+    refreshDashboard();
+  } catch (e) {
+    showToast('Fehler: ' + e.message, true);
+  }
+}
+
+function confirmDeleteUser() {
+  document.getElementById('deleteConfirmRow').style.display = 'flex';
+}
+
+async function deleteUserConfirmed() {
+  const uid = document.getElementById('editUid').value;
+  const uname = document.getElementById('editUsername').value;
+  if (!uid) return;
+  try {
+    await fbRemove('users/' + uid);
+    await fbRemove('usernames/' + uname.toLowerCase());
+    // Also delete Firebase Auth user — requires Admin SDK, so we just clean DB
+    showToast('✅ User aus Datenbank gelöscht! (Auth-Account bleibt ggf. bestehen)');
+    closeModal('editUserModal');
+    loadUsers();
+    refreshDashboard();
+  } catch (e) {
+    showToast('Fehler: ' + e.message, true);
+  }
+}
+
+function quickDeleteUser(uid, username) {
+  if (!confirm(`User "${username}" wirklich aus der Datenbank löschen?`)) return;
+  fbRemove('users/' + uid).then(() => {
+    fbRemove('usernames/' + username.toLowerCase()).catch(() => {});
+    showToast('✅ User gelöscht!');
+    loadUsers();
+    refreshDashboard();
+  }).catch(e => showToast('Fehler: ' + e.message, true));
+}
+
+// ====== VOTES ======
+const hofMembers = ['Alessia','Roman','Annika','Halil','Emir','Finn','Joscha','Cornelius','Jonas','Theodor','Mara','Frida','Malena','Jolie','Joline','Vanessa','Jood','Kiara','Clara','Danelle','Tori','Helene','Emily','Emilie','Emma'];
+
+async function loadVotes() {
+  document.getElementById('votesList').innerHTML = '<div class="loading">Lädt...</div>';
+  try {
+    const data = await fbGet('votes7d') || {};
+    renderVotesList(data);
+    renderVotesLeaderboard(data);
+  } catch (e) {
+    showToast('Fehler: ' + e.message, true);
+  }
+}
+
+function renderVotesList(data) {
+  const html = `
+    <table>
+      <thead><tr><th>Name</th><th>Aktuell</th><th>Punkte Setzen</th><th>Aktionen</th></tr></thead>
+      <tbody>
+        ${hofMembers.map(name => `
+          <tr>
+            <td><b>${esc(name)}</b></td>
+            <td><span class="pill ${(data[name]||0) > 0 ? 'pill-green' : 'pill-orange'}">${data[name] || 0}</span></td>
+            <td>
+              <div class="num-edit-wrap">
+                <input class="inp inp-sm" id="vi-${esc(name)}" type="number" min="0" value="${data[name] || 0}">
+                <button class="btn btn-accent btn-sm" onclick="setVote('${esc(name)}')">💾</button>
+              </div>
+            </td>
+            <td>
+              <button class="btn btn-danger btn-sm" onclick="clearVote('${esc(name)}')">🗑️ Löschen</button>
+              <button class="btn btn-sm" onclick="addVote('${esc(name)}',1)">+1</button>
+              <button class="btn btn-sm" onclick="addVote('${esc(name)}',-1)">-1</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  document.getElementById('votesList').innerHTML = html;
+}
+
+function renderVotesLeaderboard(data) {
+  const sorted = hofMembers
+    .map(n => ({ name: n, votes: data[n] || 0 }))
+    .filter(x => x.votes > 0)
+    .sort((a, b) => b.votes - a.votes);
+  const maxV = sorted[0]?.votes || 1;
+  document.getElementById('votesLeaderboard').innerHTML = sorted.length === 0
+    ? '<div style="color:var(--text2);">Noch keine Votes</div>'
+    : sorted.map((m, i) => `
+        <div class="lb-bar-wrap">
+          <div class="lb-name" class="${i<3?'rank-'+(i+1):''}">
+            ${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)} ${esc(m.name)}
+          </div>
+          <div class="lb-bar-bg"><div class="lb-bar-fill" style="width:${Math.round(m.votes/maxV*100)}%"></div></div>
+          <div class="lb-count">${m.votes}</div>
+        </div>
+      `).join('');
+}
+
+async function setVote(name) {
+  const inp = document.getElementById('vi-' + name);
+  if (!inp) return;
+  const val = parseInt(inp.value);
+  if (isNaN(val) || val < 0) { showToast('Ungültiger Wert!', true); return; }
+  try {
+    if (val === 0) await fbRemove('votes7d/' + name);
+    else await fbSet('votes7d/' + name, val);
+    showToast(`✅ ${name} = ${val} Votes`);
+    loadVotes();
+    refreshDashboard();
+  } catch (e) {
+    showToast('Fehler: ' + e.message, true);
+  }
+}
+
+async function addVote(name, delta) {
+  const inp = document.getElementById('vi-' + name);
+  if (!inp) return;
+  const cur = parseInt(inp.value) || 0;
+  const newVal = Math.max(0, cur + delta);
+  inp.value = newVal;
+  if (newVal === 0) await fbRemove('votes7d/' + name).catch(()=>{});
+  else await fbSet('votes7d/' + name, newVal).catch(()=>{});
+  showToast(`✅ ${name} → ${newVal}`);
+  loadVotes();
+  refreshDashboard();
+}
+
+async function clearVote(name) {
+  if (!confirm(`Votes für "${name}" wirklich löschen?`)) return;
+  try {
+    await fbRemove('votes7d/' + name);
+    showToast(`✅ ${name} Votes gelöscht`);
+    loadVotes();
+    refreshDashboard();
+  } catch (e) {
+    showToast('Fehler: ' + e.message, true);
+  }
+}
+
+async function resetAllVotes() {
+  try {
+    await fbSet('votes7d', null);
+    showToast('✅ Alle Votes zurückgesetzt!');
+    loadVotes();
+    refreshDashboard();
+  } catch (e) {
+    showToast('Fehler: ' + e.message, true);
+  }
+}
+
+// ====== DATABASE (Raw) ======
+async function dbRead() {
+  const path = document.getElementById('dbPath').value.trim();
+  if (!path) { showToast('Pfad eingeben!', true); return; }
+  try {
+    const data = await fbGet(path);
+    document.getElementById('dbJson').value = JSON.stringify(data, null, 2);
+    document.getElementById('dbResult').innerHTML = `<div class="pill pill-green">✅ Gelesen: /${path}</div>`;
+  } catch (e) {
+    showToast('Fehler: ' + e.message, true);
+  }
+}
+
+async function dbWrite() {
+  const path = document.getElementById('dbPath').value.trim();
+  const raw = document.getElementById('dbJson').value.trim();
+  if (!path || !raw) { showToast('Pfad und JSON eingeben!', true); return; }
+  if (!confirm(`Wirklich /${path} ÜBERSCHREIBEN mit diesen Daten?`)) return;
+  try {
+    const val = JSON.parse(raw);
+    await fbSet(path, val);
+    showToast(`✅ /${path} gespeichert!`);
+    document.getElementById('dbResult').innerHTML = `<div class="pill pill-green">✅ SET: /${path}</div>`;
+  } catch (e) {
+    showToast('Ungültiges JSON oder Fehler: ' + e.message, true);
+  }
+}
+
+async function dbPatch() {
+  const path = document.getElementById('dbPath').value.trim();
+  const raw = document.getElementById('dbJson').value.trim();
+  if (!path || !raw) { showToast('Pfad und JSON eingeben!', true); return; }
+  try {
+    const val = JSON.parse(raw);
+    await fbUpdate(path, val);
+    showToast(`✅ /${path} aktualisiert!`);
+    document.getElementById('dbResult').innerHTML = `<div class="pill pill-green">✅ PATCH: /${path}</div>`;
+  } catch (e) {
+    showToast('Ungültiges JSON oder Fehler: ' + e.message, true);
+  }
+}
+
+async function dbDelete() {
+  const path = document.getElementById('dbPath').value.trim();
+  if (!path) { showToast('Pfad eingeben!', true); return; }
+  if (!confirm(`Wirklich /${path} KOMPLETT LÖSCHEN? Nicht rückgängig machbar!`)) return;
+  try {
+    await fbRemove(path);
+    showToast(`✅ /${path} gelöscht!`);
+    document.getElementById('dbJson').value = '';
+    document.getElementById('dbResult').innerHTML = `<div class="pill pill-red">🗑️ Gelöscht: /${path}</div>`;
+  } catch (e) {
+    showToast('Fehler: ' + e.message, true);
+  }
+}
+
+function quickPath(p) {
+  document.getElementById('dbPath').value = p;
+  dbRead();
+}
+
+// ====== MODAL HELPERS ======
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('open');
+  }
+});
+
+// ====== RELOAD ALL ======
+async function reloadAll() {
+  await refreshDashboard();
+  const activePage = document.querySelector('.page.active');
+  if (activePage?.id === 'page-users') loadUsers();
+  if (activePage?.id === 'page-votes') loadVotes();
+  showToast('↻ Alles neu geladen!');
+}
+
+// ====== UTILS ======
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Keyboard shortcut: Enter on auth
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  }
+});
+</script>
+</body>
+</html>
