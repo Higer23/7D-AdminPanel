@@ -1,1863 +1,1817 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>7D ZONE — ADMIN PANEL v2</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Nunito:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+<title>7D ZONE — FIREBASE ADMIN 👑</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* ===== ROOT VARIABLES ===== */
-:root {
-  --bg:      #020209;
-  --surface: #08080f;
-  --card:    #0d0d1a;
-  --card2:   #111125;
-  --border:  #1a1a3a;
-  --border2: #252550;
-  --accent:  #00f5ff;
-  --accent2: #bf00ff;
-  --accent3: #00ff99;
-  --warn:    #ff9900;
-  --danger:  #ff2255;
-  --info:    #4488ff;
-  --text:    #dde4ff;
-  --text2:   #5566aa;
-  --text3:   #334488;
-  --glow:    rgba(0,245,255,0.18);
-  --glow2:   rgba(191,0,255,0.13);
-  --glow3:   rgba(0,255,153,0.15);
-  --sidebar-w: 240px;
-}
+  :root {
+    --bg: #020408;
+    --bg2: #060d14;
+    --card: #0a1520;
+    --card2: #0d1e30;
+    --border: #0f2a40;
+    --border2: #1a3a55;
+    --accent: #00ff88;
+    --accent2: #00ccff;
+    --accent3: #ff6600;
+    --danger: #ff3355;
+    --warn: #ffcc00;
+    --purple: #aa44ff;
+    --text: #d0e8f0;
+    --text2: #5a8aa0;
+    --text3: #2a5570;
+    --glow: rgba(0,255,136,0.15);
+    --glow2: rgba(0,204,255,0.15);
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-display: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+  }
 
-/* ===== RESET ===== */
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; font-size:16px; }
-::-webkit-scrollbar { width:5px; height:5px; }
-::-webkit-scrollbar-track { background:var(--bg); }
-::-webkit-scrollbar-thumb { background:var(--border2); border-radius:10px; }
-::-webkit-scrollbar-thumb:hover { background:var(--accent); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Nunito', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-  line-height: 1.5;
-}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-/* Animated grid background */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image:
-    linear-gradient(rgba(0,245,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,245,255,0.025) 1px, transparent 1px);
-  background-size: 50px 50px;
-  pointer-events: none; z-index: 0;
-  animation: gridMove 20s linear infinite;
-}
-@keyframes gridMove {
-  0%   { background-position: 0 0; }
-  100% { background-position: 50px 50px; }
-}
+  /* ── GRID BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-/* Ambient glow orbs */
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  background:
-    radial-gradient(ellipse 40% 30% at 15% 20%, rgba(0,245,255,0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 35% 25% at 85% 80%, rgba(191,0,255,0.04) 0%, transparent 70%);
-  pointer-events: none; z-index: 0;
-}
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,100,60,0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-/* ===== AUTH SCREEN ===== */
-#authScreen {
-  position: fixed; inset: 0; z-index: 9999;
-  background: var(--bg);
-  display: flex; align-items: center; justify-content: center; padding: 1rem;
-}
-.auth-wrap {
-  width: 100%; max-width: 400px;
-  position: relative; z-index: 1;
-}
-.auth-card {
-  background: var(--card);
-  border: 1px solid var(--border2);
-  border-radius: 20px;
-  padding: 2.8rem 2.2rem 2.2rem;
-  box-shadow: 0 0 80px var(--glow), 0 0 40px var(--glow2), 0 40px 60px rgba(0,0,0,0.5);
-  position: relative; overflow: hidden;
-  animation: authAppear 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
-}
-@keyframes authAppear {
-  from { opacity:0; transform:scale(0.85) translateY(30px); }
-  to   { opacity:1; transform:none; }
-}
-.auth-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3), var(--accent), var(--accent2));
-  background-size: 200% 100%;
-  animation: shimmer 3s linear infinite;
-}
-@keyframes shimmer {
-  0%   { background-position: 0% 0%; }
-  100% { background-position: 200% 0%; }
-}
-.auth-icon {
-  text-align: center; font-size: 2.8rem; margin-bottom: 0.5rem;
-  animation: iconBob 2s ease-in-out infinite;
-}
-@keyframes iconBob {
-  0%,100% { transform: translateY(0) rotate(-5deg); }
-  50%     { transform: translateY(-6px) rotate(5deg); }
-}
-.auth-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.2rem; font-weight: 900;
-  color: var(--accent); text-align: center;
-  text-shadow: 0 0 25px var(--accent);
-  letter-spacing: 0.15em; margin-bottom: 0.25rem;
-}
-.auth-sub {
-  text-align: center;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.62rem; color: var(--text2);
-  letter-spacing: 0.08em; margin-bottom: 2rem;
-}
-.form-group { margin-bottom: 1rem; }
-.form-label {
-  display: block; font-family: 'Share Tech Mono', monospace;
-  font-size: 0.58rem; color: var(--text2);
-  text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.4rem;
-}
-.auth-input {
-  width: 100%; background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: 10px; padding: 0.8rem 1rem;
-  color: var(--text); font-family: 'Share Tech Mono', monospace;
-  font-size: 0.88rem; outline: none;
-  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
-}
-.auth-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(0,245,255,0.1), 0 0 20px var(--glow);
-  background: rgba(0,245,255,0.02);
-}
-.auth-btn {
-  width: 100%; margin-top: 0.5rem;
-  padding: 0.85rem;
-  background: linear-gradient(135deg, rgba(0,245,255,0.08), rgba(0,245,255,0.03));
-  border: 1px solid var(--accent);
-  border-radius: 10px; color: var(--accent);
-  font-family: 'Orbitron', sans-serif; font-size: 0.68rem;
-  font-weight: 700; cursor: pointer;
-  letter-spacing: 0.18em; text-transform: uppercase;
-  transition: all 0.25s; position: relative; overflow: hidden;
-}
-.auth-btn::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: var(--accent); opacity: 0;
-  transition: opacity 0.25s;
-}
-.auth-btn:hover { color: var(--bg); box-shadow: 0 0 30px var(--glow); }
-.auth-btn:hover::before { opacity: 1; }
-.auth-btn span { position: relative; z-index: 1; }
-.auth-err {
-  min-height: 1.4rem; margin-top: 0.6rem; text-align: center;
-  font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
-  color: var(--danger); animation: errShake 0.3s ease;
-}
-@keyframes errShake {
-  0%,100% { transform: none; }
-  25%     { transform: translateX(-6px); }
-  75%     { transform: translateX(6px); }
-}
-.auth-attempts {
-  text-align: center; font-size: 0.65rem; color: var(--text2);
-  font-family: 'Share Tech Mono', monospace; margin-top: 0.4rem;
-}
+  /* ── SCANLINE ── */
+  .scanline {
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0,0,0,0.08) 3px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+  }
 
-/* ===== MAIN APP ===== */
-#app { display: none; position: relative; z-index: 1; min-height: 100vh; }
+  /* ── LAYOUT ── */
+  #app { position: relative; z-index: 2; display: flex; flex-direction: column; min-height: 100vh; }
 
-/* ===== SIDEBAR ===== */
-.sidebar {
-  position: fixed; left: 0; top: 0; bottom: 0;
-  width: var(--sidebar-w);
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  z-index: 200; transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-  box-shadow: 4px 0 40px rgba(0,0,0,0.4);
-  overflow-y: auto; overflow-x: hidden;
-}
-.sidebar-header {
-  padding: 1.4rem 1.3rem 1.2rem;
-  border-bottom: 1px solid var(--border);
-  position: relative;
-}
-.sidebar-logo-row {
-  display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.3rem;
-}
-.logo-icon { font-size: 1.6rem; }
-.logo-text { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 900; color: var(--accent); text-shadow: 0 0 12px var(--accent); letter-spacing: 0.08em; }
-.logo-badge { font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; color: var(--accent2); letter-spacing: 0.06em; opacity: 0.8; }
-.sidebar-ver { font-family: 'Share Tech Mono', monospace; font-size: 0.5rem; color: var(--text3); margin-top: 0.2rem; }
+  /* ── TOPBAR ── */
+  #topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(2,4,8,0.96);
+    border-bottom: 1px solid var(--border2);
+    backdrop-filter: blur(20px);
+    padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.8), 0 1px 0 rgba(0,255,136,0.1);
+  }
 
-.nav-section {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.52rem; color: var(--text3);
-  text-transform: uppercase; letter-spacing: 0.18em;
-  padding: 1.1rem 1.3rem 0.35rem;
-}
-.nav-item {
-  display: flex; align-items: center; gap: 0.7rem;
-  padding: 0.62rem 1.3rem; color: var(--text2);
-  font-size: 0.83rem; font-weight: 700;
-  cursor: pointer; transition: all 0.18s;
-  border-left: 2px solid transparent;
-  position: relative; user-select: none;
-}
-.nav-item:hover { color: var(--text); background: rgba(0,245,255,0.04); border-left-color: var(--border2); }
-.nav-item.active {
-  color: var(--accent); border-left-color: var(--accent);
-  background: rgba(0,245,255,0.07);
-}
-.nav-item.active .nav-icon { filter: drop-shadow(0 0 5px var(--accent)); }
-.nav-icon { font-size: 1rem; min-width: 1.3rem; text-align: center; transition: filter 0.2s; }
-.nav-badge {
-  margin-left: auto; background: var(--danger);
-  color: #fff; font-size: 0.55rem; font-weight: 900;
-  padding: 0.1rem 0.4rem; border-radius: 100px;
-  min-width: 18px; text-align: center;
-}
+  .logo-area { display: flex; align-items: center; gap: 14px; }
+  .logo-icon { font-size: 24px; }
+  .logo-text {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-shadow: 0 0 20px var(--accent);
+    line-height: 1.2;
+  }
+  .logo-sub { font-family: var(--font-mono); font-size: 0.55rem; color: var(--text2); letter-spacing: 0.2em; }
 
-.sidebar-footer {
-  margin-top: auto; border-top: 1px solid var(--border);
-  padding: 1rem 1.3rem;
-}
-.admin-info {
-  display: flex; align-items: center; gap: 0.55rem;
-  margin-bottom: 0.7rem;
-}
-.admin-avatar {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.8rem; font-weight: 900; color: var(--bg);
-  flex-shrink: 0;
-}
-.admin-name { font-size: 0.78rem; font-weight: 700; color: var(--text); }
-.admin-role { font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; color: var(--accent3); }
-.online-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--accent3); box-shadow: 0 0 8px var(--accent3);
-  animation: pulse 2s infinite; margin-left: auto; flex-shrink: 0;
-}
-@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
 
-.sidebar-logout {
-  width: 100%; padding: 0.55rem;
-  border: 1px solid var(--border2); border-radius: 8px;
-  background: transparent; color: var(--text2);
-  font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700;
-  cursor: pointer; transition: all 0.2s;
-}
-.sidebar-logout:hover { border-color: var(--danger); color: var(--danger); background: rgba(255,34,85,0.06); }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
 
-/* ===== TOPBAR ===== */
-.topbar {
-  position: fixed; top: 0; left: var(--sidebar-w); right: 0; z-index: 100;
-  background: rgba(2,2,9,0.9);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  padding: 0 1.8rem;
-  height: 58px; display: flex; align-items: center; justify-content: space-between;
-}
-.topbar-left { display: flex; align-items: center; gap: 0.8rem; }
-.page-title {
-  font-family: 'Orbitron', sans-serif; font-size: 0.85rem;
-  font-weight: 900; color: var(--accent); letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-.breadcrumb {
-  font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
-  color: var(--text3); letter-spacing: 0.06em; margin-top: 0.15rem;
-}
-.topbar-right { display: flex; align-items: center; gap: 0.6rem; }
-.status-pill {
-  display: flex; align-items: center; gap: 0.35rem;
-  background: rgba(0,255,153,0.07); border: 1px solid rgba(0,255,153,0.2);
-  border-radius: 100px; padding: 0.3rem 0.8rem;
-  font-family: 'Share Tech Mono', monospace; font-size: 0.56rem; color: var(--accent3);
-}
-.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); box-shadow: 0 0 6px var(--accent3); animation: pulse 1s infinite; }
-.clock-display { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--text2); }
-.topbar-btn {
-  background: none; border: 1px solid var(--border2); border-radius: 8px;
-  color: var(--text2); padding: 0.38rem 0.75rem;
-  font-size: 0.78rem; cursor: pointer; transition: all 0.2s;
-}
-.topbar-btn:hover { border-color: var(--accent); color: var(--accent); }
-.hamburger-btn {
-  display: none; background: none; border: 1px solid var(--border2);
-  border-radius: 8px; padding: 0.4rem 0.6rem; cursor: pointer;
-  flex-direction: column; gap: 4px; transition: border 0.2s;
-}
-.hamburger-btn:hover { border-color: var(--accent); }
-.hamburger-btn span { display: block; width: 18px; height: 2px; background: var(--accent); border-radius: 2px; }
+  .status-text { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text2); }
 
-/* ===== MAIN CONTENT ===== */
-.main {
-  margin-left: var(--sidebar-w);
-  padding: 58px 0 0;
-  min-height: 100vh;
-}
-.main-inner { padding: 1.6rem 1.8rem 3rem; }
+  .btn-reload {
+    padding: 8px 18px;
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    color: var(--text2);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.1em;
+  }
+  .btn-reload:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 12px var(--glow); }
 
-/* ===== PAGES ===== */
-.page { display: none; animation: fadeInUp 0.3s ease; }
-.page.active { display: block; }
-@keyframes fadeInUp {
-  from { opacity:0; transform:translateY(12px); }
-  to   { opacity:1; transform:none; }
-}
+  /* ── SIDENAV ── */
+  #sidenav {
+    position: fixed; left: 0; top: 64px; bottom: 0;
+    width: 220px;
+    background: rgba(2,4,8,0.98);
+    border-right: 1px solid var(--border);
+    z-index: 50;
+    display: flex; flex-direction: column;
+    padding: 20px 0;
+    overflow-y: auto;
+  }
 
-/* ===== CARDS ===== */
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px; padding: 1.4rem;
-  margin-bottom: 1.3rem; position: relative; overflow: hidden;
-}
-.card::after {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent 0%, var(--accent) 30%, var(--accent2) 70%, transparent 100%);
-  opacity: 0.25;
-}
-.card:hover { border-color: var(--border2); }
-.card-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 1.1rem; flex-wrap: wrap; gap: 0.5rem;
-}
-.card-title {
-  font-family: 'Orbitron', sans-serif; font-size: 0.62rem;
-  font-weight: 700; color: var(--accent); letter-spacing: 0.18em;
-  text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem;
-}
-.card-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .nav-section-label {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    color: var(--text3);
+    letter-spacing: 0.25em;
+    padding: 0 20px;
+    margin-bottom: 8px;
+    margin-top: 16px;
+  }
+  .nav-section-label:first-child { margin-top: 0; }
 
-/* ===== STAT BOXES ===== */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-  gap: 1rem; margin-bottom: 1.5rem;
-}
-.stat-box {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 14px; padding: 1.3rem 1.3rem 1.1rem;
-  position: relative; overflow: hidden; cursor: default;
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-}
-.stat-box:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
-.stat-box::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, transparent 60%, rgba(0,245,255,0.03) 100%);
-}
-.stat-box-top { display: flex; align-items: flex-start; justify-content: space-between; }
-.stat-icon-wrap {
-  width: 42px; height: 42px; border-radius: 10px;
-  background: rgba(0,245,255,0.07); border: 1px solid rgba(0,245,255,0.15);
-  display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-  flex-shrink: 0;
-}
-.stat-val {
-  font-family: 'Orbitron', sans-serif; font-size: 1.9rem;
-  font-weight: 900; color: var(--accent);
-  text-shadow: 0 0 20px rgba(0,245,255,0.4);
-  line-height: 1; margin: 0.6rem 0 0.2rem;
-}
-.stat-label { font-size: 0.72rem; color: var(--text2); font-weight: 700; }
-.stat-trend { font-family: 'Share Tech Mono', monospace; font-size: 0.55rem; color: var(--accent3); margin-top: 0.3rem; }
+  .nav-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 20px;
+    background: transparent;
+    border: none; border-left: 2px solid transparent;
+    color: var(--text2);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    width: 100%;
+    letter-spacing: 0.05em;
+  }
+  .nav-btn:hover { color: var(--text); background: rgba(0,255,136,0.04); }
+  .nav-btn.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(0,255,136,0.06);
+    text-shadow: 0 0 10px var(--glow);
+  }
+  .nav-btn .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #000;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    min-width: 20px;
+    text-align: center;
+  }
+  .nav-badge.red { background: var(--danger); color: #fff; }
+  .nav-badge.yellow { background: var(--warn); color: #000; }
 
-/* Colored stat boxes */
-.stat-box.purple .stat-icon-wrap { background:rgba(191,0,255,0.07); border-color:rgba(191,0,255,0.2); }
-.stat-box.purple .stat-val { color:var(--accent2); text-shadow:0 0 20px rgba(191,0,255,0.4); }
-.stat-box.green .stat-icon-wrap { background:rgba(0,255,153,0.07); border-color:rgba(0,255,153,0.2); }
-.stat-box.green .stat-val { color:var(--accent3); text-shadow:0 0 20px rgba(0,255,153,0.4); }
-.stat-box.orange .stat-icon-wrap { background:rgba(255,153,0,0.07); border-color:rgba(255,153,0,0.2); }
-.stat-box.orange .stat-val { color:var(--warn); text-shadow:0 0 20px rgba(255,153,0,0.4); }
+  .nav-divider { height: 1px; background: var(--border); margin: 10px 20px; }
 
-/* ===== TWO COLUMN GRID ===== */
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem; }
-.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+  /* ── MAIN CONTENT ── */
+  #main {
+    margin-left: 220px;
+    padding: 28px;
+    flex: 1;
+    min-height: calc(100vh - 64px);
+  }
 
-/* ===== TABLES ===== */
-.table-wrap { overflow-x: auto; border-radius: 8px; }
-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-thead { position: sticky; top: 0; z-index: 1; }
-thead th {
-  text-align: left; padding: 0.65rem 0.9rem;
-  font-family: 'Share Tech Mono', monospace; font-size: 0.57rem;
-  color: var(--text2); text-transform: uppercase; letter-spacing: 0.1em;
-  background: var(--card2); border-bottom: 1px solid var(--border2);
-  white-space: nowrap;
-}
-thead th:first-child { border-radius: 8px 0 0 0; }
-thead th:last-child { border-radius: 0 8px 0 0; }
-tbody tr { border-bottom: 1px solid rgba(26,26,58,0.7); transition: background 0.12s; }
-tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: rgba(0,245,255,0.025); }
-tbody td { padding: 0.68rem 0.9rem; vertical-align: middle; }
-.td-center { text-align: center; }
-.mono { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--text2); }
-.td-name { font-weight: 900; color: var(--text); }
+  /* ── PAGE ── */
+  .page { display: none; animation: fadeIn 0.25s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
 
-/* ===== PILLS / BADGES ===== */
-.pill {
-  display: inline-flex; align-items: center; gap: 0.25rem;
-  padding: 0.18rem 0.6rem; border-radius: 100px;
-  font-size: 0.63rem; font-weight: 700; white-space: nowrap;
-}
-.pill-cyan   { background:rgba(0,245,255,0.1); color:var(--accent);  border:1px solid rgba(0,245,255,0.25); }
-.pill-purple { background:rgba(191,0,255,0.1); color:var(--accent2); border:1px solid rgba(191,0,255,0.25); }
-.pill-green  { background:rgba(0,255,153,0.1); color:var(--accent3); border:1px solid rgba(0,255,153,0.25); }
-.pill-orange { background:rgba(255,153,0,0.1); color:var(--warn);    border:1px solid rgba(255,153,0,0.25); }
-.pill-red    { background:rgba(255,34,85,0.1);  color:var(--danger);  border:1px solid rgba(255,34,85,0.25); }
-.pill-grey   { background:rgba(85,102,170,0.1); color:var(--text2);   border:1px solid rgba(85,102,170,0.2); }
+  /* ── PAGE HEADER ── */
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+  }
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+  .page-subtitle { font-size: 0.85rem; color: var(--text2); margin-top: 2px; font-family: var(--font-mono); }
 
-/* ===== BUTTONS ===== */
-.btn {
-  padding: 0.42rem 0.95rem; border-radius: 7px;
-  border: 1px solid var(--border2); background: transparent;
-  color: var(--text); font-family: 'Nunito', sans-serif;
-  font-size: 0.79rem; font-weight: 700; cursor: pointer;
-  transition: all 0.18s; white-space: nowrap; display: inline-flex;
-  align-items: center; gap: 0.35rem;
-}
-.btn:hover { border-color: var(--accent); color: var(--accent); }
-.btn:active { transform: scale(0.97); }
-.btn-accent { border-color: var(--accent); color: var(--accent); }
-.btn-accent:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 16px var(--glow); }
-.btn-purple { border-color: var(--accent2); color: var(--accent2); }
-.btn-purple:hover { background: var(--accent2); color: var(--bg); box-shadow: 0 0 16px var(--glow2); }
-.btn-green  { border-color: var(--accent3); color: var(--accent3); }
-.btn-green:hover  { background: var(--accent3); color: var(--bg); }
-.btn-danger { border-color: var(--danger); color: var(--danger); }
-.btn-danger:hover { background: var(--danger); color: #fff; }
-.btn-warn   { border-color: var(--warn); color: var(--warn); }
-.btn-warn:hover   { background: var(--warn); color: var(--bg); }
-.btn-sm { padding: 0.28rem 0.65rem; font-size: 0.71rem; border-radius: 6px; }
-.btn-xs { padding: 0.18rem 0.48rem; font-size: 0.63rem; border-radius: 5px; }
-.btn-wide { width: 100%; justify-content: center; padding: 0.72rem; }
-.btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  /* ── STATS ROW ── */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
 
-/* ===== INPUTS ===== */
-.inp {
-  background: var(--surface); border: 1px solid var(--border2);
-  border-radius: 8px; padding: 0.5rem 0.85rem;
-  color: var(--text); font-family: 'Nunito', sans-serif;
-  font-size: 0.85rem; outline: none;
-  transition: border 0.2s, box-shadow 0.2s;
-}
-.inp:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,245,255,0.08); }
-.inp-sm { padding: 0.3rem 0.6rem; font-size: 0.78rem; }
-.inp-xs { padding: 0.2rem 0.5rem; font-size: 0.72rem; width: 72px; }
-.inp-full { width: 100%; }
-.inp-num { width: 80px; text-align: center; font-family: 'Share Tech Mono', monospace; }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--border2); }
+  .stat-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--accent);
+    opacity: 0.6;
+  }
+  .stat-card.blue::before { background: var(--accent2); }
+  .stat-card.orange::before { background: var(--accent3); }
+  .stat-card.red::before { background: var(--danger); }
+  .stat-card.purple::before { background: var(--purple); }
+  .stat-card.yellow::before { background: var(--warn); }
 
-/* ===== SEARCH BAR ===== */
-.search-row {
-  display: flex; gap: 0.6rem; flex-wrap: wrap;
-  align-items: center; margin-bottom: 1rem;
-}
-.search-inp {
-  flex: 1; min-width: 200px;
-  background: var(--surface); border: 1px solid var(--border2);
-  border-radius: 8px; padding: 0.52rem 1rem 0.52rem 2.2rem;
-  color: var(--text); font-family: 'Nunito', sans-serif; font-size: 0.85rem;
-  outline: none; transition: border 0.2s;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235566aa' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: 0.65rem center; background-size: 15px;
-}
-.search-inp:focus { border-color: var(--accent); }
+  .stat-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text2); letter-spacing: 0.15em; margin-bottom: 8px; }
+  .stat-value { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--text); line-height: 1; }
+  .stat-value.green { color: var(--accent); text-shadow: 0 0 20px var(--glow); }
+  .stat-value.blue { color: var(--accent2); }
+  .stat-value.orange { color: var(--accent3); }
+  .stat-value.red { color: var(--danger); }
+  .stat-value.yellow { color: var(--warn); }
+  .stat-sub { font-size: 0.75rem; color: var(--text3); margin-top: 4px; }
 
-/* ===== LEADERBOARD BARS ===== */
-.lb-row { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.6rem; }
-.lb-rank {
-  min-width: 2rem; text-align: center;
-  font-family: 'Orbitron', sans-serif; font-size: 0.65rem; font-weight: 900;
-}
-.rank-1-col { color: #ffd700; }
-.rank-2-col { color: #c0c0c0; }
-.rank-3-col { color: #cd7f32; }
-.rank-n-col { color: var(--text2); }
-.lb-name { min-width: 110px; font-size: 0.82rem; font-weight: 700; color: var(--text); }
-.lb-bar-track { flex: 1; height: 10px; background: var(--border2); border-radius: 100px; overflow: hidden; }
-.lb-bar-fill {
-  height: 100%; border-radius: 100px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  transition: width 0.7s cubic-bezier(0.4,0,0.2,1);
-}
-.lb-count { min-width: 28px; text-align: right; font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--accent); font-weight: 700; }
+  /* ── CARD ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 18px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+  }
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.15em;
+  }
 
-/* ===== VOTE GRID ===== */
-.vote-grid {
-  display: grid; gap: 0.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-.vote-row {
-  display: grid; grid-template-columns: 120px 1fr auto auto auto;
-  align-items: center; gap: 0.5rem;
-  background: var(--card2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 0.6rem 0.8rem;
-  transition: border-color 0.2s;
-}
-.vote-row:hover { border-color: var(--border2); }
-.vote-person { font-size: 0.82rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.vote-bar-mini { height: 6px; background: var(--border2); border-radius: 100px; overflow: hidden; }
-.vote-bar-mini-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent3)); border-radius: 100px; transition: width 0.5s ease; }
-.vote-actions { display: flex; gap: 0.3rem; }
+  /* ── BUTTONS ── */
+  .btn {
+    padding: 8px 18px;
+    border-radius: 7px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  .btn:hover { background: rgba(0,255,136,0.1); box-shadow: 0 0 14px var(--glow); }
+  .btn:active { transform: scale(0.97); }
 
-/* ===== JSON EDITOR ===== */
-.json-area {
-  width: 100%; min-height: 220px;
-  background: #030308; border: 1px solid var(--border2);
-  border-radius: 10px; padding: 0.9rem;
-  color: #7ec8e3; font-family: 'Share Tech Mono', monospace;
-  font-size: 0.75rem; outline: none; resize: vertical;
-  transition: border 0.2s; line-height: 1.7;
-}
-.json-area:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,245,255,0.06); }
+  .btn.blue { border-color: var(--accent2); color: var(--accent2); }
+  .btn.blue:hover { background: rgba(0,204,255,0.1); box-shadow: 0 0 14px var(--glow2); }
 
-/* ===== MODAL ===== */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 7000;
-  background: rgba(0,0,0,0.88); backdrop-filter: blur(6px);
-  display: flex; align-items: center; justify-content: center;
-  padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.25s;
-}
-.modal-overlay.open { opacity: 1; pointer-events: all; }
-.modal-box {
-  background: var(--card); border: 1px solid var(--border2);
-  border-radius: 18px; padding: 2rem;
-  width: 100%; max-width: 500px; max-height: 88vh; overflow-y: auto;
-  box-shadow: 0 0 80px var(--glow), 0 40px 60px rgba(0,0,0,0.6);
-  transform: scale(0.88) translateY(20px);
-  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-  position: relative;
-}
-.modal-overlay.open .modal-box { transform: scale(1) translateY(0); }
-.modal-box::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
-  border-radius: 18px 18px 0 0;
-}
-.modal-title {
-  font-family: 'Orbitron', sans-serif; font-size: 0.78rem;
-  color: var(--accent); margin-bottom: 1.5rem;
-  padding-bottom: 0.9rem; border-bottom: 1px solid var(--border2);
-  display: flex; align-items: center; gap: 0.5rem;
-}
-.modal-close {
-  position: absolute; top: 1rem; right: 1rem;
-  background: none; border: 1px solid var(--border2); border-radius: 6px;
-  color: var(--text2); width: 28px; height: 28px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
-  transition: all 0.2s;
-}
-.modal-close:hover { border-color: var(--danger); color: var(--danger); }
-.form-row { margin-bottom: 1rem; }
-.form-label {
-  display: block; font-family: 'Share Tech Mono', monospace;
-  font-size: 0.57rem; color: var(--text2); text-transform: uppercase;
-  letter-spacing: 0.1em; margin-bottom: 0.38rem;
-}
-.form-hint { font-size: 0.68rem; color: var(--text3); margin-top: 0.25rem; }
+  .btn.red { border-color: var(--danger); color: var(--danger); }
+  .btn.red:hover { background: rgba(255,51,85,0.1); }
 
-/* ===== DANGER ZONE ===== */
-.danger-zone {
-  border: 1px solid rgba(255,34,85,0.25);
-  border-radius: 10px; padding: 1rem 1.1rem;
-  background: rgba(255,34,85,0.04); margin-top: 1rem;
-}
-.danger-zone-title {
-  font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
-  color: var(--danger); text-transform: uppercase; letter-spacing: 0.1em;
-  margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.4rem;
-}
-.confirm-delete-row {
-  display: none; align-items: center; gap: 0.5rem;
-  background: rgba(255,34,85,0.08); border: 1px solid rgba(255,34,85,0.2);
-  border-radius: 8px; padding: 0.6rem 0.8rem;
-  font-size: 0.78rem; color: var(--danger); flex-wrap: wrap;
-  margin-top: 0.5rem;
-}
-.confirm-delete-row.show { display: flex; }
+  .btn.orange { border-color: var(--accent3); color: var(--accent3); }
+  .btn.orange:hover { background: rgba(255,102,0,0.1); }
 
-/* ===== TOAST ===== */
-#toast {
-  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
-  background: var(--card2); border-radius: 12px;
-  padding: 0.9rem 1.3rem;
-  font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
-  max-width: 320px; line-height: 1.5;
-  transform: translateX(120%); opacity: 0;
-  transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
-  pointer-events: none; box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-}
-#toast.show  { transform: none; opacity: 1; border:1px solid rgba(0,255,153,0.3); color:var(--accent3); box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 20px var(--glow3); }
-#toast.error { transform: none; opacity: 1; border:1px solid rgba(255,34,85,0.3);  color:var(--danger);  box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
-#toast.warn  { transform: none; opacity: 1; border:1px solid rgba(255,153,0,0.3);  color:var(--warn);    box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+  .btn.yellow { border-color: var(--warn); color: var(--warn); }
+  .btn.yellow:hover { background: rgba(255,204,0,0.1); }
 
-/* ===== ACTIVITY LOG ===== */
-.log-entry {
-  display: flex; align-items: flex-start; gap: 0.7rem;
-  padding: 0.6rem 0; border-bottom: 1px solid rgba(26,26,58,0.5);
-  font-size: 0.8rem;
-}
-.log-entry:last-child { border-bottom: none; }
-.log-icon { font-size: 1rem; min-width: 1.3rem; text-align: center; margin-top: 0.1rem; }
-.log-text { flex: 1; color: var(--text); line-height: 1.4; }
-.log-time { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--text3); white-space: nowrap; }
+  .btn.purple { border-color: var(--purple); color: var(--purple); }
+  .btn.purple:hover { background: rgba(170,68,255,0.1); }
 
-/* ===== QUICK ACTIONS ===== */
-.quick-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.7rem; }
-.quick-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
-  padding: 1rem 0.8rem; border-radius: 12px;
-  border: 1px solid var(--border2); background: var(--card2);
-  cursor: pointer; transition: all 0.2s; text-decoration: none; color: var(--text2);
-}
-.quick-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-.quick-btn-icon { font-size: 1.6rem; }
-.quick-btn-label { font-size: 0.72rem; font-weight: 700; text-align: center; }
+  .btn.solid { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+  .btn.solid:hover { background: #00ffaa; box-shadow: 0 0 20px var(--glow); }
 
-/* ===== SETTINGS / DB ===== */
-.path-chip {
-  display: inline-flex; align-items: center; gap: 0.3rem;
-  padding: 0.28rem 0.75rem; border-radius: 100px;
-  border: 1px solid var(--border2); background: var(--card2);
-  font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
-  color: var(--text2); cursor: pointer; transition: all 0.2s;
-}
-.path-chip:hover { border-color: var(--accent); color: var(--accent); }
-.chips-row { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .btn.solid-red { background: var(--danger); color: #fff; border-color: var(--danger); font-weight: 700; }
+  .btn.solid-red:hover { background: #ff5577; }
 
-/* ===== DIVIDER ===== */
-.divider { height: 1px; background: var(--border); margin: 1.2rem 0; }
+  .btn.big { padding: 12px 24px; font-size: 0.72rem; }
+  .btn.sm { padding: 5px 12px; font-size: 0.58rem; }
 
-/* ===== LOADING ===== */
-.loading-row {
-  text-align: center; padding: 2.5rem 1rem;
-  font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
-  color: var(--text3);
-}
-.loading-spinner {
-  display: inline-block; width: 20px; height: 20px;
-  border: 2px solid var(--border2); border-top-color: var(--accent);
-  border-radius: 50%; animation: spin 0.8s linear infinite;
-  vertical-align: middle; margin-right: 0.5rem;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 900px) {
-  .two-col { grid-template-columns: 1fr; }
-  .three-col { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 680px) {
-  :root { --sidebar-w: 0px; }
-  .sidebar { transform: translateX(-240px); --sidebar-w: 240px; box-shadow: none; }
-  .sidebar.open { transform: none; box-shadow: 8px 0 40px rgba(0,0,0,0.7); }
-  .topbar { left: 0; }
-  .hamburger-btn { display: flex !important; }
-  .main { margin-left: 0; }
-  .main-inner { padding: 1rem 1rem 3rem; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .three-col { grid-template-columns: 1fr; }
-  .vote-row { grid-template-columns: 1fr auto auto; }
-  .vote-row .lb-bar-track { display: none; }
-}
+  /* ── INPUT ── */
+  .input {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 9px 14px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .input:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--glow); }
+  .input::placeholder { color: var(--text3); }
 
-/* ===== SCROLLABLE TABLE CONTAINER ===== */
-.scroll-table { max-height: 420px; overflow-y: auto; border-radius: 8px; }
+  label.lbl { font-family: var(--font-mono); font-size: 0.58rem; color: var(--text2); letter-spacing: 0.12em; display: block; margin-bottom: 5px; }
 
-/* ===== EMPTY STATE ===== */
-.empty-state {
-  text-align: center; padding: 2rem;
-  color: var(--text3); font-size: 0.82rem;
-}
-.empty-state-icon { font-size: 2rem; margin-bottom: 0.4rem; }
+  /* ── VOTE BAR ── */
+  .vote-item {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr auto auto;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    transition: border-color 0.2s;
+  }
+  .vote-item:hover { border-color: var(--border2); }
+
+  .vote-rank { font-family: var(--font-display); font-size: 0.85rem; text-align: center; }
+  .vote-info { min-width: 0; }
+  .vote-name { font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vote-bar-wrap { height: 6px; background: var(--border); border-radius: 100px; overflow: hidden; }
+  .vote-bar-fill { height: 100%; border-radius: 100px; transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+
+  .vote-count { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--accent); min-width: 3rem; text-align: right; }
+  .vote-actions { display: flex; gap: 5px; }
+
+  /* ── USER CARD ── */
+  .user-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+  .user-card:hover { border-color: var(--border2); }
+  .user-card.admin-card { border-color: rgba(255,204,0,0.3); }
+
+  .user-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .user-name-wrap { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .user-name { font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: var(--text); }
+  .badge {
+    padding: 2px 8px; border-radius: 4px;
+    font-family: var(--font-mono); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em;
+  }
+  .badge.admin { background: var(--warn); color: #000; }
+  .badge.voted { background: rgba(0,255,136,0.15); color: var(--accent); border: 1px solid rgba(0,255,136,0.3); }
+  .badge.not-voted { background: rgba(255,51,85,0.1); color: var(--danger); border: 1px solid rgba(255,51,85,0.3); }
+
+  .user-uid { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text3); margin-top: 2px; }
+  .user-vote-info { font-size: 0.8rem; color: var(--text2); margin-top: 4px; }
+
+  .user-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .user-edit-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+  /* ── RAW JSON ── */
+  .json-viewer {
+    background: #020c10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: #7af0c8;
+    max-height: 600px;
+    overflow-y: auto;
+  }
+  .json-key { color: #00ccff; }
+  .json-str { color: #ffcc66; }
+  .json-num { color: #ff9944; }
+  .json-bool { color: #aa44ff; }
+  .json-null { color: #ff3355; }
+
+  /* ── TOOLS ── */
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+
+  .tool-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .tool-card:hover { border-color: var(--border2); }
+  .tool-card-title {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tool-card-title.green { color: var(--accent); }
+  .tool-card-title.blue { color: var(--accent2); }
+  .tool-card-title.red { color: var(--danger); }
+  .tool-card-title.orange { color: var(--accent3); }
+  .tool-card-title.yellow { color: var(--warn); }
+  .tool-card-title.purple { color: var(--purple); }
+
+  .tool-desc { font-size: 0.8rem; color: var(--text2); margin-bottom: 14px; line-height: 1.6; }
+  .tool-row { display: flex; flex-direction: column; gap: 8px; }
+  .tool-inline { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+  .field-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 100px; }
+
+  /* ── CONSOLE LOG ── */
+  #consoleBox {
+    position: fixed; bottom: 0; left: 220px; right: 0;
+    height: 0; background: rgba(2,4,8,0.98);
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+    transition: height 0.3s ease;
+    z-index: 60;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+  }
+  #consoleBox.open { height: 180px; }
+  #consoleToggle {
+    position: fixed; bottom: 0; right: 20px;
+    z-index: 61;
+    padding: 4px 14px;
+    background: rgba(2,4,8,0.98);
+    border: 1px solid var(--border2);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    color: var(--text2);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.1em;
+  }
+  #consoleToggle:hover { color: var(--accent); border-color: var(--accent); }
+
+  #consoleInner { height: 100%; padding: 8px 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
+  .log-line { display: flex; gap: 8px; }
+  .log-time { color: var(--text3); flex-shrink: 0; }
+  .log-msg { color: var(--accent); }
+  .log-msg.error { color: var(--danger); }
+  .log-msg.warn { color: var(--warn); }
+  .log-msg.info { color: var(--accent2); }
+
+  /* ── TOAST ── */
+  #toastContainer { position: fixed; top: 76px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+  .toast {
+    padding: 12px 20px;
+    border-radius: 9px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-left: 3px solid var(--accent);
+    background: rgba(6,13,20,0.98);
+    color: var(--accent);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 20px var(--glow);
+    animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+    max-width: 320px;
+  }
+  .toast.error { border-left-color: var(--danger); color: var(--danger); box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+  .toast.warn { border-left-color: var(--warn); color: var(--warn); }
+  .toast.info { border-left-color: var(--accent2); color: var(--accent2); }
+  @keyframes slideIn { from{opacity:0;transform:translateX(20px);} to{opacity:1;transform:translateX(0);} }
+  @keyframes fadeOut { from{opacity:1;} to{opacity:0;transform:translateX(20px);} }
+
+  /* ── MODAL ── */
+  #modal {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,0);
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; transition: background 0.3s;
+  }
+  #modal.open { background: rgba(0,0,0,0.85); pointer-events: all; }
+  #modal-box {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    padding: 28px 32px;
+    max-width: 480px; width: 95%;
+    box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 40px rgba(0,255,136,0.05);
+    transform: scale(0.9); opacity: 0;
+    transition: all 0.3s cubic-bezier(.34,1.56,.64,1);
+  }
+  #modal.open #modal-box { transform: scale(1); opacity: 1; }
+  .modal-title { font-family: var(--font-display); font-size: 0.85rem; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 14px; }
+  .modal-body { font-size: 0.9rem; color: var(--text2); line-height: 1.7; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* ── SEARCH ── */
+  .search-bar { position: relative; margin-bottom: 18px; }
+  .search-input { width: 100%; padding: 10px 14px 10px 38px; }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 0.9rem; pointer-events: none; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th { background: var(--card2); padding: 10px 16px; text-align: left; font-family: var(--font-mono); font-size: 0.58rem; color: var(--text2); letter-spacing: 0.15em; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(0,255,136,0.02); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
+  .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .empty-text { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; }
+
+  /* ── LOADING ── */
+  .loading { display: flex; align-items: center; gap: 10px; color: var(--text2); font-family: var(--font-mono); font-size: 0.72rem; padding: 20px; }
+  .spinner { width: 16px; height: 16px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg);} }
+
+  /* ── SELECT ── */
+  select.input { cursor: pointer; }
+
+  /* ── TEXTAREA ── */
+  textarea.input { resize: vertical; min-height: 80px; }
+
+  /* ── HIGHLIGHT COLORS ── */
+  .c-green { color: var(--accent); }
+  .c-blue { color: var(--accent2); }
+  .c-orange { color: var(--accent3); }
+  .c-red { color: var(--danger); }
+  .c-yellow { color: var(--warn); }
+  .c-purple { color: var(--purple); }
+
+  /* ── BOT STATUS ── */
+  .bot-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 100px;
+    font-family: var(--font-mono); font-size: 0.6rem;
+    background: rgba(255,51,85,0.1); border: 1px solid rgba(255,51,85,0.3); color: var(--danger);
+    margin-top: 10px;
+  }
+  .bot-status.active { background: rgba(0,255,136,0.1); border-color: rgba(0,255,136,0.3); color: var(--accent); }
+  .bot-status .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 1.5s infinite; }
+
+  /* ── WEEK DISPLAY ── */
+  .week-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 6px;
+    font-family: var(--font-mono); font-size: 0.6rem;
+    background: rgba(0,204,255,0.08); border: 1px solid rgba(0,204,255,0.2); color: var(--accent2);
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 100px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    #sidenav { display: none; }
+    #main { margin-left: 0; padding: 16px; }
+    #consoleBox { left: 0; }
+    .stats-row { grid-template-columns: repeat(2,1fr); }
+    .tools-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── SEPARATOR ── */
+  hr.sep { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  /* ── DIFF VIEW ── */
+  .diff-before { color: var(--danger); }
+  .diff-after { color: var(--accent); }
+
+  /* ── TOGGLE SWITCH ── */
+  .toggle-wrap { display: flex; align-items: center; gap: 10px; }
+  .toggle { position: relative; width: 36px; height: 20px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0;
+    background: var(--border2); border-radius: 100px; cursor: pointer;
+    transition: 0.2s;
+  }
+  .toggle-slider:before {
+    content: ''; position: absolute;
+    width: 14px; height: 14px;
+    left: 3px; top: 3px;
+    background: var(--text2); border-radius: 50%;
+    transition: 0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background: rgba(0,255,136,0.3); }
+  .toggle input:checked + .toggle-slider:before { transform: translateX(16px); background: var(--accent); }
+  .toggle-label { font-size: 0.82rem; color: var(--text2); }
 </style>
 </head>
 <body>
-
-<!-- ==================== AUTH SCREEN ==================== -->
-<div id="authScreen">
-  <div class="auth-wrap">
-    <div class="auth-card">
-      <div class="auth-icon">🛡️</div>
-      <div class="auth-title">7D ADMIN</div>
-      <div class="auth-sub">RESTRICTED — AUTHORIZED ONLY</div>
-      <div class="form-group">
-        <label class="form-label">Admin Username</label>
-        <input class="auth-input" id="loginUser" type="text" placeholder="username eingeben" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Passwort</label>
-        <input class="auth-input" id="loginPass" type="password" placeholder="passwort eingeben" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
-      </div>
-      <button class="auth-btn" onclick="doLogin()"><span>▶ EINLOGGEN</span></button>
-      <div class="auth-err" id="loginErr"></div>
-      <div class="auth-attempts" id="loginAttempts"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== MAIN APP ==================== -->
+<div class="scanline"></div>
 <div id="app">
 
-  <!-- SIDEBAR -->
-  <nav class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo-row">
-        <div class="logo-icon">⚡</div>
-        <div>
-          <div class="logo-text">7D ZONE</div>
-          <div class="logo-badge">ADMIN PANEL</div>
-        </div>
-      </div>
-      <div class="sidebar-ver">v2.0 — Firebase RT DB</div>
-    </div>
-    <div class="nav-section">Dashboard</div>
-    <div class="nav-item active" onclick="goPage('dashboard',this)" id="nav-dashboard">
-      <span class="nav-icon">📊</span> Übersicht
-    </div>
-    <div class="nav-section">Verwaltung</div>
-    <div class="nav-item" onclick="goPage('users',this)" id="nav-users">
-      <span class="nav-icon">👤</span> Benutzer
-      <span class="nav-badge" id="userCountBadge">—</span>
-    </div>
-    <div class="nav-item" onclick="goPage('votes',this)" id="nav-votes">
-      <span class="nav-icon">⭐</span> Voting
-    </div>
-    <div class="nav-section">Werkzeuge</div>
-    <div class="nav-item" onclick="goPage('db',this)" id="nav-db">
-      <span class="nav-icon">🗄️</span> Datenbank
-    </div>
-    <div class="nav-item" onclick="goPage('log',this)" id="nav-log">
-      <span class="nav-icon">📋</span> Aktivitäts-Log
-    </div>
-    <div class="sidebar-footer">
-      <div class="admin-info">
-        <div class="admin-avatar" id="adminAvatar">H</div>
-        <div>
-          <div class="admin-name" id="adminNameDisplay">halil</div>
-          <div class="admin-role">Super Admin</div>
-        </div>
-        <div class="online-dot"></div>
-      </div>
-      <button class="sidebar-logout" onclick="doLogout()">🚪 Logout</button>
-    </div>
-  </nav>
-
   <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <button class="hamburger-btn" onclick="toggleSidebar()">
-        <span></span><span></span><span></span>
-      </button>
+  <div id="topbar">
+    <div class="logo-area">
+      <span class="logo-icon">🔥</span>
       <div>
-        <div class="page-title" id="pageTitle">ÜBERSICHT</div>
-        <div class="breadcrumb" id="pageBreadcrumb">Admin / Dashboard</div>
+        <div class="logo-text">7D ZONE ADMIN</div>
+        <div class="logo-sub">FIREBASE CONTROL PANEL v2.0</div>
       </div>
     </div>
     <div class="topbar-right">
-      <span class="clock-display" id="clockDisplay">—</span>
-      <div class="status-pill"><div class="live-dot"></div>LIVE</div>
-      <button class="topbar-btn" onclick="reloadCurrentPage()" title="Neu laden">↻</button>
+      <span class="week-badge">📅 <span id="weekDisplay">HAFTA YÜKLENİYOR</span></span>
+      <div class="status-dot" id="statusDot"></div>
+      <span class="status-text" id="statusText">BAĞLANIYOR...</span>
+      <button class="btn-reload" onclick="fullReload()">↻ YENİLE</button>
     </div>
   </div>
 
-  <!-- MAIN CONTENT -->
-  <div class="main">
-    <div class="main-inner">
+  <!-- SIDENAV -->
+  <nav id="sidenav">
+    <div class="nav-section-label">GENEL BAKIŞ</div>
+    <button class="nav-btn active" onclick="switchPage('dashboard',this)" data-page="dashboard">
+      <span class="nav-icon">📊</span> Dashboard
+      <span class="nav-badge" id="nb-dashboard">—</span>
+    </button>
 
-      <!-- ====== PAGE: DASHBOARD ====== -->
-      <div class="page active" id="page-dashboard">
-        <div class="stats-grid">
-          <div class="stat-box">
-            <div class="stat-box-top">
-              <div class="stat-icon-wrap">👤</div>
-            </div>
-            <div class="stat-val" id="sUser">—</div>
-            <div class="stat-label">Registrierte User</div>
-            <div class="stat-trend" id="sTrend1">Firebase Auth DB</div>
-          </div>
-          <div class="stat-box purple">
-            <div class="stat-box-top"><div class="stat-icon-wrap" style="background:rgba(191,0,255,0.07);border-color:rgba(191,0,255,0.2);">⭐</div></div>
-            <div class="stat-val" id="sVotes">—</div>
-            <div class="stat-label">Votes diese Woche</div>
-            <div class="stat-trend" id="sTrend2">Woche: <span id="sWeek">—</span></div>
-          </div>
-          <div class="stat-box orange">
-            <div class="stat-box-top"><div class="stat-icon-wrap" style="background:rgba(255,153,0,0.07);border-color:rgba(255,153,0,0.2);">🏆</div></div>
-            <div class="stat-val" id="sTop" style="font-size:1.1rem;margin-top:0.9rem;">—</div>
-            <div class="stat-label">Führt das Voting an</div>
-            <div class="stat-trend" id="sTopVotes">— Stimmen</div>
-          </div>
-          <div class="stat-box green">
-            <div class="stat-box-top"><div class="stat-icon-wrap" style="background:rgba(0,255,153,0.07);border-color:rgba(0,255,153,0.2);">📊</div></div>
-            <div class="stat-val" id="sNames">—</div>
-            <div class="stat-label">Namen im Voting</div>
-            <div class="stat-trend">Aktive Kandidaten</div>
-          </div>
+    <div class="nav-section-label">VERİ</div>
+    <button class="nav-btn" onclick="switchPage('votes',this)" data-page="votes">
+      <span class="nav-icon">⭐</span> Votes
+      <span class="nav-badge" id="nb-votes">0</span>
+    </button>
+    <button class="nav-btn" onclick="switchPage('users',this)" data-page="users">
+      <span class="nav-icon">👥</span> Kullanıcılar
+      <span class="nav-badge blue" id="nb-users">0</span>
+    </button>
+
+    <div class="nav-section-label">ARAÇLAR</div>
+    <button class="nav-btn" onclick="switchPage('tools',this)" data-page="tools">
+      <span class="nav-icon">🛠️</span> Araçlar
+    </button>
+    <button class="nav-btn" onclick="switchPage('raw',this)" data-page="raw">
+      <span class="nav-icon">📄</span> Raw JSON
+    </button>
+    <button class="nav-btn" onclick="switchPage('writer',this)" data-page="writer">
+      <span class="nav-icon">✏️</span> DB Yazıcı
+    </button>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">TEHLİKELİ</div>
+    <button class="nav-btn" onclick="switchPage('danger',this)" data-page="danger">
+      <span class="nav-icon">⚠️</span> Temizleme
+      <span class="nav-badge red">!</span>
+    </button>
+  </nav>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📊 DASHBOARD</div>
+          <div class="page-subtitle" id="lastRefreshText">SON GÜNCELLEME: —</div>
         </div>
-
-        <div class="two-col">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">🏆 TOP-10 LEADERBOARD</div>
-              <div class="card-actions">
-                <button class="btn btn-sm" onclick="loadDashboard()">↻</button>
-              </div>
-            </div>
-            <div id="dashLeaderboard"><div class="loading-row"><span class="loading-spinner"></span>Lädt...</div></div>
-          </div>
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">👤 LETZTE BENUTZER</div>
-              <div class="card-actions">
-                <button class="btn btn-accent btn-sm" onclick="goPage('users',document.getElementById('nav-users'))">Alle →</button>
-              </div>
-            </div>
-            <div id="dashRecentUsers"><div class="loading-row"><span class="loading-spinner"></span>Lädt...</div></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">⚡ SCHNELL-AKTIONEN</div>
-          <div class="quick-grid">
-            <div class="quick-btn" onclick="goPage('users',document.getElementById('nav-users'))">
-              <div class="quick-btn-icon">👤</div>
-              <div class="quick-btn-label">User verwalten</div>
-            </div>
-            <div class="quick-btn" onclick="goPage('votes',document.getElementById('nav-votes'))">
-              <div class="quick-btn-icon">⭐</div>
-              <div class="quick-btn-label">Votes bearbeiten</div>
-            </div>
-            <div class="quick-btn" onclick="resetAllVotesConfirm()">
-              <div class="quick-btn-icon">🗑️</div>
-              <div class="quick-btn-label">Alle Votes löschen</div>
-            </div>
-            <div class="quick-btn" onclick="goPage('db',document.getElementById('nav-db'))">
-              <div class="quick-btn-icon">🗄️</div>
-              <div class="quick-btn-label">Datenbank</div>
-            </div>
-            <div class="quick-btn" onclick="reloadCurrentPage()">
-              <div class="quick-btn-icon">↻</div>
-              <div class="quick-btn-label">Alles neu laden</div>
-            </div>
-            <div class="quick-btn" onclick="goPage('log',document.getElementById('nav-log'))">
-              <div class="quick-btn-icon">📋</div>
-              <div class="quick-btn-label">Aktivitäts-Log</div>
-            </div>
-          </div>
+        <div class="btn-row">
+          <button class="btn solid" onclick="fullReload()">↻ TÜM VERİYİ YENİLE</button>
         </div>
       </div>
 
-      <!-- ====== PAGE: USERS ====== -->
-      <div class="page" id="page-users">
+      <div class="stats-row" id="statsRow">
+        <div class="stat-card"><div class="stat-label">TOPLAM KULLANICI</div><div class="stat-value green" id="stat-users">—</div><div class="stat-sub">kayıtlı hesap</div></div>
+        <div class="stat-card blue"><div class="stat-label">TOPLAM VOTE</div><div class="stat-value blue" id="stat-totalvotes">—</div><div class="stat-sub">bu hafta</div></div>
+        <div class="stat-card orange"><div class="stat-label">OY VEREN</div><div class="stat-value orange" id="stat-voted">—</div><div class="stat-sub">kullanıcı</div></div>
+        <div class="stat-card purple"><div class="stat-label">ADMİN SAYISI</div><div class="stat-value purple" id="stat-admins">—</div><div class="stat-sub">yetkili hesap</div></div>
+        <div class="stat-card yellow"><div class="stat-label">VOTE LİDERİ</div><div class="stat-value yellow" id="stat-leader" style="font-size:0.9rem;">—</div><div class="stat-sub" id="stat-leader-votes">—</div></div>
+        <div class="stat-card red"><div class="stat-label">OY VERMEYENLEr</div><div class="stat-value red" id="stat-notvoted">—</div><div class="stat-sub">kullanıcı</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;flex-wrap:wrap;">
         <div class="card">
           <div class="card-header">
-            <div class="card-title">👤 ALLE BENUTZER</div>
-            <div class="card-actions">
-              <button class="btn btn-accent btn-sm" onclick="loadUsers()">↻ Neu laden</button>
-            </div>
+            <div class="card-title">🏆 TOP 5 OY</div>
+            <button class="btn sm" onclick="switchPage('votes', document.querySelector('[data-page=votes]'))">TÜMÜNÜ GÖR →</button>
           </div>
-          <div class="search-row">
-            <input class="search-inp" id="userSearch" type="text" placeholder="Username oder UID suchen..." oninput="filterUsers()">
-            <select class="inp inp-sm" id="userVoteFilter" onchange="filterUsers()">
-              <option value="all">Alle anzeigen</option>
-              <option value="voted">Nur mit Vote</option>
-              <option value="novote">Nur ohne Vote</option>
-            </select>
+          <div id="dash-top5"><div class="loading"><div class="spinner"></div>Yükleniyor...</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">👥 SON KAYIT</div>
+            <button class="btn sm blue" onclick="switchPage('users', document.querySelector('[data-page=users]'))">TÜMÜNÜ GÖR →</button>
           </div>
-          <div style="font-family:'Share Tech Mono';font-size:0.58rem;color:var(--text2);margin-bottom:0.7rem;" id="userCountInfo">Lädt...</div>
-          <div class="scroll-table table-wrap">
-            <table>
-              <thead><tr>
-                <th>#</th>
-                <th>Username</th>
-                <th>UID</th>
-                <th>Vote (diese Woche)</th>
-                <th>Status</th>
-                <th>Aktionen</th>
-              </tr></thead>
-              <tbody id="usersBody">
-                <tr><td colspan="6"><div class="loading-row"><span class="loading-spinner"></span>Lädt...</div></td></tr>
-              </tbody>
-            </table>
-          </div>
+          <div id="dash-users"><div class="loading"><div class="spinner"></div>Yükleniyor...</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VOTES -->
+    <div class="page" id="page-votes">
+      <div class="page-header">
+        <div>
+          <div class="page-title">⭐ VOTE TABLOSU</div>
+          <div class="page-subtitle">Haftalık oy sıralaması ve yönetimi</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn solid" onclick="fullReload()">↻ YENİLE</button>
+          <button class="btn red" onclick="confirmDeleteAllVotes()">🗑️ TÜM VOTLARI SİL</button>
         </div>
       </div>
 
-      <!-- ====== PAGE: VOTES ====== -->
-      <div class="page" id="page-votes">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">⭐ VOTING — PUNKTE BEARBEITEN</div>
-            <div class="card-actions">
-              <button class="btn btn-danger btn-sm" onclick="resetAllVotesConfirm()">🗑️ Alle zurücksetzen</button>
-              <button class="btn btn-accent btn-sm" onclick="loadVotes()">↻</button>
-            </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">➕ VOTE DÜZENLEME</div></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+          <div class="field-group">
+            <label class="lbl">HEDEF İSİM</label>
+            <input id="vi-name" class="input" placeholder="halil" style="width:160px;" value="halil"/>
           </div>
-          <div style="font-size:0.8rem;color:var(--text2);margin-bottom:1rem;">
-            📅 Aktuelle Woche: <span style="color:var(--accent);font-family:'Share Tech Mono';" id="voteWeekDisplay">—</span>
-            &nbsp;&nbsp;|&nbsp;&nbsp;
-            ⭐ Gesamt Votes: <span style="color:var(--accent3);font-family:'Share Tech Mono';" id="voteTotalDisplay">—</span>
+          <div class="field-group">
+            <label class="lbl">MİKTAR</label>
+            <input id="vi-amount" type="number" class="input" value="100" style="width:100px;"/>
           </div>
-          <div class="search-row" style="margin-bottom:0.8rem;">
-            <input class="search-inp" id="voteSearch" type="text" placeholder="Person suchen..." oninput="filterVotes()" style="max-width:280px;">
-          </div>
-          <div id="votesGrid"><div class="loading-row"><span class="loading-spinner"></span>Lädt...</div></div>
-        </div>
-        <div class="card">
-          <div class="card-title">🏆 LEADERBOARD</div>
-          <div id="votesLeaderboard"><div class="loading-row"><span class="loading-spinner"></span>Lädt...</div></div>
+          <button class="btn solid" onclick="voteAdd()">✅ EKLE</button>
+          <button class="btn orange" onclick="voteRemove()">➖ ÇIKAR</button>
+          <button class="btn blue" onclick="voteSet()">📌 SET ET</button>
+          <button class="btn red" onclick="voteDeleteOne()">🗑️ SİL</button>
         </div>
       </div>
 
-      <!-- ====== PAGE: DATABASE ====== -->
-      <div class="page" id="page-db">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">🗄️ FIREBASE DIREKTZUGRIFF</div>
-          </div>
-          <p style="font-size:0.8rem;color:var(--text2);margin-bottom:1rem;line-height:1.6;">
-            ⚠️ <b style="color:var(--warn);">Vorsicht!</b> Hier kannst du beliebige Firebase-Pfade direkt lesen, schreiben und löschen. Falsche Eingaben können Daten zerstören!
-          </p>
-          <div class="form-row">
-            <label class="form-label">Firebase Pfad</label>
-            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-              <input class="inp inp-full" id="dbPath" type="text" placeholder="z.B. votes7d oder users/UID/username" style="flex:1;">
-              <button class="btn btn-accent" onclick="dbRead()">📖 Lesen</button>
-              <button class="btn btn-danger" onclick="dbDeleteConfirm()">🗑️ Löschen</button>
+      <div id="votesList"><div class="loading"><div class="spinner"></div>Yükleniyor...</div></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="page" id="page-users">
+      <div class="page-header">
+        <div>
+          <div class="page-title">👥 KULLANICI YÖNETİMİ</div>
+          <div class="page-subtitle" id="users-subtitle">Tüm kayıtlı hesaplar</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn solid" onclick="fullReload()">↻ YENİLE</button>
+          <button class="btn orange" onclick="resetAllVotedFlags()">🔄 TÜM OY KAYITLARINI SİL</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding:14px 20px;">
+        <div class="search-bar" style="margin:0;">
+          <span class="search-icon">🔍</span>
+          <input id="userSearch" class="input search-input" placeholder="kullanıcı ara..." oninput="filterUsers()"/>
+        </div>
+      </div>
+
+      <div id="usersList"><div class="loading"><div class="spinner"></div>Yükleniyor...</div></div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="page" id="page-tools">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🛠️ ARAÇLAR</div>
+          <div class="page-subtitle">Vote botları, koruma araçları ve toplu işlemler</div>
+        </div>
+      </div>
+
+      <div class="tools-grid">
+
+        <div class="tool-card">
+          <div class="tool-card-title green">🐱 HALİL VOTE BOMBA</div>
+          <div class="tool-desc">Halil'e istediğin kadar oy ekle. Mevcut oya eklenir.</div>
+          <div class="tool-row">
+            <div class="field-group">
+              <label class="lbl">EKLENECEK OY MİKTARI</label>
+              <input id="t-halilAmt" type="number" class="input" value="999"/>
             </div>
+            <button class="btn solid big" onclick="halilBomb()">🚀 HALİL'E EKLE</button>
           </div>
-          <div class="chips-row" id="quickPaths">
-            <span class="path-chip" onclick="quickPath('votes7d')">⭐ votes7d</span>
-            <span class="path-chip" onclick="quickPath('users')">👤 users</span>
-            <span class="path-chip" onclick="quickPath('usernames')">🔑 usernames</span>
-            <span class="path-chip" onclick="quickPath('votes7d')">📅 votes7d (Woche)</span>
-          </div>
-          <div class="form-row" style="margin-top:0.5rem;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem;">
-              <label class="form-label" style="margin:0;">JSON Daten</label>
-              <div style="display:flex;gap:0.4rem;">
-                <button class="btn btn-xs" onclick="formatJson()">Format</button>
-                <button class="btn btn-xs" onclick="clearJson()">Leeren</button>
+          <div id="t-halilResult" style="margin-top:10px;font-family:var(--font-mono);font-size:0.7rem;color:var(--accent);min-height:20px;"></div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-card-title blue">🛡️ KORUMA BOTU</div>
+          <div class="tool-desc">Her N saniyede Halil'in votunu kontrol eder. Minimum altına düşerse otomatik düzeltir.</div>
+          <div class="tool-row">
+            <div class="tool-inline">
+              <div class="field-group">
+                <label class="lbl">MİNİMUM OY</label>
+                <input id="t-lockMin" type="number" class="input" value="500"/>
+              </div>
+              <div class="field-group">
+                <label class="lbl">KONTROL ARALIĞI (SN)</label>
+                <input id="t-lockInterval" type="number" class="input" value="5"/>
               </div>
             </div>
-            <textarea class="json-area" id="dbJson" placeholder='// Hier erscheinen die gelesenen Daten&#10;// Oder eigene JSON-Daten eingeben&#10;{&#10;  "schluessel": "wert"&#10;}'></textarea>
+            <div class="btn-row">
+              <button class="btn solid" onclick="lockStart()">▶ BAŞLAT</button>
+              <button class="btn red" onclick="lockStop()">⏹ DURDUR</button>
+            </div>
+          </div>
+          <div class="bot-status" id="lockStatus"><div class="dot"></div> BOT: KAPALI</div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-card-title orange">⚡ OTO VOTE BOTU</div>
+          <div class="tool-desc">Belirli aralıklarla otomatik oy ekler. Arka planda çalışır.</div>
+          <div class="tool-row">
+            <div class="tool-inline">
+              <div class="field-group">
+                <label class="lbl">HEDEF</label>
+                <input id="t-autoTarget" class="input" value="halil"/>
+              </div>
+              <div class="field-group">
+                <label class="lbl">HER N SANIYEDE</label>
+                <input id="t-autoInterval" type="number" class="input" value="10"/>
+              </div>
+              <div class="field-group">
+                <label class="lbl">KAÇ OY EKLE</label>
+                <input id="t-autoAmount" type="number" class="input" value="5"/>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn solid" onclick="autoVoteStart()">▶ BAŞLAT</button>
+              <button class="btn red" onclick="autoVoteStop()">⏹ DURDUR</button>
+            </div>
+          </div>
+          <div class="bot-status" id="autoVoteStatus"><div class="dot"></div> BOT: KAPALI</div>
+          <div id="t-autoLog" style="margin-top:8px;font-family:var(--font-mono);font-size:0.65rem;color:var(--text3);max-height:60px;overflow-y:auto;"></div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-card-title yellow">🏆 SADECE HALİL KALS</div>
+          <div class="tool-desc">Tüm oyları siler, sadece Halil'e istediğin skoru yazar.</div>
+          <div class="tool-row">
+            <div class="field-group">
+              <label class="lbl">HALİL'E VERİLECEK OY</label>
+              <input id="t-onlyHalilAmt" type="number" class="input" value="9999"/>
+            </div>
+            <button class="btn yellow" onclick="onlyHalil()">⚡ UYGULA</button>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-card-title purple">👤 TOPLU OY KAYDI SİL</div>
+          <div class="tool-desc">Tüm kullanıcıların bu haftaki oy kaydını siler. Herkes tekrar oy verebilir.</div>
+          <div class="tool-row">
+            <button class="btn purple big" onclick="resetAllVotedFlags()">🔄 TÜM OY KAYITLARINI SİL</button>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-card-title red">🔓 YETKİ VER</div>
+          <div class="tool-desc">Belirli bir kullanıcıya admin yetkisi ver ya da al.</div>
+          <div class="tool-row">
+            <div class="tool-inline">
+              <div class="field-group">
+                <label class="lbl">USERNAME</label>
+                <input id="t-adminTarget" class="input" placeholder="roman"/>
+              </div>
+              <div class="field-group">
+                <label class="lbl">İŞLEM</label>
+                <select id="t-adminAction" class="input">
+                  <option value="give">Admin Ver</option>
+                  <option value="remove">Admin Al</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn red" onclick="toggleAdminByName()">⚡ UYGULA</button>
+          </div>
+          <div id="t-adminResult" style="margin-top:8px;font-family:var(--font-mono);font-size:0.65rem;color:var(--accent);min-height:18px;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RAW JSON -->
+    <div class="page" id="page-raw">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📄 RAW JSON VERİSİ</div>
+          <div class="page-subtitle">Firebase'deki tüm ham veri</div>
+        </div>
+        <div class="btn-row">
+          <select id="rawSection" class="input" onchange="renderRaw()">
+            <option value="all">TÜM VERİ</option>
+            <option value="votes7d">Sadece VOTES</option>
+            <option value="users">Sadece USERS</option>
+          </select>
+          <button class="btn solid" onclick="fullReload()">↻ YENİLE</button>
+          <button class="btn blue" onclick="copyRaw()">📋 KOPYALA</button>
+          <button class="btn" onclick="downloadRaw()">💾 İNDİR</button>
+        </div>
+      </div>
+      <div id="rawContent"><div class="loading"><div class="spinner"></div>Yükleniyor...</div></div>
+    </div>
+
+    <!-- DB YAZICI -->
+    <div class="page" id="page-writer">
+      <div class="page-header">
+        <div>
+          <div class="page-title">✏️ DATABASE YAZICI</div>
+          <div class="page-subtitle">İstediğin path'e direkt oku/yaz/sil</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📍 PATH & DEĞER</div></div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="field-group">
+            <label class="lbl">DATABASE PATH</label>
+            <input id="w-path" class="input" placeholder="/votes7d/halil veya /users/UID/username" style="width:100%;"/>
+          </div>
+          <div class="field-group">
+            <label class="lbl">DEĞER (sayı, "metin", {"json":"obje"}, null)</label>
+            <textarea id="w-value" class="input" placeholder='999 veya "merhaba" veya {"key":"value"}'></textarea>
           </div>
           <div class="btn-row">
-            <button class="btn btn-accent" onclick="dbWrite()">💾 Schreiben (SET — überschreibt alles)</button>
-            <button class="btn btn-warn" onclick="dbPatch()">🔧 Aktualisieren (PATCH — zusammenführen)</button>
-          </div>
-          <div id="dbResult" style="margin-top:1rem;min-height:1.5rem;"></div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">⚡ VORDEFINIERTE AKTIONEN</div>
-          <div class="btn-row">
-            <button class="btn btn-danger" onclick="resetAllVotesConfirm()">🗑️ Alle Votes löschen</button>
-            <button class="btn btn-warn" onclick="clearAllUserVotes()">🔄 Alle User-Votes (wöchentlich) zurücksetzen</button>
-            <button class="btn btn-sm" onclick="readAllData()">📖 Gesamte DB laden</button>
+            <button class="btn solid" onclick="writerSet()">📌 YAZ (PUT)</button>
+            <button class="btn blue" onclick="writerGet()">👁️ OKU (GET)</button>
+            <button class="btn orange" onclick="writerUpdate()">🔄 GÜNCELLE (PATCH)</button>
+            <button class="btn red" onclick="writerDelete()">🗑️ SİL (DELETE)</button>
           </div>
         </div>
       </div>
 
-      <!-- ====== PAGE: LOG ====== -->
-      <div class="page" id="page-log">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">📋 AKTIVITÄTS-LOG</div>
-            <div class="card-actions">
-              <button class="btn btn-danger btn-sm" onclick="clearLog()">🗑️ Log leeren</button>
-            </div>
-          </div>
-          <p style="font-size:0.78rem;color:var(--text2);margin-bottom:1rem;">Alle Aktionen dieser Session werden hier aufgezeichnet.</p>
-          <div id="logList">
-            <div class="empty-state"><div class="empty-state-icon">📋</div>Noch keine Aktivitäten</div>
-          </div>
+      <div class="card" id="writerResult" style="display:none;">
+        <div class="card-header"><div class="card-title">📤 SONUÇ</div></div>
+        <div class="json-viewer" id="writerResultContent"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📚 YARDIMCI PATH LİSTESİ</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;">
+          <div onclick="document.getElementById('w-path').value='/votes7d'" style="padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;color:var(--accent2);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">/votes7d → Tüm oylar</div>
+          <div onclick="document.getElementById('w-path').value='/votes7d/halil'" style="padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;color:var(--accent2);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">/votes7d/halil → Halil'in oyu</div>
+          <div onclick="document.getElementById('w-path').value='/users'" style="padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;color:var(--accent2);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">/users → Tüm kullanıcılar</div>
+          <div onclick="document.getElementById('w-path').value='/usernames'" style="padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;color:var(--accent2);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">/usernames → Username→UID eşleşmesi</div>
+          <div onclick="document.getElementById('w-path').value='/voteWeekMarker'" style="padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;color:var(--accent2);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">/voteWeekMarker → Hafta işaretleyici</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DANGER -->
+    <div class="page" id="page-danger">
+      <div class="page-header">
+        <div>
+          <div class="page-title" style="color:var(--danger);">⚠️ TEHLİKELİ BÖLGE</div>
+          <div class="page-subtitle">Bu işlemler geri alınamaz! Dikkatli kullan.</div>
         </div>
       </div>
 
-    </div><!-- /main-inner -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;">
+
+        <div class="card" style="border-color:rgba(255,51,85,0.3);">
+          <div class="card-header"><div class="card-title" style="color:var(--danger);">🗑️ TÜM VOTE'LARI SİL</div></div>
+          <p style="color:var(--text2);font-size:0.85rem;margin-bottom:16px;line-height:1.6;">votes7d path'indeki tüm veri silinir. Liderboard tamamen sıfırlanır.</p>
+          <button class="btn solid-red big" onclick="confirmDeleteAllVotes()">🗑️ TÜM VOTE'LARI SİL</button>
+        </div>
+
+        <div class="card" style="border-color:rgba(255,102,0,0.3);">
+          <div class="card-header"><div class="card-title" style="color:var(--accent3);">🔄 OY KAYITLARINI SİFIRLA</div></div>
+          <p style="color:var(--text2);font-size:0.85rem;margin-bottom:16px;line-height:1.6;">Tüm kullanıcıların "voted" flagını temizler. Herkes bu hafta tekrar oy verebilir hale gelir.</p>
+          <button class="btn orange big" onclick="resetAllVotedFlags()">🔄 HERKES TEKRAR OY VEREBİLSİN</button>
+        </div>
+
+        <div class="card" style="border-color:rgba(255,51,85,0.3);">
+          <div class="card-header"><div class="card-title" style="color:var(--danger);">💣 TÜM HAFTA VERİSİNİ SİL</div></div>
+          <p style="color:var(--text2);font-size:0.85rem;margin-bottom:16px;line-height:1.6;">Hem votes7d hem de tüm kullanıcıların voted kayıtları silinir. Tam sıfırlama.</p>
+          <button class="btn solid-red big" onclick="confirmNuke()">💣 TAM NUKE</button>
+        </div>
+
+        <div class="card" style="border-color:rgba(170,68,255,0.3);">
+          <div class="card-header"><div class="card-title" style="color:var(--purple);">🗓️ HAFTA MARKER'I SİFIRLA</div></div>
+          <p style="color:var(--text2);font-size:0.85rem;margin-bottom:16px;line-height:1.6;">voteWeekMarker'ı siler. Site bir sonraki açılışta haftalık sıfırlama yapar.</p>
+          <button class="btn purple big" onclick="resetWeekMarker()">🗓️ MARKER'I SİL</button>
+        </div>
+
+        <div class="card" style="border-color:rgba(255,51,85,0.3);">
+          <div class="card-header"><div class="card-title" style="color:var(--danger);">👤 TEK KULLANICI SİL</div></div>
+          <p style="color:var(--text2);font-size:0.85rem;margin-bottom:12px;line-height:1.6;">Belirli bir kullanıcıyı UID ile sil.</p>
+          <div class="field-group" style="margin-bottom:10px;">
+            <label class="lbl">KULLANICI UID</label>
+            <input id="d-deleteUid" class="input" placeholder="UID buraya..." style="width:100%;"/>
+          </div>
+          <button class="btn solid-red" onclick="deleteUserByUid()">🗑️ KULLANICIYI SİL</button>
+        </div>
+
+      </div>
+    </div>
+
   </div><!-- /main -->
-</div><!-- /app -->
-
-<!-- ====== EDIT USER MODAL ====== -->
-<div class="modal-overlay" id="modalEditUser">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modalEditUser')">✕</button>
-    <div class="modal-title">✏️ BENUTZER BEARBEITEN</div>
-    <input type="hidden" id="editUid">
-    <div class="form-row">
-      <label class="form-label">UID (nur lesen)</label>
-      <input class="inp inp-full mono" id="editUidDisplay" type="text" readonly style="color:var(--text3);cursor:default;">
-    </div>
-    <div class="form-row">
-      <label class="form-label">Username</label>
-      <input class="inp inp-full" id="editUsername" type="text" placeholder="Username eingeben">
-      <div class="form-hint">⚠️ Ändert den Namen in der Datenbank. Bisheriger Username-Key bleibt bestehen.</div>
-    </div>
-    <div class="form-row">
-      <label class="form-label">Vote dieser Woche (leer = kein Vote)</label>
-      <input class="inp inp-full" id="editVoteValue" type="text" placeholder="z.B. Roman, Halil, ...">
-      <div class="form-hint">Hier siehst du wen der User gewählt hat. Ändern oder leer lassen zum Löschen.</div>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-accent btn-wide" style="flex:1;" onclick="saveUser()">💾 Änderungen Speichern</button>
-      <button class="btn btn-wide" style="width:auto;" onclick="closeModal('modalEditUser')">✕</button>
-    </div>
-    <div class="danger-zone">
-      <div class="danger-zone-title">⚠️ GEFAHRENZONE</div>
-      <p style="font-size:0.75rem;color:var(--text2);margin-bottom:0.6rem;">User aus der Datenbank entfernen (nicht rückgängig):</p>
-      <button class="btn btn-danger btn-sm" onclick="showDeleteConfirm()">🗑️ User löschen</button>
-      <div class="confirm-delete-row" id="deleteConfirmRow">
-        <span>Wirklich <b id="deleteConfirmName">?</b> löschen?</span>
-        <button class="btn btn-danger btn-sm" onclick="executeDeleteUser()">✅ JA, LÖSCHEN</button>
-        <button class="btn btn-sm" onclick="hideDeleteConfirm()">✕ Nein</button>
-      </div>
-    </div>
-  </div>
 </div>
 
-<!-- ====== VOTE EDIT MODAL (single person) ====== -->
-<div class="modal-overlay" id="modalEditVote">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modalEditVote')">✕</button>
-    <div class="modal-title">⭐ VOTE BEARBEITEN</div>
-    <input type="hidden" id="voteEditName">
-    <div style="text-align:center;margin-bottom:1.2rem;">
-      <div style="font-size:2rem;" id="voteEditEmoji">⭐</div>
-      <div style="font-size:1.1rem;font-weight:900;color:var(--text);" id="voteEditDisplayName">—</div>
-    </div>
-    <div class="form-row">
-      <label class="form-label">Aktuelle Stimmen</label>
-      <input class="inp inp-full inp-num" id="voteEditCount" type="number" min="0" value="0">
-    </div>
-    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
-      <button class="btn btn-sm btn-accent" onclick="voteEditDelta(+1)">+1</button>
-      <button class="btn btn-sm btn-accent" onclick="voteEditDelta(+5)">+5</button>
-      <button class="btn btn-sm btn-accent" onclick="voteEditDelta(+10)">+10</button>
-      <button class="btn btn-sm btn-danger" onclick="voteEditDelta(-1)">-1</button>
-      <button class="btn btn-sm btn-danger" onclick="voteEditDelta(-5)">-5</button>
-      <button class="btn btn-sm" onclick="document.getElementById('voteEditCount').value=0">Auf 0</button>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-accent btn-wide" style="flex:1;" onclick="saveVoteEdit()">💾 Stimmen Speichern</button>
-      <button class="btn btn-danger btn-sm" onclick="clearOneVoteConfirm()">🗑️ Löschen</button>
-    </div>
-  </div>
+<!-- CONSOLE -->
+<button id="consoleToggle" onclick="toggleConsole()">▲ LOG (0)</button>
+<div id="consoleBox">
+  <div id="consoleInner"></div>
 </div>
 
 <!-- TOAST -->
-<div id="toast"></div>
+<div id="toastContainer"></div>
+
+<!-- MODAL -->
+<div id="modal">
+  <div id="modal-box">
+    <div class="modal-title" id="modal-title">ONAY GEREKLİ</div>
+    <div class="modal-body" id="modal-body">Bu işlemi yapmak istediğinden emin misin?</div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">İPTAL</button>
+      <button class="btn solid-red" id="modal-confirm">ONAYLA</button>
+    </div>
+  </div>
+</div>
 
 <script>
-// ===========================
-// FIREBASE CONFIGURATION
-// ===========================
-const FB_CONFIG = {
-  apiKey:      "AIzaSyAm-_eGrLsHnzsdiDAi1XTFU0fP_1AN8Lk",
-  authDomain:  "dzone-9946c.firebaseapp.com",
-  databaseURL: "https://dzone-9946c-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:   "dzone-9946c",
-};
+// ═══════════════════════════════════════════════════
+//  GLOBALS
+// ═══════════════════════════════════════════════════
+const BASE = 'https://dzone-9946c-default-rtdb.europe-west1.firebasedatabase.app';
+let DB = { users: {}, votes: {}, usernames: {} };
+let logCount = 0;
+let lockBot = null, autoBot = null;
+let currentPage = 'dashboard';
 
-// ===========================
-// ADMIN CREDENTIALS
-// ===========================
-const ADMINS = {
-  "halil": "elazigliadmin",
-};
-
-// ===========================
-// GLOBAL STATE
-// ===========================
-let fbDb = null;
-let currentAdmin = null;
-let loginAttempts = 0;
-let lockUntil = 0;
-let allUsersArr = [];
-let allVotesData = {};
-let activityLog = [];
-let currentPageName = 'dashboard';
-
-// ===========================
-// FIREBASE INIT
-// ===========================
-function loadScript(src) {
-  return new Promise((res, rej) => {
-    const s = document.createElement('script');
-    s.src = src; s.onload = res; s.onerror = rej;
-    document.head.appendChild(s);
-  });
-}
-
-(async () => {
-  try {
-    await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
-    await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js');
-    await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js');
-    firebase.initializeApp(FB_CONFIG);
-    fbDb = firebase.database();
-    console.log('[7D Admin] Firebase initialisiert ✓');
-  } catch (e) {
-    console.error('[7D Admin] Firebase Fehler:', e);
-  }
-})();
-
-// ===========================
-// CLOCK
-// ===========================
-function updateClock() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2, '0');
-  const m = String(now.getMinutes()).padStart(2, '0');
-  const s = String(now.getSeconds()).padStart(2, '0');
-  const el = document.getElementById('clockDisplay');
-  if (el) el.textContent = h + ':' + m + ':' + s;
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-// ===========================
-// AUTH
-// ===========================
-function doLogin() {
-  const now = Date.now();
-  if (now < lockUntil) {
-    const sek = Math.ceil((lockUntil - now) / 1000);
-    document.getElementById('loginErr').textContent = '⏳ Gesperrt! Warte ' + sek + ' Sekunden.';
-    return;
-  }
-  const u = document.getElementById('loginUser').value.trim().toLowerCase();
-  const p = document.getElementById('loginPass').value;
-  const errEl = document.getElementById('loginErr');
-
-  if (!u || !p) { errEl.textContent = '❌ Alle Felder ausfüllen!'; return; }
-
-  if (ADMINS[u] && ADMINS[u] === p) {
-    loginAttempts = 0;
-    currentAdmin = u;
-    document.getElementById('authScreen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    const initials = u.charAt(0).toUpperCase();
-    document.getElementById('adminAvatar').textContent = initials;
-    document.getElementById('adminNameDisplay').textContent = u;
-    addLog('🔐', 'Admin "' + u + '" eingeloggt');
-    loadDashboard();
-  } else {
-    loginAttempts++;
-    const remaining = Math.max(0, 5 - loginAttempts);
-    if (loginAttempts >= 5) {
-      lockUntil = Date.now() + 30000;
-      errEl.textContent = '🔒 Zu viele Versuche! 30 Sekunden gesperrt.';
-      document.getElementById('loginAttempts').textContent = '';
-    } else {
-      errEl.textContent = '❌ Falscher Username oder falsches Passwort!';
-      document.getElementById('loginAttempts').textContent = 'Verbleibende Versuche: ' + remaining;
-    }
-  }
-}
-
-function doLogout() {
-  if (!confirm('Wirklich ausloggen?')) return;
-  addLog('🚪', 'Admin "' + currentAdmin + '" ausgeloggt');
-  currentAdmin = null;
-  document.getElementById('authScreen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('loginUser').value = '';
-  document.getElementById('loginPass').value = '';
-  document.getElementById('loginErr').textContent = '';
-  document.getElementById('loginAttempts').textContent = '';
-}
-
-// ===========================
-// NAVIGATION
-// ===========================
-const PAGE_INFO = {
-  dashboard: { t: 'ÜBERSICHT',       b: 'Admin / Dashboard' },
-  users:     { t: 'BENUTZER',         b: 'Admin / Benutzer verwalten' },
-  votes:     { t: 'VOTING',           b: 'Admin / Voting & Punkte' },
-  db:        { t: 'DATENBANK',        b: 'Admin / Firebase Direktzugriff' },
-  log:       { t: 'AKTIVITÄTS-LOG',   b: 'Admin / Session-Log' },
-};
-
-function goPage(name, navEl) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const pg = document.getElementById('page-' + name);
-  if (pg) pg.classList.add('active');
-  if (navEl) navEl.classList.add('active');
-  const info = PAGE_INFO[name] || { t: name.toUpperCase(), b: 'Admin' };
-  document.getElementById('pageTitle').textContent = info.t;
-  document.getElementById('pageBreadcrumb').textContent = info.b;
-  currentPageName = name;
-  if (window.innerWidth <= 680) document.getElementById('sidebar').classList.remove('open');
-  if (name === 'users')     loadUsers();
-  if (name === 'votes')     loadVotes();
-  if (name === 'dashboard') loadDashboard();
-  if (name === 'log')       renderLog();
-}
-
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-}
-
-function reloadCurrentPage() {
-  if (currentPageName === 'dashboard') loadDashboard();
-  else if (currentPageName === 'users') loadUsers();
-  else if (currentPageName === 'votes') loadVotes();
-  showToast('↻ Neu geladen!');
-}
-
-// ===========================
-// FIREBASE HELPERS
-// ===========================
-async function fbGet(path) {
-  if (!fbDb) throw new Error('Firebase nicht bereit');
-  const snap = await fbDb.ref(path).once('value');
-  return snap.val();
-}
-async function fbSet(path, val) {
-  if (!fbDb) throw new Error('Firebase nicht bereit');
-  await fbDb.ref(path).set(val);
-}
-async function fbUpdate(path, val) {
-  if (!fbDb) throw new Error('Firebase nicht bereit');
-  await fbDb.ref(path).update(val);
-}
-async function fbRemove(path) {
-  if (!fbDb) throw new Error('Firebase nicht bereit');
-  await fbDb.ref(path).remove();
-}
-
+// ─── WEEK KEY ───────────────────────────────────────
 function getWeekKey() {
   const d = new Date();
   const day = d.getDay();
-  const offset = day === 0 ? -6 : 1 - day;
-  const mon = new Date(d.getFullYear(), d.getMonth(), d.getDate() + offset);
-  const y = mon.getFullYear();
-  const m = String(mon.getMonth() + 1).padStart(2, '0');
-  const dd = String(mon.getDate()).padStart(2, '0');
-  return y + '-' + m + '-' + dd;
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  const mon = new Date(d.getFullYear(), d.getMonth(), d.getDate() + mondayOffset);
+  return mon.getFullYear() + '-' + String(mon.getMonth()+1).padStart(2,'0') + '-' + String(mon.getDate()).padStart(2,'0');
 }
 
-// ===========================
-// TOAST
-// ===========================
-let _toastTimer = null;
-function showToast(msg, type = 'ok') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = type === 'error' ? 'error' : type === 'warn' ? 'warn' : 'show';
-  clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => { t.className = ''; }, 3500);
-}
-
-// ===========================
-// ACTIVITY LOG
-// ===========================
-function addLog(icon, text) {
-  const now = new Date();
-  const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
-  activityLog.unshift({ icon, text, time });
-  if (activityLog.length > 100) activityLog.pop();
-  const badge = document.getElementById('logBadge');
-  if (badge) badge.textContent = activityLog.length;
-}
-function renderLog() {
-  const el = document.getElementById('logList');
-  if (!el) return;
-  if (activityLog.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div>Noch keine Aktivitäten</div>';
-    return;
-  }
-  el.innerHTML = activityLog.map(e => `
-    <div class="log-entry">
-      <div class="log-icon">${e.icon}</div>
-      <div class="log-text">${esc(e.text)}</div>
-      <div class="log-time">${e.time}</div>
-    </div>
-  `).join('');
-}
-function clearLog() {
-  activityLog = [];
-  renderLog();
-  showToast('📋 Log geleert');
-}
-
-// ===========================
-// DASHBOARD
-// ===========================
-async function loadDashboard() {
+// ═══════════════════════════════════════════════════
+//  FIREBASE REST
+// ═══════════════════════════════════════════════════
+async function fbGet(path) {
   try {
-    const [usersData, votesData] = await Promise.all([
-      fbGet('users'),
-      fbGet('votes7d'),
+    const r = await fetch(BASE + path + '.json');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } catch(e) {
+    addLog('GET HATA: ' + path + ' — ' + e.message, 'error');
+    return null;
+  }
+}
+
+async function fbSet(path, val) {
+  try {
+    const r = await fetch(BASE + path + '.json', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(val)
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    addLog('SET: ' + path + ' = ' + JSON.stringify(val));
+    return await r.json();
+  } catch(e) {
+    addLog('SET HATA: ' + path + ' — ' + e.message, 'error');
+    return null;
+  }
+}
+
+async function fbPatch(path, val) {
+  try {
+    const r = await fetch(BASE + path + '.json', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(val)
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    addLog('PATCH: ' + path);
+    return await r.json();
+  } catch(e) {
+    addLog('PATCH HATA: ' + path + ' — ' + e.message, 'error');
+    return null;
+  }
+}
+
+async function fbDelete(path) {
+  try {
+    const r = await fetch(BASE + path + '.json', { method: 'DELETE' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    addLog('DELETE: ' + path, 'warn');
+    return true;
+  } catch(e) {
+    addLog('DELETE HATA: ' + path + ' — ' + e.message, 'error');
+    return false;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  DATA LOADING
+// ═══════════════════════════════════════════════════
+async function loadAllData() {
+  setStatus('YÜKLENİYOR...', false);
+  addLog('Tüm veriler çekiliyor...', 'info');
+  try {
+    const [users, votes, usernames] = await Promise.all([
+      fbGet('/users'),
+      fbGet('/votes7d'),
+      fbGet('/usernames')
     ]);
-    const users = usersData || {};
-    const votes = votesData || {};
-    allVotesData = votes;
-
-    const userCount = Object.keys(users).length;
-    const totalVotes = Object.values(votes).reduce((a, b) => a + (Number(b) || 0), 0);
-    const sorted = Object.entries(votes).sort((a, b) => b[1] - a[1]);
-    const topEntry = sorted[0];
-    const namesWithVotes = sorted.filter(x => x[1] > 0).length;
-
-    document.getElementById('sUser').textContent = userCount;
-    document.getElementById('sVotes').textContent = totalVotes;
-    document.getElementById('sTop').textContent = topEntry ? topEntry[0] : '—';
-    document.getElementById('sTopVotes').textContent = topEntry ? topEntry[1] + ' Stimmen' : '—';
-    document.getElementById('sWeek').textContent = getWeekKey();
-    document.getElementById('sNames').textContent = namesWithVotes;
-    document.getElementById('userCountBadge').textContent = userCount;
-
-    // Leaderboard top 10
-    const maxV = sorted[0]?.[1] || 1;
-    const lbEl = document.getElementById('dashLeaderboard');
-    if (sorted.filter(x => x[1] > 0).length === 0) {
-      lbEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⭐</div>Noch keine Votes</div>';
-    } else {
-      lbEl.innerHTML = sorted.filter(x => x[1] > 0).slice(0, 10).map(([name, count], i) => `
-        <div class="lb-row">
-          <div class="lb-rank ${i < 3 ? 'rank-' + (i+1) + '-col' : 'rank-n-col'}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</div>
-          <div class="lb-name">${esc(name)}</div>
-          <div class="lb-bar-track"><div class="lb-bar-fill" style="width:${Math.round(count/maxV*100)}%"></div></div>
-          <div class="lb-count">${count}</div>
-        </div>
-      `).join('');
-    }
-
-    // Recent users
-    const userArr = Object.entries(users).slice(0, 8);
+    DB.users = users || {};
+    DB.votes = votes || {};
+    DB.usernames = usernames || {};
     const week = getWeekKey();
-    const ruEl = document.getElementById('dashRecentUsers');
-    if (userArr.length === 0) {
-      ruEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👤</div>Keine User</div>';
-    } else {
-      ruEl.innerHTML = `<div class="table-wrap"><table>
-        <thead><tr><th>Username</th><th>Vote</th><th>Aktion</th></tr></thead>
-        <tbody>
-          ${userArr.map(([uid, data]) => `
-            <tr>
-              <td class="td-name">${esc(data?.username || '—')}</td>
-              <td>${data?.voted?.[week] ? '<span class="pill pill-green">✓</span>' : '<span class="pill pill-grey">—</span>'}</td>
-              <td><button class="btn btn-accent btn-xs" onclick="openEditUser('${esc(uid)}')">✏️</button></td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table></div>`;
-      allUsersArr = Object.entries(users).map(([uid, data]) => ({
-        uid, username: data?.username || '—', vote: data?.voted?.[week] || null, data
-      }));
-    }
-    addLog('📊', 'Dashboard geladen (' + userCount + ' User, ' + totalVotes + ' Votes)');
-  } catch (e) {
-    showToast('Fehler beim Laden: ' + e.message, 'error');
-    addLog('❌', 'Dashboard-Fehler: ' + e.message);
+    document.getElementById('weekDisplay').textContent = week;
+    updateBadges();
+    setStatus('BAĞLANDI', true);
+    document.getElementById('lastRefreshText').textContent = 'SON GÜNCELLEME: ' + new Date().toLocaleTimeString('tr-TR');
+    addLog('Veriler yüklendi. ' + Object.keys(DB.users).length + ' kullanıcı, ' + Object.keys(DB.votes).length + ' vote kaydı.', 'info');
+    renderCurrentPage();
+  } catch(e) {
+    setStatus('HATA!', false);
+    addLog('Veri yükleme hatası: ' + e.message, 'error');
   }
 }
 
-// ===========================
-// USERS
-// ===========================
-async function loadUsers() {
-  document.getElementById('usersBody').innerHTML = '<tr><td colspan="6"><div class="loading-row"><span class="loading-spinner"></span>Lädt...</div></td></tr>';
-  document.getElementById('userCountInfo').textContent = 'Lädt...';
-  try {
-    const usersData = await fbGet('users') || {};
-    const week = getWeekKey();
-    allUsersArr = Object.entries(usersData).map(([uid, data]) => ({
-      uid,
-      username: data?.username || '—',
-      vote: data?.voted?.[week] || null,
-      data: data || {}
-    }));
-    document.getElementById('userCountBadge').textContent = allUsersArr.length;
-    renderUsersTable(allUsersArr);
-    addLog('👤', 'Benutzerliste geladen (' + allUsersArr.length + ' User)');
-  } catch (e) {
-    document.getElementById('usersBody').innerHTML = `<tr><td colspan="6"><div class="empty-state">❌ Fehler: ${esc(e.message)}</div></td></tr>`;
-    showToast('Fehler: ' + e.message, 'error');
-    addLog('❌', 'User-Ladefehler: ' + e.message);
+function fullReload() {
+  loadAllData();
+  toast('↻ Veriler yenileniyor...', 'info');
+}
+
+function renderCurrentPage() {
+  if (currentPage === 'dashboard') renderDashboard();
+  else if (currentPage === 'votes') renderVotesPage();
+  else if (currentPage === 'users') renderUsersPage();
+  else if (currentPage === 'raw') renderRaw();
+  else if (currentPage === 'tools') { /* static */ }
+  else if (currentPage === 'writer') { /* static */ }
+  else if (currentPage === 'danger') { /* static */ }
+}
+
+// ═══════════════════════════════════════════════════
+//  STATUS & BADGES
+// ═══════════════════════════════════════════════════
+function setStatus(text, ok) {
+  document.getElementById('statusText').textContent = text;
+  const dot = document.getElementById('statusDot');
+  dot.style.background = ok ? 'var(--accent)' : 'var(--danger)';
+  dot.style.boxShadow = '0 0 10px ' + (ok ? 'var(--accent)' : 'var(--danger)');
+}
+
+function updateBadges() {
+  const userCount = Object.keys(DB.users).length;
+  const voteCount = Object.keys(DB.votes).length;
+  const totalVotes = Object.values(DB.votes).reduce((a, b) => a + (b || 0), 0);
+  const week = getWeekKey();
+  const votedCount = Object.values(DB.users).filter(u => u && u.voted && u.voted[week]).length;
+  const adminCount = Object.values(DB.users).filter(u => u && u.admin).length;
+
+  document.getElementById('nb-dashboard').textContent = userCount + ' U';
+  document.getElementById('nb-votes').textContent = voteCount;
+  document.getElementById('nb-users').textContent = userCount;
+
+  document.getElementById('stat-users').textContent = userCount;
+  document.getElementById('stat-totalvotes').textContent = totalVotes;
+  document.getElementById('stat-voted').textContent = votedCount;
+  document.getElementById('stat-admins').textContent = adminCount;
+  document.getElementById('stat-notvoted').textContent = userCount - votedCount;
+
+  const sorted = Object.entries(DB.votes).sort((a, b) => b[1] - a[1]);
+  if (sorted.length > 0) {
+    document.getElementById('stat-leader').textContent = sorted[0][0];
+    document.getElementById('stat-leader-votes').textContent = sorted[0][1] + ' oy';
+  } else {
+    document.getElementById('stat-leader').textContent = '—';
+    document.getElementById('stat-leader-votes').textContent = '—';
   }
 }
 
-function renderUsersTable(arr) {
-  const tbody = document.getElementById('usersBody');
-  const info = document.getElementById('userCountInfo');
-  info.textContent = arr.length + ' User angezeigt';
-  if (arr.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">👤</div>Keine User gefunden</div></td></tr>';
+// ═══════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════
+function renderDashboard() {
+  updateBadges();
+  renderDashVotes();
+  renderDashUsers();
+}
+
+function renderDashVotes() {
+  const el = document.getElementById('dash-top5');
+  const sorted = Object.entries(DB.votes).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const maxV = sorted[0] ? sorted[0][1] : 1;
+  if (sorted.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">HENÜZ OY YOK</div></div>';
     return;
   }
-  tbody.innerHTML = arr.map((u, i) => `
-    <tr>
-      <td class="mono" style="color:var(--text3);">${i + 1}</td>
-      <td class="td-name">${esc(u.username)}</td>
-      <td><span class="mono" style="font-size:0.65rem;">${esc(u.uid.slice(0, 16))}...</span></td>
-      <td>${u.vote ? `<span class="pill pill-green" title="${esc(u.vote)}">✓ ${esc(u.vote.slice(0, 18))}${u.vote.length > 18 ? '…' : ''}</span>` : '<span class="pill pill-grey">Kein Vote</span>'}</td>
-      <td><span class="pill pill-cyan">Aktiv</span></td>
-      <td>
-        <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-          <button class="btn btn-accent btn-xs" onclick="openEditUser('${esc(u.uid)}')">✏️ Edit</button>
-          <button class="btn btn-danger btn-xs" onclick="quickDeleteUser('${esc(u.uid)}','${esc(u.username)}')">🗑️</button>
+  const medals = ['🥇','🥈','🥉','#4','#5'];
+  const colors = ['#ffd700','#c0c0c0','#cd7f32','var(--accent)','var(--accent)'];
+  el.innerHTML = sorted.map(([key, val], i) => {
+    const pct = Math.round((val / maxV) * 100);
+    return `<div style="display:grid;grid-template-columns:2rem 1fr auto;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:1.1rem;text-align:center;">${medals[i]}</div>
+      <div>
+        <div style="font-weight:700;font-size:0.9rem;color:var(--text);margin-bottom:4px;">${key}</div>
+        <div style="background:var(--border);height:5px;border-radius:100px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${colors[i]};border-radius:100px;"></div>
         </div>
-      </td>
-    </tr>
-  `).join('');
+      </div>
+      <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:${colors[i]};">${val}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderDashUsers() {
+  const el = document.getElementById('dash-users');
+  const users = Object.entries(DB.users).slice(0, 6);
+  const week = getWeekKey();
+  if (users.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">👤</div><div class="empty-text">HİÇ KULLANICI YOK</div></div>';
+    return;
+  }
+  el.innerHTML = users.map(([uid, u]) => {
+    if (!u) return '';
+    const voted = u.voted && u.voted[week];
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:1rem;">${u.admin ? '👑' : '👤'}</span>
+        <span style="font-weight:700;font-size:0.88rem;">${u.username || '???'}</span>
+        ${u.admin ? '<span class="badge admin">ADMIN</span>' : ''}
+      </div>
+      <span class="badge ${voted ? 'voted' : 'not-voted'}">${voted ? '✅ OY VERDİ' : '❌ OY VERMEDI'}</span>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  VOTES PAGE
+// ═══════════════════════════════════════════════════
+function renderVotesPage() {
+  const el = document.getElementById('votesList');
+  const sorted = Object.entries(DB.votes).sort((a, b) => b[1] - a[1]);
+  const maxV = sorted[0] ? sorted[0][1] : 1;
+  const totalVotes = sorted.reduce((a, b) => a + b[1], 0);
+
+  if (sorted.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">HENÜZ OY YOK</div></div>';
+    return;
+  }
+
+  const medals = ['🥇','🥈','🥉'];
+  const barColors = ['#ffd700','#c0c0c0','#cd7f32'];
+
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text2);">${sorted.length} KİŞİ · TOPLAM ${totalVotes} OY</span>
+    </div>
+    ${sorted.map(([key, val], i) => {
+      const pct = Math.round((val / maxV) * 100);
+      const medal = i < 3 ? medals[i] : `<span style="font-size:0.7rem;color:var(--text3);">#${i+1}</span>`;
+      const barColor = i < 3 ? barColors[i] : 'var(--accent)';
+      const rankColor = i < 3 ? barColors[i] : 'var(--text)';
+      return `<div class="vote-item">
+        <div class="vote-rank" style="color:${rankColor};">${medal}</div>
+        <div class="vote-info">
+          <div class="vote-name">${key}</div>
+          <div class="vote-bar-wrap">
+            <div class="vote-bar-fill" style="width:${pct}%;background:${barColor};"></div>
+          </div>
+        </div>
+        <div class="vote-count" style="color:${barColor};">${val}</div>
+        <div class="vote-actions">
+          <button class="btn sm" onclick="quickAdd('${key}', 1)" title="+1">+1</button>
+          <button class="btn sm orange" onclick="quickAdd('${key}', -1)" title="-1">-1</button>
+          <button class="btn sm red" onclick="quickDelete('${key}')" title="Sil">🗑️</button>
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+async function quickAdd(key, amt) {
+  const cur = DB.votes[key] || 0;
+  const newVal = Math.max(0, cur + amt);
+  await fbSet('/votes7d/' + key, newVal);
+  DB.votes[key] = newVal;
+  renderVotesPage();
+  renderDashVotes();
+  updateBadges();
+  toast(amt > 0 ? `✅ ${key} +${amt}` : `➖ ${key} ${amt}`);
+}
+
+async function quickDelete(key) {
+  showModal('VOTE SİL', `"${key}" adlı kişinin tüm oyu silinsin mi?`, async () => {
+    await fbDelete('/votes7d/' + key);
+    delete DB.votes[key];
+    renderVotesPage();
+    updateBadges();
+    toast(`🗑️ ${key} silindi!`, 'warn');
+  });
+}
+
+async function voteAdd() {
+  const name = document.getElementById('vi-name').value.trim().toLowerCase();
+  const amt = parseInt(document.getElementById('vi-amount').value) || 0;
+  if (!name) { toast('İsim gir!', 'error'); return; }
+  const cur = DB.votes[name] || 0;
+  const newVal = cur + amt;
+  await fbSet('/votes7d/' + name, newVal);
+  DB.votes[name] = newVal;
+  renderVotesPage(); renderDashVotes(); updateBadges();
+  toast(`✅ ${name} → +${amt} (toplam: ${newVal})`);
+}
+
+async function voteRemove() {
+  const name = document.getElementById('vi-name').value.trim().toLowerCase();
+  const amt = parseInt(document.getElementById('vi-amount').value) || 0;
+  if (!name) { toast('İsim gir!', 'error'); return; }
+  const cur = DB.votes[name] || 0;
+  const newVal = Math.max(0, cur - amt);
+  await fbSet('/votes7d/' + name, newVal);
+  DB.votes[name] = newVal;
+  renderVotesPage(); renderDashVotes(); updateBadges();
+  toast(`➖ ${name} → -${amt} (toplam: ${newVal})`, 'warn');
+}
+
+async function voteSet() {
+  const name = document.getElementById('vi-name').value.trim().toLowerCase();
+  const amt = parseInt(document.getElementById('vi-amount').value) || 0;
+  if (!name) { toast('İsim gir!', 'error'); return; }
+  await fbSet('/votes7d/' + name, amt);
+  DB.votes[name] = amt;
+  renderVotesPage(); renderDashVotes(); updateBadges();
+  toast(`📌 ${name} = ${amt}`);
+}
+
+async function voteDeleteOne() {
+  const name = document.getElementById('vi-name').value.trim().toLowerCase();
+  if (!name) { toast('İsim gir!', 'error'); return; }
+  showModal('OY SİL', `"${name}" kişisinin oyu silinsin mi?`, async () => {
+    await fbDelete('/votes7d/' + name);
+    delete DB.votes[name];
+    renderVotesPage(); updateBadges();
+    toast(`🗑️ ${name} vote silindi!`, 'warn');
+  });
+}
+
+async function confirmDeleteAllVotes() {
+  showModal('⚠️ TÜM VOTE\'LARI SİL', 'Bu işlem geri alınamaz! Tüm oylar silinecek. Devam?', async () => {
+    await fbDelete('/votes7d');
+    DB.votes = {};
+    renderVotesPage(); renderDashVotes(); updateBadges();
+    toast('🗑️ Tüm votlar silindi!', 'warn');
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  USERS PAGE
+// ═══════════════════════════════════════════════════
+function renderUsersPage(filter) {
+  const el = document.getElementById('usersList');
+  const week = getWeekKey();
+  let entries = Object.entries(DB.users).filter(([_, u]) => u);
+
+  if (filter) {
+    const q = filter.toLowerCase();
+    entries = entries.filter(([uid, u]) =>
+      (u.username || '').toLowerCase().includes(q) || uid.toLowerCase().includes(q)
+    );
+  }
+
+  document.getElementById('users-subtitle').textContent = `${entries.length} hesap listeleniyor · Hafta: ${week}`;
+
+  if (entries.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">KULLANICI BULUNAMADI</div></div>';
+    return;
+  }
+
+  el.innerHTML = entries.map(([uid, u]) => {
+    const uname = u.username || '???';
+    const isAdmin = u.admin === true;
+    const voted = u.voted && u.voted[week];
+    let votedDisplay = '❌ Oy vermedi';
+    if (voted) {
+      try {
+        const a = JSON.parse(voted);
+        votedDisplay = '✅ ' + (Array.isArray(a) ? a.join(', ') : voted);
+      } catch { votedDisplay = '✅ ' + voted; }
+    }
+
+    return `<div class="user-card ${isAdmin ? 'admin-card' : ''}">
+      <div class="user-top">
+        <div>
+          <div class="user-name-wrap">
+            <div class="user-name">${isAdmin ? '👑' : '👤'} ${uname}</div>
+            ${isAdmin ? '<span class="badge admin">ADMIN</span>' : ''}
+            <span class="badge ${voted ? 'voted' : 'not-voted'}">${voted ? 'OY VERDİ' : 'OY VERMEDİ'}</span>
+          </div>
+          <div class="user-uid">UID: ${uid}</div>
+          <div class="user-vote-info">${votedDisplay}</div>
+        </div>
+        <div class="user-actions">
+          <button class="btn sm ${isAdmin ? 'red' : 'yellow'}" onclick="toggleAdminUser('${uid}', ${isAdmin})">
+            ${isAdmin ? '❌ ADMİN AL' : '👑 ADMİN VER'}
+          </button>
+          <button class="btn sm orange" onclick="resetUserVote('${uid}')">🔄 OY KAYDINI SİL</button>
+          <button class="btn sm red" onclick="deleteUserConfirm('${uid}', '${uname}')">🗑️ SİL</button>
+        </div>
+      </div>
+      <div class="user-edit-row">
+        <div class="field-group" style="min-width:150px;">
+          <label class="lbl">YENİ KULLANICI ADI</label>
+          <input id="un-${uid}" class="input" value="${uname}" style="width:100%;"/>
+        </div>
+        <button class="btn sm" onclick="renameUser('${uid}')">✏️ KAYDET</button>
+        <div class="field-group" style="min-width:180px;">
+          <label class="lbl">OY KAYDI YAZ</label>
+          <input id="uv-${uid}" class="input" placeholder='["Halil","Roman"]' style="width:100%;"/>
+        </div>
+        <button class="btn sm blue" onclick="setUserVoteRecord('${uid}')">📌 YAZ</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function filterUsers() {
-  const q = document.getElementById('userSearch').value.toLowerCase();
-  const vf = document.getElementById('userVoteFilter').value;
-  let filtered = allUsersArr.filter(u =>
-    u.username.toLowerCase().includes(q) || u.uid.toLowerCase().includes(q)
-  );
-  if (vf === 'voted')  filtered = filtered.filter(u => u.vote);
-  if (vf === 'novote') filtered = filtered.filter(u => !u.vote);
-  renderUsersTable(filtered);
+  const q = document.getElementById('userSearch').value;
+  renderUsersPage(q);
 }
 
-function openEditUser(uid) {
-  const u = allUsersArr.find(x => x.uid === uid);
-  if (!u) { showToast('User nicht gefunden', 'error'); return; }
-  document.getElementById('editUid').value = uid;
-  document.getElementById('editUidDisplay').value = uid;
-  document.getElementById('editUsername').value = u.username;
-  document.getElementById('editVoteValue').value = u.vote || '';
-  document.getElementById('deleteConfirmRow').classList.remove('show');
-  document.getElementById('deleteConfirmName').textContent = u.username;
-  openModal('modalEditUser');
+async function toggleAdminUser(uid, isAdmin) {
+  await fbSet('/users/' + uid + '/admin', !isAdmin);
+  if (DB.users[uid]) DB.users[uid].admin = !isAdmin;
+  renderUsersPage();
+  toast(isAdmin ? '❌ Admin alındı' : '👑 Admin verildi!', isAdmin ? 'warn' : undefined);
 }
 
-async function saveUser() {
-  const uid = document.getElementById('editUid').value;
-  const uname = document.getElementById('editUsername').value.trim();
-  const vote = document.getElementById('editVoteValue').value.trim();
-  if (!uid) return;
-  if (!uname) { showToast('Username darf nicht leer sein!', 'error'); return; }
-  try {
+async function resetUserVote(uid) {
+  const week = getWeekKey();
+  await fbDelete('/users/' + uid + '/voted/' + week);
+  if (DB.users[uid] && DB.users[uid].voted) delete DB.users[uid].voted[week];
+  renderUsersPage();
+  updateBadges();
+  toast('🔄 Oy kaydı silindi, kullanıcı tekrar oy verebilir!');
+}
+
+async function deleteUserConfirm(uid, uname) {
+  showModal('KULLANICI SİL', `"${uname}" kullanıcısını kalıcı olarak silmek istediğine emin misin?`, async () => {
+    await fbDelete('/users/' + uid);
+    const nameKey = uname.toLowerCase();
+    await fbDelete('/usernames/' + nameKey);
+    delete DB.users[uid];
+    renderUsersPage(); updateBadges();
+    toast(`🗑️ ${uname} silindi!`, 'warn');
+  });
+}
+
+async function renameUser(uid) {
+  const newName = document.getElementById('un-' + uid).value.trim();
+  if (!newName) { toast('Yeni isim gir!', 'error'); return; }
+  const oldName = DB.users[uid] ? DB.users[uid].username : null;
+  await fbSet('/users/' + uid + '/username', newName);
+  if (oldName) await fbDelete('/usernames/' + oldName.toLowerCase());
+  await fbSet('/usernames/' + newName.toLowerCase(), uid);
+  if (DB.users[uid]) DB.users[uid].username = newName;
+  renderUsersPage();
+  toast(`✏️ İsim değiştirildi: ${newName}`);
+}
+
+async function setUserVoteRecord(uid) {
+  const val = document.getElementById('uv-' + uid).value.trim();
+  if (!val) { toast('Değer gir!', 'error'); return; }
+  const week = getWeekKey();
+  await fbSet('/users/' + uid + '/voted/' + week, val);
+  if (DB.users[uid]) {
+    if (!DB.users[uid].voted) DB.users[uid].voted = {};
+    DB.users[uid].voted[week] = val;
+  }
+  renderUsersPage(); updateBadges();
+  toast('📌 Oy kaydı yazıldı!');
+}
+
+async function resetAllVotedFlags() {
+  showModal('TOPLU OY KAYDI SİL', 'Tüm kullanıcıların bu haftaki oy kaydı silinecek. Herkes tekrar oy verebilir hale gelir. Devam?', async () => {
     const week = getWeekKey();
-    const upd = {};
-    upd['users/' + uid + '/username'] = uname;
-    if (vote) upd['users/' + uid + '/voted/' + week] = vote;
-    else upd['users/' + uid + '/voted/' + week] = null;
-    await fbDb.ref().update(upd);
-    showToast('✅ User "' + uname + '" gespeichert!');
-    addLog('✏️', 'User "' + uname + '" bearbeitet (UID: ' + uid.slice(0,10) + '...)');
-    closeModal('modalEditUser');
-    loadUsers();
-    loadDashboard();
-  } catch (e) {
-    showToast('Fehler: ' + e.message, 'error');
-    addLog('❌', 'User-Speicherfehler: ' + e.message);
-  }
-}
-
-function showDeleteConfirm() {
-  document.getElementById('deleteConfirmRow').classList.add('show');
-}
-function hideDeleteConfirm() {
-  document.getElementById('deleteConfirmRow').classList.remove('show');
-}
-
-async function executeDeleteUser() {
-  const uid = document.getElementById('editUid').value;
-  const uname = document.getElementById('editUsername').value;
-  if (!uid) return;
-  try {
-    await fbRemove('users/' + uid);
-    await fbRemove('usernames/' + uname.toLowerCase()).catch(() => {});
-    showToast('✅ User "' + uname + '" gelöscht!');
-    addLog('🗑️', 'User "' + uname + '" aus DB gelöscht (UID: ' + uid.slice(0,10) + '...)');
-    closeModal('modalEditUser');
-    loadUsers();
-    loadDashboard();
-  } catch (e) {
-    showToast('Fehler: ' + e.message, 'error');
-    addLog('❌', 'User-Löschfehler: ' + e.message);
-  }
-}
-
-function quickDeleteUser(uid, uname) {
-  if (!confirm('User "' + uname + '" wirklich löschen? Nicht rückgängig machbar!')) return;
-  fbRemove('users/' + uid).then(() => {
-    fbRemove('usernames/' + uname.toLowerCase()).catch(() => {});
-    showToast('✅ "' + uname + '" gelöscht!');
-    addLog('🗑️', 'User "' + uname + '" schnell gelöscht');
-    loadUsers(); loadDashboard();
-  }).catch(e => { showToast('Fehler: ' + e.message, 'error'); });
-}
-
-// ===========================
-// VOTES
-// ===========================
-const HOF_MEMBERS = [
-  { name: 'Alessia',   emoji: '🌸' }, { name: 'Roman',    emoji: '🦫' },
-  { name: 'Annika',    emoji: '🌟' }, { name: 'Halil',    emoji: '🐱' },
-  { name: 'Emir',      emoji: '⚡' }, { name: 'Finn',     emoji: '🏄' },
-  { name: 'Joscha',    emoji: '🎯' }, { name: 'Cornelius',emoji: '🦁' },
-  { name: 'Jonas',     emoji: '🚀' }, { name: 'Theodor',  emoji: '🎸' },
-  { name: 'Mara',      emoji: '🦋' }, { name: 'Frida',    emoji: '🎨' },
-  { name: 'Malena',    emoji: '💫' }, { name: 'Jolie',    emoji: '🌈' },
-  { name: 'Joline',    emoji: '🍀' }, { name: 'Vanessa',  emoji: '👑' },
-  { name: 'Jood',      emoji: '🔥' }, { name: 'Kiara',    emoji: '🐆' },
-  { name: 'Clara',     emoji: '🌙' }, { name: 'Danelle',  emoji: '💎' },
-  { name: 'Tori',      emoji: '🎪' }, { name: 'Helene',   emoji: '☀️' },
-  { name: 'Emily',     emoji: '🎵' }, { name: 'Emilie',   emoji: '🌺' },
-  { name: 'Emma',      emoji: '🦄' },
-];
-
-let filteredVotes = [...HOF_MEMBERS];
-
-async function loadVotes() {
-  document.getElementById('votesGrid').innerHTML = '<div class="loading-row"><span class="loading-spinner"></span>Lädt...</div>';
-  document.getElementById('votesLeaderboard').innerHTML = '<div class="loading-row"><span class="loading-spinner"></span>Lädt...</div>';
-  try {
-    const data = await fbGet('votes7d') || {};
-    allVotesData = data;
-    document.getElementById('voteWeekDisplay').textContent = getWeekKey();
-    const total = Object.values(data).reduce((a, b) => a + (Number(b) || 0), 0);
-    document.getElementById('voteTotalDisplay').textContent = total;
-    filteredVotes = [...HOF_MEMBERS];
-    renderVotesGrid(data);
-    renderVotesLeaderboard(data);
-    addLog('⭐', 'Voting geladen (Gesamt: ' + total + ' Stimmen)');
-  } catch (e) {
-    showToast('Fehler beim Laden: ' + e.message, 'error');
-    addLog('❌', 'Vote-Ladefehler: ' + e.message);
-  }
-}
-
-function filterVotes() {
-  const q = document.getElementById('voteSearch').value.toLowerCase();
-  filteredVotes = HOF_MEMBERS.filter(m => m.name.toLowerCase().includes(q));
-  renderVotesGrid(allVotesData);
-}
-
-function renderVotesGrid(data) {
-  const maxV = Math.max(...HOF_MEMBERS.map(m => Number(data[m.name]) || 0), 1);
-  const el = document.getElementById('votesGrid');
-  el.innerHTML = `<div class="vote-grid">` + filteredVotes.map(m => {
-    const count = Number(data[m.name]) || 0;
-    const pct = Math.round(count / maxV * 100);
-    return `
-      <div class="vote-row">
-        <div class="vote-person">${m.emoji} ${esc(m.name)}</div>
-        <div class="lb-bar-track" style="height:8px;">
-          <div class="lb-bar-fill" style="width:${pct}%;"></div>
-        </div>
-        <div class="lb-count" style="min-width:40px;">${count}</div>
-        <div class="vote-actions">
-          <button class="btn btn-accent btn-xs" onclick="openVoteEdit('${esc(m.name)}','${esc(m.emoji)}',${count})">✏️</button>
-          <button class="btn btn-danger btn-xs" onclick="clearOneVote('${esc(m.name)}')">🗑️</button>
-        </div>
-      </div>
-    `;
-  }).join('') + `</div>`;
-}
-
-function renderVotesLeaderboard(data) {
-  const sorted = HOF_MEMBERS
-    .map(m => ({ ...m, votes: Number(data[m.name]) || 0 }))
-    .filter(m => m.votes > 0)
-    .sort((a, b) => b.votes - a.votes);
-  const maxV = sorted[0]?.votes || 1;
-  const el = document.getElementById('votesLeaderboard');
-  if (sorted.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⭐</div>Noch keine Votes</div>';
-    return;
-  }
-  el.innerHTML = sorted.map((m, i) => `
-    <div class="lb-row">
-      <div class="lb-rank ${i < 3 ? 'rank-' + (i+1) + '-col' : 'rank-n-col'}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</div>
-      <div class="lb-name">${m.emoji} ${esc(m.name)}</div>
-      <div class="lb-bar-track"><div class="lb-bar-fill" style="width:${Math.round(m.votes/maxV*100)}%"></div></div>
-      <div class="lb-count">${m.votes}</div>
-    </div>
-  `).join('');
-}
-
-function openVoteEdit(name, emoji, currentCount) {
-  document.getElementById('voteEditName').value = name;
-  document.getElementById('voteEditEmoji').textContent = emoji;
-  document.getElementById('voteEditDisplayName').textContent = name;
-  document.getElementById('voteEditCount').value = currentCount;
-  openModal('modalEditVote');
-}
-
-function voteEditDelta(d) {
-  const inp = document.getElementById('voteEditCount');
-  const newVal = Math.max(0, (parseInt(inp.value) || 0) + d);
-  inp.value = newVal;
-}
-
-async function saveVoteEdit() {
-  const name = document.getElementById('voteEditName').value;
-  const count = parseInt(document.getElementById('voteEditCount').value);
-  if (!name) return;
-  if (isNaN(count) || count < 0) { showToast('Ungültiger Wert!', 'error'); return; }
-  try {
-    if (count === 0) await fbRemove('votes7d/' + name);
-    else await fbSet('votes7d/' + name, count);
-    allVotesData[name] = count || null;
-    showToast('✅ ' + name + ' → ' + count + ' Stimmen');
-    addLog('✏️', 'Vote gesetzt: "' + name + '" = ' + count);
-    closeModal('modalEditVote');
-    loadVotes();
-    loadDashboard();
-  } catch (e) {
-    showToast('Fehler: ' + e.message, 'error');
-    addLog('❌', 'Vote-Speicherfehler: ' + e.message);
-  }
-}
-
-function clearOneVoteConfirm() {
-  const name = document.getElementById('voteEditName').value;
-  if (!confirm('Votes für "' + name + '" wirklich auf 0 setzen?')) return;
-  clearOneVote(name);
-  closeModal('modalEditVote');
-}
-
-async function clearOneVote(name) {
-  try {
-    await fbRemove('votes7d/' + name);
-    delete allVotesData[name];
-    showToast('✅ Votes für "' + name + '" gelöscht');
-    addLog('🗑️', 'Votes gelöscht: "' + name + '"');
-    loadVotes(); loadDashboard();
-  } catch (e) {
-    showToast('Fehler: ' + e.message, 'error');
-    addLog('❌', 'Vote-Löschfehler: ' + e.message);
-  }
-}
-
-function resetAllVotesConfirm() {
-  if (!confirm('⚠️ ALLE VOTES FÜR DIESE WOCHE LÖSCHEN?\n\nDiese Aktion kann nicht rückgängig gemacht werden!')) return;
-  resetAllVotes();
-}
-
-async function resetAllVotes() {
-  try {
-    await fbSet('votes7d', null);
-    allVotesData = {};
-    showToast('✅ Alle Votes zurückgesetzt!');
-    addLog('🗑️', 'ALLE VOTES GELÖSCHT (Woche: ' + getWeekKey() + ')');
-    loadVotes(); loadDashboard();
-  } catch (e) {
-    showToast('Fehler: ' + e.message, 'error');
-    addLog('❌', 'Reset-Fehler: ' + e.message);
-  }
-}
-
-// ===========================
-// DATABASE (Raw Access)
-// ===========================
-async function dbRead() {
-  const path = document.getElementById('dbPath').value.trim();
-  if (!path) { showToast('Bitte einen Pfad eingeben!', 'warn'); return; }
-  const resultEl = document.getElementById('dbResult');
-  resultEl.innerHTML = '<div class="loading-row"><span class="loading-spinner"></span>Lese...</div>';
-  try {
-    const data = await fbGet(path);
-    const json = JSON.stringify(data, null, 2);
-    document.getElementById('dbJson').value = json;
-    const size = new Blob([json]).size;
-    resultEl.innerHTML = `<span class="pill pill-green">✅ Gelesen: /${path} (${size} Bytes)</span>`;
-    addLog('📖', 'DB gelesen: /' + path + ' (' + size + ' Bytes)');
-  } catch (e) {
-    resultEl.innerHTML = `<span class="pill pill-red">❌ ${esc(e.message)}</span>`;
-    showToast('Fehler: ' + e.message, 'error');
-    addLog('❌', 'DB-Lesefehler: ' + e.message);
-  }
-}
-
-async function dbWrite() {
-  const path = document.getElementById('dbPath').value.trim();
-  const raw = document.getElementById('dbJson').value.trim();
-  if (!path || !raw) { showToast('Pfad und JSON eingeben!', 'warn'); return; }
-  if (!confirm('⚠️ /' + path + ' wirklich KOMPLETT ÜBERSCHREIBEN?\n\nAlle vorhandenen Daten gehen verloren!')) return;
-  try {
-    const val = JSON.parse(raw);
-    await fbSet(path, val);
-    document.getElementById('dbResult').innerHTML = `<span class="pill pill-green">✅ Gespeichert: /${path}</span>`;
-    showToast('✅ /' + path + ' gespeichert!');
-    addLog('💾', 'DB geschrieben (SET): /' + path);
-  } catch (e) {
-    showToast('Ungültiges JSON oder Fehler: ' + e.message, 'error');
-    addLog('❌', 'DB-Schreibfehler: ' + e.message);
-  }
-}
-
-async function dbPatch() {
-  const path = document.getElementById('dbPath').value.trim();
-  const raw = document.getElementById('dbJson').value.trim();
-  if (!path || !raw) { showToast('Pfad und JSON eingeben!', 'warn'); return; }
-  try {
-    const val = JSON.parse(raw);
-    await fbUpdate(path, val);
-    document.getElementById('dbResult').innerHTML = `<span class="pill pill-cyan">✅ Aktualisiert: /${path}</span>`;
-    showToast('✅ /' + path + ' aktualisiert!');
-    addLog('🔧', 'DB aktualisiert (PATCH): /' + path);
-  } catch (e) {
-    showToast('Ungültiges JSON oder Fehler: ' + e.message, 'error');
-    addLog('❌', 'DB-PATCH-Fehler: ' + e.message);
-  }
-}
-
-function dbDeleteConfirm() {
-  const path = document.getElementById('dbPath').value.trim();
-  if (!path) { showToast('Bitte einen Pfad eingeben!', 'warn'); return; }
-  if (!confirm('⚠️ /' + path + ' wirklich KOMPLETT LÖSCHEN?\n\nNicht rückgängig machbar!')) return;
-  dbExecuteDelete(path);
-}
-
-async function dbExecuteDelete(path) {
-  try {
-    await fbRemove(path);
-    document.getElementById('dbJson').value = '';
-    document.getElementById('dbResult').innerHTML = `<span class="pill pill-red">🗑️ Gelöscht: /${path}</span>`;
-    showToast('✅ /' + path + ' gelöscht!');
-    addLog('🗑️', 'DB gelöscht: /' + path);
-  } catch (e) {
-    showToast('Fehler: ' + e.message, 'error');
-    addLog('❌', 'DB-Löschfehler: ' + e.message);
-  }
-}
-
-function quickPath(p) {
-  document.getElementById('dbPath').value = p;
-  dbRead();
-}
-
-function formatJson() {
-  const el = document.getElementById('dbJson');
-  try {
-    el.value = JSON.stringify(JSON.parse(el.value), null, 2);
-    showToast('✅ JSON formatiert');
-  } catch (e) {
-    showToast('Ungültiges JSON!', 'error');
-  }
-}
-function clearJson() {
-  document.getElementById('dbJson').value = '';
-  document.getElementById('dbResult').innerHTML = '';
-}
-
-async function readAllData() {
-  document.getElementById('dbPath').value = '/';
-  document.getElementById('dbResult').innerHTML = '<div class="loading-row"><span class="loading-spinner"></span>Lade gesamte Datenbank...</div>';
-  try {
-    const snap = await fbDb.ref('/').once('value');
-    const data = snap.val();
-    const json = JSON.stringify(data, null, 2);
-    document.getElementById('dbJson').value = json;
-    const size = new Blob([json]).size;
-    document.getElementById('dbResult').innerHTML = `<span class="pill pill-green">✅ Gesamte DB geladen (${Math.round(size/1024*10)/10} KB)</span>`;
-    addLog('📖', 'Gesamte DB geladen (' + Math.round(size/1024*10)/10 + ' KB)');
-  } catch (e) {
-    showToast('Fehler: ' + e.message, 'error');
-    addLog('❌', 'DB-Lesefehler: ' + e.message);
-  }
-}
-
-async function clearAllUserVotes() {
-  if (!confirm('⚠️ ALLE User-Votes (voted/ Pfade) für diese Woche zurücksetzen?\n\nDas betrifft alle Nutzer-Einträge, nicht das Gesamt-Voting!')) return;
-  try {
-    const usersData = await fbGet('users') || {};
-    const week = getWeekKey();
-    const updates = {};
-    Object.keys(usersData).forEach(uid => {
-      updates['users/' + uid + '/voted/' + week] = null;
+    const promises = Object.keys(DB.users).map(uid => {
+      if (DB.users[uid] && DB.users[uid].voted && DB.users[uid].voted[week]) {
+        delete DB.users[uid].voted[week];
+        return fbDelete('/users/' + uid + '/voted/' + week);
+      }
+      return Promise.resolve();
     });
-    await fbDb.ref('/').update(updates);
-    showToast('✅ Alle User-Votes zurückgesetzt!');
-    addLog('🔄', 'Alle User-Votes zurückgesetzt (Woche: ' + week + ')');
-    loadUsers();
-  } catch (e) {
-    showToast('Fehler: ' + e.message, 'error');
-    addLog('❌', 'User-Vote-Reset-Fehler: ' + e.message);
-  }
+    await Promise.all(promises);
+    renderUsersPage(); updateBadges();
+    toast('🔄 Tüm oy kayıtları silindi!', 'warn');
+  });
 }
 
-// ===========================
-// MODAL HELPERS
-// ===========================
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-}
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
-document.addEventListener('click', e => {
-  if (e.target.classList.contains('modal-overlay')) {
-    e.target.classList.remove('open');
-  }
-});
-
-// ===========================
-// UTILITIES
-// ===========================
-function esc(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+// ═══════════════════════════════════════════════════
+//  TOOLS
+// ═══════════════════════════════════════════════════
+async function halilBomb() {
+  const amt = parseInt(document.getElementById('t-halilAmt').value) || 999;
+  const cur = DB.votes['halil'] || 0;
+  const newVal = cur + amt;
+  await fbSet('/votes7d/halil', newVal);
+  DB.votes['halil'] = newVal;
+  document.getElementById('t-halilResult').textContent = `🐱 Halil: ${cur} + ${amt} = ${newVal} OY!`;
+  renderDashVotes(); updateBadges();
+  if (currentPage === 'votes') renderVotesPage();
+  toast(`🐱 Halil +${amt} oy! Toplam: ${newVal}`);
 }
 
-// Keyboard shortcuts
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
-  }
-  if (e.key === 'Enter' && document.getElementById('authScreen').style.display !== 'none') {
-    doLogin();
-  }
-});
-
-// Click outside sidebar to close on mobile
-document.addEventListener('click', e => {
-  const sb = document.getElementById('sidebar');
-  const hb = document.querySelector('.hamburger-btn');
-  if (window.innerWidth <= 680 && sb.classList.contains('open')) {
-    if (!sb.contains(e.target) && (!hb || !hb.contains(e.target))) {
-      sb.classList.remove('open');
+function lockStart() {
+  if (lockBot) clearInterval(lockBot);
+  const minV = parseInt(document.getElementById('t-lockMin').value) || 500;
+  const interval = parseInt(document.getElementById('t-lockInterval').value) || 5;
+  const el = document.getElementById('lockStatus');
+  el.className = 'bot-status active';
+  el.innerHTML = `<div class="dot"></div> BOT AKTİF — MİN: ${minV} · ARALIK: ${interval}SN`;
+  addLog(`Koruma botu başlatıldı. Min: ${minV}, Aralık: ${interval}sn`, 'info');
+  lockBot = setInterval(async () => {
+    const cur = await fbGet('/votes7d/halil');
+    if (!cur || cur < minV) {
+      await fbSet('/votes7d/halil', minV);
+      DB.votes['halil'] = minV;
+      addLog(`🛡️ Halil korundu → ${minV}`);
+      toast(`🛡️ Halil korundu → ${minV}`);
+      if (currentPage === 'votes') renderVotesPage();
+      renderDashVotes(); updateBadges();
     }
-  }
+  }, interval * 1000);
+}
+
+function lockStop() {
+  if (lockBot) { clearInterval(lockBot); lockBot = null; }
+  const el = document.getElementById('lockStatus');
+  if (el) { el.className = 'bot-status'; el.innerHTML = '<div class="dot"></div> BOT: KAPALI'; }
+  addLog('Koruma botu durduruldu.', 'warn');
+  toast('⏹ Koruma botu durduruldu', 'warn');
+}
+
+async function autoVoteStart() {
+  if (autoBot) clearInterval(autoBot);
+  const target = (document.getElementById('t-autoTarget').value || 'halil').trim().toLowerCase();
+  const interval = parseInt(document.getElementById('t-autoInterval').value) || 10;
+  const amount = parseInt(document.getElementById('t-autoAmount').value) || 5;
+  const statusEl = document.getElementById('autoVoteStatus');
+  const logEl = document.getElementById('t-autoLog');
+  statusEl.className = 'bot-status active';
+  statusEl.innerHTML = `<div class="dot"></div> AKTİF → ${target} her ${interval}sn +${amount}`;
+  addLog(`Oto vote botu: ${target} her ${interval}sn +${amount}`, 'info');
+  autoBot = setInterval(async () => {
+    const cur = await fbGet('/votes7d/' + target);
+    const newVal = (cur || 0) + amount;
+    await fbSet('/votes7d/' + target, newVal);
+    DB.votes[target] = newVal;
+    const msg = `[${new Date().toLocaleTimeString('tr-TR')}] ${target}: ${newVal}`;
+    addLog(msg);
+    logEl.innerHTML = msg + '<br>' + logEl.innerHTML;
+    if (currentPage === 'votes') renderVotesPage();
+    renderDashVotes(); updateBadges();
+  }, interval * 1000);
+}
+
+function autoVoteStop() {
+  if (autoBot) { clearInterval(autoBot); autoBot = null; }
+  const el = document.getElementById('autoVoteStatus');
+  if (el) { el.className = 'bot-status'; el.innerHTML = '<div class="dot"></div> BOT: KAPALI'; }
+  addLog('Oto vote botu durduruldu.', 'warn');
+  toast('⏹ Oto vote botu durduruldu', 'warn');
+}
+
+async function onlyHalil() {
+  const amt = parseInt(document.getElementById('t-onlyHalilAmt').value) || 9999;
+  showModal('SADECE HALİL', `Tüm oylar silinecek ve Halil'e ${amt} oy yazılacak. Emin misin?`, async () => {
+    await fbDelete('/votes7d');
+    await fbSet('/votes7d/halil', amt);
+    DB.votes = { halil: amt };
+    renderDashVotes(); updateBadges();
+    if (currentPage === 'votes') renderVotesPage();
+    toast(`⭐ Sadece Halil: ${amt} oy!`);
+  });
+}
+
+async function toggleAdminByName() {
+  const target = document.getElementById('t-adminTarget').value.trim().toLowerCase();
+  const action = document.getElementById('t-adminAction').value;
+  const result = document.getElementById('t-adminResult');
+  if (!target) { result.textContent = '⚠️ Username gir!'; return; }
+  const uid = DB.usernames[target];
+  if (!uid) { result.style.color = 'var(--danger)'; result.textContent = `❌ "${target}" bulunamadı!`; return; }
+  const val = action === 'give';
+  await fbSet('/users/' + uid + '/admin', val);
+  if (DB.users[uid]) DB.users[uid].admin = val;
+  result.style.color = 'var(--accent)';
+  result.textContent = val ? `👑 ${target} admin yapıldı!` : `❌ ${target} admin alındı!`;
+  toast(val ? `👑 ${target} admin!` : `❌ ${target} admin değil`);
+  if (currentPage === 'users') renderUsersPage();
+}
+
+// ═══════════════════════════════════════════════════
+//  RAW JSON
+// ═══════════════════════════════════════════════════
+function renderRaw() {
+  const el = document.getElementById('rawContent');
+  const section = (document.getElementById('rawSection') ? document.getElementById('rawSection').value : 'all');
+  let data;
+  if (section === 'all') data = DB;
+  else if (section === 'votes7d') data = DB.votes;
+  else if (section === 'users') data = DB.users;
+  const json = JSON.stringify(data, null, 2);
+  const highlighted = json
+    .replace(/(".*?")\s*:/g, '<span class="json-key">$1</span>:')
+    .replace(/:\s*(".*?")/g, ': <span class="json-str">$1</span>')
+    .replace(/:\s*(\d+\.?\d*)/g, ': <span class="json-num">$1</span>')
+    .replace(/:\s*(true|false)/g, ': <span class="json-bool">$1</span>')
+    .replace(/:\s*(null)/g, ': <span class="json-null">$1</span>');
+  el.innerHTML = `<div class="json-viewer">${highlighted}</div>`;
+}
+
+function copyRaw() {
+  const section = document.getElementById('rawSection').value;
+  let data;
+  if (section === 'all') data = DB;
+  else if (section === 'votes7d') data = DB.votes;
+  else if (section === 'users') data = DB.users;
+  navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => toast('📋 Kopyalandı!')).catch(() => toast('Kopyalama başarısız!', 'error'));
+}
+
+function downloadRaw() {
+  const section = document.getElementById('rawSection').value;
+  let data;
+  if (section === 'all') data = DB;
+  else if (section === 'votes7d') data = DB.votes;
+  else if (section === 'users') data = DB.users;
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `7dzone-${section}-${Date.now()}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('💾 Dosya indiriliyor...');
+}
+
+// ═══════════════════════════════════════════════════
+//  DB YAZICI
+// ═══════════════════════════════════════════════════
+async function writerGet() {
+  const path = document.getElementById('w-path').value.trim();
+  if (!path) { toast('Path gir!', 'error'); return; }
+  const data = await fbGet(path);
+  showWriterResult(data);
+  toast('👁️ Okundu: ' + path, 'info');
+}
+
+async function writerSet() {
+  const path = document.getElementById('w-path').value.trim();
+  let val = document.getElementById('w-value').value.trim();
+  if (!path) { toast('Path gir!', 'error'); return; }
+  try { val = JSON.parse(val); } catch(e) { /* string */ }
+  const result = await fbSet(path, val);
+  showWriterResult(result);
+  toast('📌 Yazıldı: ' + path);
+  loadAllData();
+}
+
+async function writerUpdate() {
+  const path = document.getElementById('w-path').value.trim();
+  let val = document.getElementById('w-value').value.trim();
+  if (!path) { toast('Path gir!', 'error'); return; }
+  try { val = JSON.parse(val); } catch(e) { toast('Geçerli JSON gir!', 'error'); return; }
+  const result = await fbPatch(path, val);
+  showWriterResult(result);
+  toast('🔄 Güncellendi: ' + path);
+  loadAllData();
+}
+
+async function writerDelete() {
+  const path = document.getElementById('w-path').value.trim();
+  if (!path) { toast('Path gir!', 'error'); return; }
+  showModal('SİL', `"${path}" silinsin mi?`, async () => {
+    await fbDelete(path);
+    showWriterResult(null);
+    toast('🗑️ Silindi: ' + path, 'warn');
+    loadAllData();
+  });
+}
+
+function showWriterResult(data) {
+  const box = document.getElementById('writerResult');
+  const content = document.getElementById('writerResultContent');
+  box.style.display = 'block';
+  content.textContent = JSON.stringify(data, null, 2);
+}
+
+// ═══════════════════════════════════════════════════
+//  DANGER ZONE
+// ═══════════════════════════════════════════════════
+async function confirmNuke() {
+  showModal('⚠️ TAM NUKE', 'TÜM VOTE\'LAR ve TÜM KULLANICILARIN OY KAYITLARI silinecek. Bu geri alınamaz! Gerçekten yapmak istiyor musun?', async () => {
+    await fbDelete('/votes7d');
+    const week = getWeekKey();
+    const promises = Object.keys(DB.users).map(uid => fbDelete('/users/' + uid + '/voted/' + week));
+    await Promise.all(promises);
+    DB.votes = {};
+    Object.values(DB.users).forEach(u => { if (u && u.voted) delete u.voted[week]; });
+    updateBadges(); renderDashVotes();
+    if (currentPage === 'votes') renderVotesPage();
+    if (currentPage === 'users') renderUsersPage();
+    toast('💣 Tam nuke yapıldı!', 'warn');
+  });
+}
+
+async function resetWeekMarker() {
+  showModal('MARKER SİL', 'voteWeekMarker silinsin mi?', async () => {
+    await fbDelete('/voteWeekMarker');
+    toast('🗓️ Hafta marker\'ı silindi!', 'warn');
+  });
+}
+
+async function deleteUserByUid() {
+  const uid = document.getElementById('d-deleteUid').value.trim();
+  if (!uid) { toast('UID gir!', 'error'); return; }
+  showModal('KULLANICI SİL', `UID: "${uid}" silinsin mi?`, async () => {
+    await fbDelete('/users/' + uid);
+    delete DB.users[uid];
+    renderUsersPage(); updateBadges();
+    toast('🗑️ Kullanıcı silindi!', 'warn');
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  UI UTILITIES
+// ═══════════════════════════════════════════════════
+function switchPage(name, btn) {
+  currentPage = name;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderCurrentPage();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toast(msg, type) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type || '');
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 3000);
+}
+
+function addLog(msg, type) {
+  logCount++;
+  const now = new Date().toLocaleTimeString('tr-TR');
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `<span class="log-time">${now}</span><span class="log-msg ${type || ''}">${msg}</span>`;
+  const inner = document.getElementById('consoleInner');
+  inner.appendChild(line);
+  inner.scrollTop = inner.scrollHeight;
+  const toggle = document.getElementById('consoleToggle');
+  toggle.textContent = `▲ LOG (${logCount})`;
+}
+
+function toggleConsole() {
+  const box = document.getElementById('consoleBox');
+  const toggle = document.getElementById('consoleToggle');
+  const isOpen = box.classList.contains('open');
+  box.classList.toggle('open');
+  toggle.textContent = (isOpen ? '▲' : '▼') + ` LOG (${logCount})`;
+}
+
+let modalCallback = null;
+function showModal(title, body, onConfirm) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').textContent = body;
+  document.getElementById('modal').classList.add('open');
+  modalCallback = onConfirm;
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  modalCallback = null;
+}
+document.getElementById('modal-confirm').onclick = async function() {
+  if (modalCallback) await modalCallback();
+  closeModal();
+};
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
 });
 
-// ===========================
-// INIT
-// ===========================
-console.log('[7D Admin] Panel v2.0 geladen. Login mit halil / elazigliadmin');
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+loadAllData();
+addLog('7D Zone Admin Panel v2.0 başlatıldı.', 'info');
+addLog('Firebase: ' + BASE, 'info');
 </script>
 </body>
 </html>
