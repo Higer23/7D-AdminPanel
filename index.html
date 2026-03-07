@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7D ZONE — ADMIN v2 👑</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06060f;--bg2:#0a0a18;--card:#0f0f22;--card2:#131328;
+  --border:#1c1c3a;--border2:#242450;
+  --accent:#00ff88;--accent2:#00ccff;--accent3:#7b2fff;
+  --danger:#ff2255;--warn:#ff9900;--info:#00ccff;
+  --text:#dde0f0;--text2:#6b6b9a;--text3:#4a4a70;
+  --glow:rgba(0,255,136,0.18);--glow2:rgba(0,204,255,0.15);
+  --sidebar-w:220px;
+  --radius:14px;--radius-sm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:var(--bg);}
+body{color:var(--text);font-family:'Nunito',sans-serif;overflow:hidden;}
+::selection{background:rgba(0,255,136,0.2);}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+
+/* ——— BG ——— */
+#bgC{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;}
+
+/* ——— LOGIN ——— */
+#loginScreen{
+  position:fixed;inset:0;z-index:9000;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 40%,rgba(0,255,136,.06) 0%,transparent 60%),var(--bg);
+}
+.lb{
+  position:relative;z-index:2;
+  background:rgba(13,13,30,.97);
+  border:1px solid rgba(0,255,136,.2);
+  border-radius:20px;
+  padding:2.8rem 2.2rem 2.2rem;
+  width:360px;max-width:94vw;
+  box-shadow:0 0 80px rgba(0,255,136,.07),0 30px 60px rgba(0,0,0,.6);
+  animation:loginIn .5s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes loginIn{from{opacity:0;transform:translateY(30px) scale(.95);}to{opacity:1;transform:none;}}
+.lb-crown{text-align:center;font-size:3rem;margin-bottom:.8rem;filter:drop-shadow(0 0 16px rgba(0,255,136,.6));}
+.lb-title{font-family:'Press Start 2P';font-size:.72rem;color:var(--accent);text-align:center;line-height:1.9;text-shadow:0 0 12px var(--accent);}
+.lb-sub{font-family:'Press Start 2P';font-size:.36rem;color:var(--text2);text-align:center;margin-bottom:2rem;letter-spacing:.12em;}
+.lb-field{margin-bottom:1rem;}
+.lb-label{font-family:'Press Start 2P';font-size:.38rem;color:var(--text2);display:block;margin-bottom:.4rem;letter-spacing:.1em;}
+.lb-wrap{position:relative;}
+.lb-icon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none;}
+.lb-in{
+  width:100%;background:rgba(0,255,136,.03);
+  border:1.5px solid var(--border2);border-radius:10px;
+  padding:.7rem 1rem .7rem 2.8rem;
+  color:var(--text);font-family:'Nunito';font-size:.95rem;outline:none;
+  transition:all .2s;
+}
+.lb-in:focus{border-color:var(--accent);background:rgba(0,255,136,.06);box-shadow:0 0 0 3px rgba(0,255,136,.1);}
+.lb-btn{
+  width:100%;margin-top:.3rem;
+  background:linear-gradient(135deg,rgba(0,255,136,.12),rgba(0,204,255,.08));
+  border:1.5px solid var(--accent);border-radius:10px;
+  padding:.85rem;color:var(--accent);
+  font-family:'Press Start 2P';font-size:.52rem;
+  cursor:pointer;transition:all .2s;letter-spacing:.1em;
+}
+.lb-btn:hover{background:var(--accent);color:var(--bg);box-shadow:0 0 24px rgba(0,255,136,.4);}
+.lb-btn:active{transform:scale(.97);}
+.lb-btn:disabled{opacity:.5;cursor:not-allowed;pointer-events:none;}
+#lMsg{text-align:center;font-size:.78rem;min-height:1.1rem;margin-top:.6rem;color:var(--danger);font-family:'Press Start 2P';font-size:.38rem;}
+.lb-info{margin-top:1.2rem;padding:.6rem .9rem;background:rgba(0,204,255,.05);border:1px solid rgba(0,204,255,.15);border-radius:8px;font-size:.72rem;color:var(--text2);text-align:center;}
+
+/* ——— APP ——— */
+#app{display:none;height:100vh;position:relative;z-index:1;}
+#app.on{display:flex;}
+
+/* ——— SIDEBAR ——— */
+#sb{
+  width:var(--sidebar-w);min-width:var(--sidebar-w);
+  background:rgba(6,6,15,.98);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  height:100vh;position:relative;z-index:50;
+  flex-shrink:0;overflow:hidden;
+}
+.sb-head{padding:1.2rem 1rem .9rem;border-bottom:1px solid var(--border);}
+.sb-logo{font-family:'Press Start 2P';font-size:.52rem;color:var(--accent);line-height:1.9;text-shadow:0 0 8px var(--accent);}
+.sb-who{font-size:.72rem;color:var(--text2);margin-top:.25rem;display:flex;align-items:center;gap:.3rem;}
+.sb-who b{color:var(--accent);}
+.online-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 5px var(--accent);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.sb-nav{flex:1;overflow-y:auto;padding:.4rem 0;}
+.sb-grp{
+  font-family:'Press Start 2P';font-size:.3rem;color:var(--text3);
+  padding:.5rem 1rem .25rem;letter-spacing:.12em;margin-top:.4rem;
+}
+.si{
+  display:flex;align-items:center;gap:.6rem;
+  padding:.55rem 1rem;cursor:pointer;
+  transition:all .15s;border-left:3px solid transparent;
+  font-size:.78rem;color:var(--text2);font-weight:700;
+  position:relative;user-select:none;
+}
+.si:hover{background:rgba(0,255,136,.04);color:var(--text);border-left-color:rgba(0,255,136,.3);}
+.si.on{background:rgba(0,255,136,.07);border-left-color:var(--accent);color:var(--accent);}
+.si-ico{font-size:.95rem;width:1.3rem;text-align:center;flex-shrink:0;}
+.si-badge{
+  margin-left:auto;background:var(--danger);color:#fff;
+  font-family:'Press Start 2P';font-size:.28rem;
+  padding:.1rem .35rem;border-radius:100px;
+  min-width:18px;text-align:center;
+}
+.sb-foot{padding:.8rem 1rem;border-top:1px solid var(--border);}
+.lb-out{
+  width:100%;display:flex;align-items:center;gap:.5rem;
+  padding:.5rem .7rem;background:rgba(255,34,85,.07);
+  border:1px solid rgba(255,34,85,.2);border-radius:8px;
+  color:var(--danger);font-family:'Nunito';font-size:.78rem;
+  font-weight:700;cursor:pointer;transition:all .2s;
+}
+.lb-out:hover{background:rgba(255,34,85,.15);border-color:var(--danger);}
+#sidebarToggle{
+  display:none;position:fixed;top:.7rem;left:.7rem;z-index:9999;
+  background:var(--card);border:1px solid var(--border2);border-radius:8px;
+  color:var(--text2);font-size:1.1rem;padding:.35rem .55rem;cursor:pointer;
+}
+
+/* ——— MAIN ——— */
+#main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;min-width:0;}
+.topbar{
+  background:rgba(6,6,15,.97);border-bottom:1px solid var(--border);
+  padding:.65rem 1.4rem;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;gap:1rem;
+}
+.tb-left{min-width:0;}
+.tb-title{font-family:'Press Start 2P';font-size:.6rem;color:var(--text);letter-spacing:.05em;}
+.tb-sub{font-size:.72rem;color:var(--text2);margin-top:.15rem;}
+.tb-right{display:flex;align-items:center;gap:.8rem;flex-shrink:0;}
+.tb-clock{font-family:'Press Start 2P';font-size:.42rem;color:var(--text2);}
+.tb-fbstatus{display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--text2);}
+#fbDot{width:7px;height:7px;border-radius:50%;background:var(--text3);}
+#fbDot.ok{background:var(--accent);box-shadow:0 0 5px var(--accent);animation:blink 2s ease-in-out infinite;}
+#fbDot.err{background:var(--danger);}
+
+.content{flex:1;overflow-y:auto;padding:1.4rem;}
+
+/* ——— PAGE ——— */
+.page{display:none;animation:fadeUp .25s ease;}
+.page.on{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* ——— SECTION HEADER ——— */
+.pg-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.3rem;gap:.8rem;flex-wrap:wrap;}
+.pg-title{font-family:'Press Start 2P';font-size:.68rem;color:var(--text);letter-spacing:.05em;}
+.pg-sub{font-size:.78rem;color:var(--text2);margin-top:.25rem;}
+.pg-actions{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+
+/* ——— CARDS ——— */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem;margin-bottom:.9rem;transition:border-color .2s;}
+.card:hover{border-color:rgba(0,255,136,.15);}
+.card-head{font-family:'Press Start 2P';font-size:.46rem;color:var(--accent);margin-bottom:.9rem;display:flex;align-items:center;gap:.45rem;letter-spacing:.06em;}
+.card-head .ico{font-size:.95rem;}
+
+/* ——— STAT BOXES ——— */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.7rem;margin-bottom:1.1rem;}
+.sbox{
+  background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1rem .8rem;text-align:center;
+  transition:all .2s;cursor:default;position:relative;overflow:hidden;
+}
+.sbox::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,255,136,.03),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.sbox:hover::before{opacity:1;}
+.sbox:hover{border-color:rgba(0,255,136,.25);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.sbox-num{font-size:2rem;font-weight:900;line-height:1.1;color:var(--accent);}
+.sbox-num.b{color:var(--accent2);}
+.sbox-num.r{color:var(--danger);}
+.sbox-num.o{color:var(--warn);}
+.sbox-num.p{color:var(--accent3);}
+.sbox-lbl{font-family:'Press Start 2P';font-size:.32rem;color:var(--text2);margin-top:.35rem;letter-spacing:.05em;}
+
+/* ——— BUTTONS ——— */
+.btn{
+  display:inline-flex;align-items:center;gap:.35rem;
+  padding:.42rem .95rem;border-radius:var(--radius-sm);
+  border:1.5px solid var(--accent);background:transparent;
+  color:var(--accent);font-family:'Press Start 2P';font-size:.42rem;
+  cursor:pointer;transition:all .18s;white-space:nowrap;letter-spacing:.04em;
+  user-select:none;
+}
+.btn:hover{background:var(--accent);color:var(--bg);box-shadow:0 0 14px var(--glow);}
+.btn:active{transform:scale(.96);}
+.btn:disabled{opacity:.4;pointer-events:none;}
+.btn.sm{padding:.3rem .7rem;font-size:.36rem;}
+.btn.xs{padding:.18rem .5rem;font-size:.3rem;}
+.btn.red{border-color:var(--danger);color:var(--danger);}
+.btn.red:hover{background:var(--danger);color:#fff;box-shadow:0 0 14px rgba(255,34,85,.3);}
+.btn.o{border-color:var(--warn);color:var(--warn);}
+.btn.o:hover{background:var(--warn);color:#fff;}
+.btn.b{border-color:var(--accent2);color:var(--accent2);}
+.btn.b:hover{background:var(--accent2);color:var(--bg);}
+.btn.p{border-color:var(--accent3);color:var(--accent3);}
+.btn.p:hover{background:var(--accent3);color:#fff;}
+.btn-row{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
+
+/* ——— INPUTS ——— */
+.inp{
+  background:rgba(0,255,136,.03);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:.55rem .8rem;
+  color:var(--text);font-family:'Nunito';font-size:.88rem;outline:none;
+  transition:all .2s;width:100%;
+}
+.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,255,136,.08);background:rgba(0,255,136,.05);}
+.inp::placeholder{color:var(--text3);}
+.inp.sm{padding:.35rem .6rem;font-size:.8rem;}
+.sel{
+  background:var(--card2);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:.5rem .65rem;
+  color:var(--text);font-family:'Nunito';font-size:.88rem;outline:none;cursor:pointer;
+}
+.sel:focus{border-color:var(--accent);}
+.ta{
+  background:rgba(0,255,136,.03);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:.65rem .8rem;
+  color:var(--text);font-family:'Nunito';font-size:.88rem;
+  outline:none;resize:vertical;min-height:75px;width:100%;transition:all .2s;
+}
+.ta:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,255,136,.08);}
+.fgrp{margin-bottom:.8rem;}
+.flbl{font-family:'Press Start 2P';font-size:.36rem;color:var(--text2);display:block;margin-bottom:.35rem;letter-spacing:.06em;}
+.frow{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;}
+
+/* ——— TABLE ——— */
+.tbl-wrap{overflow-x:auto;border-radius:var(--radius-sm);}
+table.tbl{width:100%;border-collapse:collapse;}
+table.tbl th{
+  font-family:'Press Start 2P';font-size:.32rem;color:var(--text2);
+  padding:.55rem .7rem;text-align:left;border-bottom:1px solid var(--border2);
+  white-space:nowrap;letter-spacing:.07em;
+}
+table.tbl td{padding:.5rem .7rem;font-size:.82rem;border-bottom:1px solid rgba(28,28,58,.5);vertical-align:middle;}
+table.tbl tr:last-child td{border-bottom:none;}
+table.tbl tr:hover td{background:rgba(0,255,136,.02);}
+
+/* ——— USER ROWS ——— */
+.urow{
+  display:flex;align-items:center;gap:.7rem;
+  padding:.6rem .85rem;background:var(--card2);
+  border:1px solid var(--border);border-radius:10px;
+  margin-bottom:.35rem;transition:all .18s;flex-wrap:wrap;
+}
+.urow:hover{border-color:rgba(0,255,136,.2);}
+.urow.banned{border-color:rgba(255,34,85,.25);background:rgba(255,34,85,.03);}
+.urow.admin{border-color:rgba(0,255,136,.25);background:rgba(0,255,136,.03);}
+.u-ava{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,rgba(0,255,136,.1),rgba(0,204,255,.1));
+  border:1px solid var(--border2);display:flex;align-items:center;
+  justify-content:center;font-size:1.1rem;flex-shrink:0;
+}
+.u-info{flex:1;min-width:0;}
+.u-name{font-weight:900;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.u-meta{font-size:.7rem;color:var(--text2);display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.1rem;}
+.u-acts{display:flex;gap:.3rem;flex-wrap:wrap;align-items:center;}
+.tag{
+  font-family:'Press Start 2P';font-size:.28rem;padding:.13rem .38rem;
+  border-radius:4px;white-space:nowrap;display:inline-block;
+}
+.tag.a{background:rgba(0,255,136,.1);color:var(--accent);border:1px solid rgba(0,255,136,.25);}
+.tag.b{background:rgba(255,34,85,.1);color:var(--danger);border:1px solid rgba(255,34,85,.25);}
+.tag.o{background:rgba(255,153,0,.1);color:var(--warn);border:1px solid rgba(255,153,0,.25);}
+.tag.p{background:rgba(123,47,255,.1);color:var(--accent3);border:1px solid rgba(123,47,255,.25);}
+
+/* ——— LB ROWS ——— */
+.lbrow{
+  display:flex;align-items:center;gap:.7rem;
+  padding:.6rem .8rem;background:var(--card2);
+  border:1px solid var(--border);border-radius:10px;margin-bottom:.35rem;transition:all .18s;
+}
+.lbrow:hover{border-color:rgba(0,255,136,.2);transform:translateX(3px);}
+.lbrow:first-child{border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.04);}
+.lbrow:nth-child(2){border-color:rgba(192,192,192,.3);background:rgba(192,192,192,.03);}
+.lbrow:nth-child(3){border-color:rgba(205,127,50,.3);background:rgba(205,127,50,.03);}
+.lb-rk{font-family:'Press Start 2P';font-size:.42rem;color:var(--text2);min-width:2rem;text-align:center;}
+.lb-nm{flex:1;font-weight:900;font-size:.88rem;}
+.lb-lv{font-size:.7rem;color:var(--text2);}
+.lb-xp{font-family:'Press Start 2P';font-size:.4rem;color:var(--accent);}
+.xb{height:4px;background:var(--border);border-radius:100px;overflow:hidden;width:70px;margin-top:.2rem;}
+.xbf{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;}
+
+/* ——— CHAT ITEMS ——— */
+.cmsg{
+  display:flex;align-items:flex-start;gap:.6rem;
+  padding:.5rem .7rem;background:var(--card2);
+  border:1px solid var(--border);border-radius:9px;margin-bottom:.28rem;
+  transition:all .15s;
+}
+.cmsg:hover{border-color:rgba(0,255,136,.15);}
+.cmsg.sys{border-color:rgba(0,204,255,.2);background:rgba(0,204,255,.04);}
+.cm-usr{font-weight:900;font-size:.78rem;color:var(--accent);white-space:nowrap;min-width:70px;}
+.cmsg.sys .cm-usr{color:var(--accent2);}
+.cm-txt{flex:1;font-size:.8rem;word-break:break-word;}
+.cm-time{font-size:.62rem;color:var(--text3);white-space:nowrap;}
+.cm-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:.9rem;padding:0 .15rem;transition:color .15s;flex-shrink:0;}
+.cm-del:hover{color:var(--danger);}
+
+/* ——— ANN ITEMS ——— */
+.aitem{
+  display:flex;align-items:flex-start;gap:.7rem;
+  padding:.65rem .8rem;background:var(--card2);
+  border:1px solid rgba(0,204,255,.15);border-radius:9px;margin-bottom:.3rem;
+}
+.ai-body{flex:1;}
+.ai-txt{font-size:.85rem;line-height:1.5;}
+.ai-meta{font-size:.68rem;color:var(--text2);margin-top:.2rem;}
+
+/* ——— BADGE GRID ——— */
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.55rem;}
+.bitem{
+  background:var(--card2);border:1px solid var(--border);border-radius:10px;
+  padding:.75rem .6rem;text-align:center;transition:all .18s;cursor:default;
+}
+.bitem:hover{border-color:rgba(0,255,136,.2);transform:translateY(-2px);}
+.bitem.earned{border-color:rgba(0,255,136,.35);background:rgba(0,255,136,.05);}
+.bitem.earned::after{content:'✓';position:absolute;top:.3rem;right:.4rem;color:var(--accent);font-family:'Press Start 2P';font-size:.3rem;}
+.bitem{position:relative;}
+.b-em{font-size:1.5rem;display:block;margin-bottom:.28rem;}
+.b-nm{font-family:'Press Start 2P';font-size:.3rem;color:var(--text);margin-bottom:.18rem;}
+.b-dc{font-size:.62rem;color:var(--text2);line-height:1.3;}
+.b-btn{margin-top:.4rem;}
+
+/* ——— XP BAR ——— */
+.xpb-out{height:7px;background:var(--border);border-radius:100px;overflow:hidden;margin:.35rem 0;}
+.xpb-in{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .6s cubic-bezier(.34,1.56,.64,1);}
+
+/* ——— HOF ITEMS ——— */
+.hof-it{
+  display:flex;align-items:center;gap:.65rem;
+  padding:.5rem .7rem;background:var(--card2);
+  border:1px solid var(--border);border-radius:9px;margin-bottom:.3rem;
+}
+.hof-em{font-size:1.25rem;width:1.8rem;text-align:center;}
+.hof-data{flex:1;}
+.hof-nm{font-weight:900;font-size:.83rem;}
+.hof-tl{font-size:.68rem;color:var(--text2);}
+
+/* ——— VOTE BARS ——— */
+.vbar-row{
+  display:flex;align-items:center;gap:.6rem;
+  padding:.45rem .7rem;background:var(--card2);
+  border:1px solid var(--border);border-radius:8px;margin-bottom:.3rem;
+}
+.vbar-nm{flex:1;font-weight:700;font-size:.82rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.vbar-wrap{width:100px;height:6px;background:var(--border);border-radius:100px;overflow:hidden;}
+.vbar-fill{height:100%;background:linear-gradient(90deg,var(--accent3),var(--accent2));border-radius:100px;transition:width .5s;}
+.vbar-cnt{font-family:'Press Start 2P';font-size:.38rem;color:var(--accent);min-width:40px;text-align:right;}
+
+/* ——— MODAL ——— */
+#modal{
+  position:fixed;inset:0;z-index:2000;
+  background:rgba(0,0,0,.82);display:none;
+  align-items:center;justify-content:center;padding:1rem;
+  backdrop-filter:blur(6px);
+}
+#modal.on{display:flex;}
+.modal-box{
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:var(--radius);padding:1.5rem;
+  max-width:520px;width:100%;
+  box-shadow:0 0 60px rgba(0,0,0,.6);
+  max-height:85vh;overflow-y:auto;
+  animation:modalIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.92);}to{opacity:1;transform:none;}}
+.modal-ttl{font-family:'Press Start 2P';font-size:.56rem;color:var(--accent);margin-bottom:1.1rem;}
+.modal-foot{display:flex;justify-content:flex-end;gap:.4rem;margin-top:1.1rem;padding-top:.8rem;border-top:1px solid var(--border);}
+
+/* ——— TOAST ——— */
+#toast{
+  position:fixed;bottom:1.3rem;right:1.3rem;z-index:9998;
+  padding:.65rem 1.1rem;border-radius:10px;
+  font-family:'Press Start 2P';font-size:.4rem;
+  background:var(--card);border:1.5px solid var(--accent);color:var(--accent);
+  box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 16px var(--glow);
+  transform:translateX(120%);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;max-width:280px;line-height:1.5;
+}
+#toast.on{transform:none;opacity:1;}
+#toast.err{border-color:var(--danger);color:var(--danger);box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 16px rgba(255,34,85,.2);}
+#toast.warn{border-color:var(--warn);color:var(--warn);box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 16px rgba(255,153,0,.2);}
+
+/* ——— MISC ——— */
+.loading{text-align:center;padding:2rem;color:var(--text2);font-size:.82rem;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--text2);}
+.empty .em-ico{font-size:2.2rem;display:block;margin-bottom:.5rem;}
+.empty .em-txt{font-size:.82rem;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;}
+.divider{height:1px;background:var(--border);margin:1rem 0;}
+.msg-feedback{font-family:'Press Start 2P';font-size:.36rem;min-height:1rem;margin-top:.4rem;transition:all .2s;}
+.text-green{color:var(--accent);}
+.text-red{color:var(--danger);}
+.text-warn{color:var(--warn);}
+.text-muted{color:var(--text2);}
+.progress-outer{height:7px;background:var(--border);border-radius:100px;overflow:hidden;}
+.progress-inner{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .5s;}
+.search-row{display:flex;gap:.5rem;margin-bottom:.9rem;flex-wrap:wrap;}
+.act-log-item{
+  display:flex;align-items:flex-start;gap:.6rem;
+  padding:.45rem .6rem;border-bottom:1px solid rgba(28,28,58,.5);
+  font-size:.75rem;
+}
+.al-time{color:var(--text3);font-size:.62rem;white-space:nowrap;flex-shrink:0;}
+.al-ico{font-size:.9rem;flex-shrink:0;}
+.al-txt{flex:1;color:var(--text);}
+.al-txt b{color:var(--accent);}
+
+@media(max-width:750px){
+  :root{--sidebar-w:210px;}
+  #sb{position:fixed;left:-230px;top:0;height:100%;z-index:200;transition:left .3s;box-shadow:4px 0 20px rgba(0,0,0,.5);}
+  #sb.open{left:0;}
+  #sidebarToggle{display:block;}
+  .g2,.g3{grid-template-columns:1fr;}
+  .content{padding:1rem;}
+  .stats{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+<canvas id="bgC"></canvas>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="lb">
+    <div class="lb-crown">👑</div>
+    <div class="lb-title">7D ZONE<br>ADMIN PANEL</div>
+    <div class="lb-sub">— KONTROLLZENTRUM —</div>
+    <div class="lb-field">
+      <label class="lb-label">ADMIN NAME</label>
+      <div class="lb-wrap">
+        <span class="lb-icon">👤</span>
+        <input class="lb-in" id="lU" type="text" placeholder="admin username" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+    </div>
+    <div class="lb-field">
+      <label class="lb-label">PASSWORT</label>
+      <div class="lb-wrap">
+        <span class="lb-icon">🔑</span>
+        <input class="lb-in" id="lP" type="password" placeholder="passwort" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+    </div>
+    <button class="lb-btn" id="lBtn" onclick="doLogin()">▶ EINLOGGEN</button>
+    <div id="lMsg"></div>
+    <div class="lb-info">⚠️ nur für autorisierte admins!!</div>
+  </div>
+</div>
+
+<!-- APP -->
+<button id="sidebarToggle" onclick="toggleSb()">☰</button>
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <div id="sb">
+    <div class="sb-head">
+      <div class="sb-logo">👑 7D ADMIN</div>
+      <div class="sb-who"><span class="online-dot"></span>eingeloggt: <b id="sbU">–</b></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-grp">ÜBERSICHT</div>
+      <div class="si on" data-sec="dash"><span class="si-ico">📊</span>Dashboard</div>
+      <div class="si" data-sec="lb"><span class="si-ico">🏆</span>Leaderboard</div>
+      <div class="si" data-sec="actlog"><span class="si-ico">📋</span>Aktivitäts-Log</div>
+
+      <div class="sb-grp">USER</div>
+      <div class="si" data-sec="users"><span class="si-ico">👥</span>Alle Users</div>
+      <div class="si" data-sec="xp"><span class="si-ico">⚡</span>XP / Level Editor</div>
+      <div class="si" data-sec="badges"><span class="si-ico">🎖️</span>Badges</div>
+      <div class="si" data-sec="bans"><span class="si-ico">🚫</span>Ban System<span class="si-badge" id="banBadge" style="display:none;">0</span></div>
+
+      <div class="sb-grp">CONTENT</div>
+      <div class="si" data-sec="chat"><span class="si-ico">💬</span>Chat</div>
+      <div class="si" data-sec="ann"><span class="si-ico">📢</span>Ankündigungen</div>
+      <div class="si" data-sec="votes"><span class="si-ico">🗳️</span>Votes</div>
+      <div class="si" data-sec="hof"><span class="si-ico">🏛️</span>Hall of Fame</div>
+
+      <div class="sb-grp">SYSTEM</div>
+      <div class="si" data-sec="chall"><span class="si-ico">🎯</span>Challenges</div>
+      <div class="si" data-sec="cfg"><span class="si-ico">⚙️</span>Config / DB</div>
+    </nav>
+    <div class="sb-foot">
+      <button class="lb-out" onclick="doLogout()">🚪 Ausloggen</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div class="topbar">
+      <div class="tb-left">
+        <div class="tb-title" id="tbTitle">DASHBOARD</div>
+        <div class="tb-sub" id="tbSub">Lade Daten...</div>
+      </div>
+      <div class="tb-right">
+        <div class="tb-fbstatus"><div id="fbDot"></div><span id="fbTxt">Verbinde...</span></div>
+        <div class="tb-clock" id="tbClock">00:00:00</div>
+      </div>
+    </div>
+
+    <div class="content" id="content">
+
+      <!-- ===== DASHBOARD ===== -->
+      <div class="page on" id="p-dash">
+        <div class="pg-hdr">
+          <div><div class="pg-title">📊 DASHBOARD</div><div class="pg-sub">Echtzeit-Übersicht der 7D Zone</div></div>
+          <div class="pg-actions"><button class="btn sm" onclick="safe(loadDash)">🔄 Refresh</button></div>
+        </div>
+        <div class="stats" id="dStats">
+          <div class="sbox"><div class="sbox-num" id="ds-u">–</div><div class="sbox-lbl">TOTAL USERS</div></div>
+          <div class="sbox"><div class="sbox-num b" id="ds-a">–</div><div class="sbox-lbl">ADMINS</div></div>
+          <div class="sbox"><div class="sbox-num r" id="ds-b">–</div><div class="sbox-lbl">GEBANNT</div></div>
+          <div class="sbox"><div class="sbox-num o" id="ds-xp">–</div><div class="sbox-lbl">TOTAL XP</div></div>
+          <div class="sbox"><div class="sbox-num p" id="ds-msg">–</div><div class="sbox-lbl">CHAT MSGS</div></div>
+          <div class="sbox"><div class="sbox-num b" id="ds-v">–</div><div class="sbox-lbl">VOTES</div></div>
+          <div class="sbox"><div class="sbox-num" id="ds-top">–</div><div class="sbox-lbl">TOP USER</div></div>
+          <div class="sbox"><div class="sbox-num o" id="ds-avg">–</div><div class="sbox-lbl">Ø XP/USER</div></div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-head"><span class="ico">🏆</span>TOP 5 LEADERBOARD</div>
+            <div id="dTop5"><div class="loading"><span class="spin"></span>Laden...</div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="ico">📢</span>LETZTE ANKÜNDIGUNGEN</div>
+            <div id="dAnn"><div class="loading"><span class="spin"></span>Laden...</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="ico">💬</span>NEUESTE CHAT NACHRICHTEN <span style="margin-left:auto;font-family:'Nunito';font-size:.75rem;color:var(--text2);font-weight:400;" id="dChatCnt"></span></div>
+          <div id="dChat"><div class="loading"><span class="spin"></span>Laden...</div></div>
+        </div>
+      </div>
+
+      <!-- ===== LEADERBOARD ===== -->
+      <div class="page" id="p-lb">
+        <div class="pg-hdr">
+          <div><div class="pg-title">🏆 XP LEADERBOARD</div><div class="pg-sub">Alle User nach XP sortiert</div></div>
+          <div class="pg-actions"><button class="btn sm" onclick="safe(loadLB)">🔄 Laden</button></div>
+        </div>
+        <div class="card"><div id="lbBody"><div class="loading"><span class="spin"></span>Laden...</div></div></div>
+      </div>
+
+      <!-- ===== ACTIVITY LOG ===== -->
+      <div class="page" id="p-actlog">
+        <div class="pg-hdr">
+          <div><div class="pg-title">📋 AKTIVITÄTS-LOG</div><div class="pg-sub">Alle Admin-Aktionen in dieser Sitzung</div></div>
+          <div class="pg-actions"><button class="btn sm red" onclick="clearActLog()">🗑️ Leeren</button></div>
+        </div>
+        <div class="card"><div id="actLogBody"><div class="empty"><span class="em-ico">📋</span><div class="em-txt">Noch keine Aktionen</div></div></div></div>
+      </div>
+
+      <!-- ===== USERS ===== -->
+      <div class="page" id="p-users">
+        <div class="pg-hdr">
+          <div><div class="pg-title">👥 ALLE USERS</div><div class="pg-sub">User verwalten & moderieren</div></div>
+          <div class="pg-actions"><button class="btn sm" onclick="safe(loadUsers)">🔄 Laden</button></div>
+        </div>
+        <div class="search-row">
+          <input class="inp sm" id="uSearch" placeholder="🔍 User suchen..." oninput="filterUsers()" style="max-width:260px;">
+          <select class="sel" id="uFilter" onchange="filterUsers()">
+            <option value="all">Alle</option>
+            <option value="admin">Nur Admins</option>
+            <option value="banned">Nur Gebannte</option>
+            <option value="normal">Normale User</option>
+          </select>
+          <select class="sel" id="uSort" onchange="filterUsers()">
+            <option value="xp">Sortiert: XP</option>
+            <option value="name">Sortiert: Name</option>
+            <option value="level">Sortiert: Level</option>
+          </select>
+          <span id="uCount" style="font-size:.72rem;color:var(--text2);align-self:center;"></span>
+        </div>
+        <div id="userBody"><div class="loading"><span class="spin"></span>Laden...</div></div>
+      </div>
+
+      <!-- ===== XP EDITOR ===== -->
+      <div class="page" id="p-xp">
+        <div class="pg-hdr">
+          <div><div class="pg-title">⚡ XP / LEVEL EDITOR</div><div class="pg-sub">XP, Level & Streak manuell bearbeiten</div></div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-head"><span class="ico">🔍</span>USER AUSWÄHLEN</div>
+            <div class="fgrp">
+              <label class="flbl">USERNAME EINGEBEN</label>
+              <div class="frow">
+                <input class="inp" id="xpUInput" placeholder="Username..." style="flex:1;">
+                <button class="btn sm" onclick="safe(loadXPUser)">LADEN</button>
+              </div>
+            </div>
+            <div id="xpInfo" style="display:none;">
+              <div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:.9rem;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem;">
+                  <span style="font-weight:900;font-size:.95rem;" id="xi-name">–</span>
+                  <span style="font-family:'Press Start 2P';font-size:.42rem;padding:.2rem .5rem;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.25);border-radius:5px;color:var(--accent);" id="xi-lv">Lv1</span>
+                </div>
+                <div style="font-size:.75rem;color:var(--text2);margin-bottom:.4rem;" id="xi-title">–</div>
+                <div class="xpb-out"><div class="xpb-in" id="xi-bar" style="width:0%;"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--text2);">
+                  <span id="xi-cur">0</span><span id="xi-nxt">/ 0 XP</span>
+                </div>
+                <div style="margin-top:.5rem;text-align:center;font-family:'Press Start 2P';font-size:.42rem;color:var(--accent);">TOTAL: <span id="xi-tot">0</span> XP</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="ico">✏️</span>XP BEARBEITEN</div>
+            <div class="fgrp">
+              <label class="flbl">+ XP HINZUFÜGEN</label>
+              <div class="frow">
+                <input class="inp" id="xpAddV" type="number" min="1" value="100" style="flex:1;">
+                <button class="btn sm" onclick="safe(doXPAdd)">+ GEBEN</button>
+              </div>
+            </div>
+            <div class="fgrp">
+              <label class="flbl">– XP ENTFERNEN</label>
+              <div class="frow">
+                <input class="inp" id="xpRemV" type="number" min="1" value="100" style="flex:1;">
+                <button class="btn sm red" onclick="safe(doXPRem)">– NEHMEN</button>
+              </div>
+            </div>
+            <div class="fgrp">
+              <label class="flbl">XP DIREKT SETZEN</label>
+              <div class="frow">
+                <input class="inp" id="xpSetV" type="number" min="0" value="0" style="flex:1;">
+                <button class="btn sm o" onclick="safe(doXPSet)">SET XP</button>
+              </div>
+            </div>
+            <div class="fgrp">
+              <label class="flbl">LOGIN STREAK SETZEN</label>
+              <div class="frow">
+                <input class="inp" id="xpStrV" type="number" min="0" value="0" style="flex:1;">
+                <button class="btn sm b" onclick="safe(doSetStreak)">SET STREAK</button>
+              </div>
+            </div>
+            <div class="fgrp">
+              <label class="flbl">LEVEL DIREKT SETZEN</label>
+              <div class="frow">
+                <input class="inp" id="xpLvlV" type="number" min="1" max="20" value="1" style="flex:1;">
+                <button class="btn sm p" onclick="safe(doSetLevel)">SET LEVEL</button>
+              </div>
+            </div>
+            <div id="xpFeedback" class="msg-feedback"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="ico">📊</span>ALLE USER XP ÜBERSICHT</div>
+          <div id="xpOverview"><div class="loading"><span class="spin"></span>Laden...</div></div>
+        </div>
+      </div>
+
+      <!-- ===== BADGES ===== -->
+      <div class="page" id="p-badges">
+        <div class="pg-hdr">
+          <div><div class="pg-title">🎖️ BADGE MANAGEMENT</div><div class="pg-sub">Badges vergeben & entziehen</div></div>
+        </div>
+        <div class="card" style="margin-bottom:.9rem;">
+          <div class="card-head"><span class="ico">🔍</span>USER AUSWÄHLEN</div>
+          <div class="frow">
+            <input class="inp" id="bUser" placeholder="Username..." style="max-width:280px;">
+            <button class="btn sm" onclick="safe(loadBadgesForUser)">LADEN</button>
+            <button class="btn sm red" onclick="safe(revokeAllBadges)">🗑️ ALLE ENTZIEHEN</button>
+          </div>
+          <div id="bUserInfo" style="font-size:.8rem;color:var(--text2);margin-top:.5rem;"></div>
+        </div>
+        <div id="badgeGrid" class="bgrid"><div class="empty" style="grid-column:1/-1;"><span class="em-ico">🎖️</span><div class="em-txt">User laden...</div></div></div>
+      </div>
+
+      <!-- ===== BANS ===== -->
+      <div class="page" id="p-bans">
+        <div class="pg-hdr">
+          <div><div class="pg-title">🚫 BAN SYSTEM</div><div class="pg-sub">User sperren & entsperren</div></div>
+          <div class="pg-actions"><button class="btn sm" onclick="safe(loadBans)">🔄 Laden</button></div>
+        </div>
+        <div class="g2">
+          <div>
+            <div class="card" style="border-color:rgba(255,34,85,.15);">
+              <div class="card-head"><span class="ico">🚫</span>USER BANNEN</div>
+              <div class="fgrp">
+                <label class="flbl">USERNAME</label>
+                <input class="inp" id="banUN" placeholder="Username..." style="width:100%;">
+              </div>
+              <div class="fgrp">
+                <label class="flbl">BAN GRUND</label>
+                <input class="inp" id="banR" placeholder="Grund (optional)..." style="width:100%;">
+              </div>
+              <button class="btn red" onclick="safe(doBan)">🚫 JETZT BANNEN</button>
+              <div id="banFb" class="msg-feedback"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><span class="ico">📋</span>GEBANNTE USER <span id="banCnt" style="font-family:'Nunito';font-size:.72rem;color:var(--text2);"></span></div>
+              <div id="banListBody"><div class="loading"><span class="spin"></span>Laden...</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="ico">👥</span>ALLE USER (ADMIN KONTROLLE)</div>
+            <div class="search-row" style="margin-bottom:.6rem;">
+              <input class="inp sm" id="banUserSearch" placeholder="🔍 Suchen..." oninput="filterBanUserList()" style="flex:1;">
+            </div>
+            <div id="banUserBody" style="max-height:480px;overflow-y:auto;"><div class="loading"><span class="spin"></span>Laden...</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CHAT ===== -->
+      <div class="page" id="p-chat">
+        <div class="pg-hdr">
+          <div><div class="pg-title">💬 CHAT VERWALTUNG</div><div class="pg-sub">Nachrichten einsehen & moderieren</div></div>
+          <div class="pg-actions">
+            <button class="btn sm" onclick="safe(loadChat)">🔄 Laden</button>
+            <button class="btn sm red" onclick="safe(clearChat)">🗑️ Alles löschen</button>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;flex-wrap:wrap;gap:.4rem;">
+            <span id="chatCntLbl" style="font-size:.75rem;color:var(--text2);"></span>
+            <input class="inp sm" id="chatSrc" placeholder="🔍 Nachricht/User suchen..." oninput="filterChat()" style="max-width:220px;">
+          </div>
+          <div id="chatBody" style="max-height:440px;overflow-y:auto;"><div class="loading"><span class="spin"></span>Laden...</div></div>
+        </div>
+      </div>
+
+      <!-- ===== ANNOUNCEMENTS ===== -->
+      <div class="page" id="p-ann">
+        <div class="pg-hdr">
+          <div><div class="pg-title">📢 ANKÜNDIGUNGEN</div><div class="pg-sub">Nachrichten an alle senden</div></div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-head"><span class="ico">✍️</span>NEUE ANKÜNDIGUNG</div>
+            <div class="fgrp">
+              <label class="flbl">NACHRICHT (MAX 300 ZEICHEN)</label>
+              <textarea class="ta" id="annTxt" placeholder="Deine Ankündigung an Klasse 7D..."></textarea>
+              <div style="font-size:.68rem;color:var(--text3);margin-top:.2rem;" id="annCharCnt">0 / 300</div>
+            </div>
+            <div class="fgrp">
+              <label class="flbl">EMOJI PRÄFIX</label>
+              <div class="frow">
+                <input class="inp" id="annEmoji" value="📢" style="width:70px;text-align:center;">
+                <span style="font-size:.75rem;color:var(--text2);">wird vor die Nachricht gesetzt</span>
+              </div>
+            </div>
+            <button class="btn" onclick="safe(sendAnn)">📢 AN ALLE SENDEN</button>
+            <div id="annFb" class="msg-feedback"></div>
+          </div>
+          <div class="card">
+            <div class="card-head" style="justify-content:space-between;">
+              <span><span class="ico">📋</span>VERLAUF</span>
+              <button class="btn xs red" onclick="safe(deleteAllAnn)">🗑️ ALLE</button>
+            </div>
+            <button class="btn sm" onclick="safe(loadAnn)" style="margin-bottom:.8rem;">🔄 Laden</button>
+            <div id="annBody" style="max-height:380px;overflow-y:auto;"><div class="loading"><span class="spin"></span>Laden...</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VOTES ===== -->
+      <div class="page" id="p-votes">
+        <div class="pg-hdr">
+          <div><div class="pg-title">🗳️ VOTE VERWALTUNG</div><div class="pg-sub">Hall of Fame Votes verwalten</div></div>
+        </div>
+        <div class="g2">
+          <div>
+            <div class="card">
+              <div class="card-head"><span class="ico">📊</span>AKTUELLE VOTES</div>
+              <button class="btn sm" onclick="safe(loadVotes)" style="margin-bottom:.7rem;">🔄 Laden</button>
+              <div id="votesBody"><div class="loading"><span class="spin"></span>Laden...</div></div>
+              <div class="btn-row" style="margin-top:.8rem;border-top:1px solid var(--border);padding-top:.8rem;">
+                <button class="btn red" onclick="safe(resetVotes)">🗑️ ALLE RESETTEN</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-head"><span class="ico">✏️</span>VOTES MANUELL</div>
+              <div class="fgrp">
+                <label class="flbl">PERSON</label>
+                <select class="sel" id="voteSel" style="width:100%;"></select>
+              </div>
+              <div class="fgrp">
+                <label class="flbl">ANZAHL</label>
+                <input class="inp" id="voteAmt" type="number" min="1" value="1" style="width:100%;">
+              </div>
+              <div class="btn-row">
+                <button class="btn" onclick="safe(()=>giveVotes(1))">+ GEBEN</button>
+                <button class="btn red" onclick="safe(()=>giveVotes(-1))">– NEHMEN</button>
+              </div>
+              <div id="voteFb" class="msg-feedback"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><span class="ico">🔄</span>USER VOTE RESET</div>
+              <div class="fgrp">
+                <label class="flbl">USERNAME</label>
+                <div class="frow">
+                  <input class="inp" id="voteResetU" placeholder="Username..." style="flex:1;">
+                  <button class="btn sm o" onclick="safe(resetUserVote)">RESET</button>
+                </div>
+              </div>
+              <div id="voteResetFb" class="msg-feedback"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== HOF ===== -->
+      <div class="page" id="p-hof">
+        <div class="pg-hdr">
+          <div><div class="pg-title">🏛️ HALL OF FAME</div><div class="pg-sub">Mitglieder & Zitate verwalten</div></div>
+          <div class="pg-actions">
+            <button class="btn sm" onclick="safe(saveHoFToDB)">💾 Speichern</button>
+            <button class="btn sm b" onclick="safe(loadHoFFromDB)">🔄 Aus DB laden</button>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-head" style="justify-content:space-between;"><span><span class="ico">👥</span>MITGLIEDER (<span id="hofMCnt">0</span>)</span></div>
+            <div id="hofMList" style="max-height:300px;overflow-y:auto;margin-bottom:.8rem;"></div>
+            <div class="divider"></div>
+            <div style="font-family:'Press Start 2P';font-size:.36rem;color:var(--text2);margin-bottom:.5rem;">NEUES MITGLIED</div>
+            <div class="fgrp"><label class="flbl">NAME (MIT EMOJI)</label><input class="inp" id="hofMN" placeholder="🚀 Max 🚀" style="width:100%;"></div>
+            <div class="fgrp"><label class="flbl">TITEL</label><input class="inp" id="hofMT" placeholder="Rocket Man" style="width:100%;"></div>
+            <div class="fgrp"><label class="flbl">HAUPT-EMOJI</label><input class="inp" id="hofME" placeholder="🚀" style="width:80px;"></div>
+            <button class="btn sm" onclick="safe(addHoFMember)">+ HINZUFÜGEN</button>
+            <div id="hofFb" class="msg-feedback"></div>
+          </div>
+          <div class="card">
+            <div class="card-head" style="justify-content:space-between;"><span><span class="ico">💬</span>ZITATE (<span id="hofQCnt">0</span>)</span></div>
+            <div id="hofQList" style="max-height:300px;overflow-y:auto;margin-bottom:.8rem;"></div>
+            <div class="divider"></div>
+            <div style="font-family:'Press Start 2P';font-size:.36rem;color:var(--text2);margin-bottom:.5rem;">NEUES ZITAT</div>
+            <div class="fgrp"><label class="flbl">ZITAT TEXT</label><textarea class="ta" id="hofQT" placeholder="Ein legendäres Zitat..." style="min-height:60px;"></textarea></div>
+            <div class="fgrp"><label class="flbl">AUTOR</label><input class="inp" id="hofQA" placeholder="— Autor" style="width:100%;"></div>
+            <button class="btn sm" onclick="safe(addHoFQuote)">+ HINZUFÜGEN</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CHALLENGES ===== -->
+      <div class="page" id="p-chall">
+        <div class="pg-hdr">
+          <div><div class="pg-title">🎯 CHALLENGES</div><div class="pg-sub">Challenge-Fortschritt verwalten</div></div>
+        </div>
+        <div class="g2">
+          <div>
+            <div class="card">
+              <div class="card-head"><span class="ico">🔄</span>USER CHALLENGE RESET</div>
+              <div class="fgrp"><label class="flbl">USERNAME</label><input class="inp" id="chUN" placeholder="Username..." style="width:100%;"></div>
+              <div class="fgrp"><label class="flbl">DATUM (YYYY-MM-DD)</label><input class="inp" id="chDate" type="date" style="width:100%;"></div>
+              <div class="btn-row">
+                <button class="btn o" onclick="safe(resetUserChall)">🔄 RESET</button>
+                <button class="btn red" onclick="safe(resetAllChall)">⚠️ ALLE USER HEUTE</button>
+              </div>
+              <div id="challFb" class="msg-feedback"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><span class="ico">📊</span>CHALLENGE XP VERGABE</div>
+              <div class="fgrp"><label class="flbl">USERNAME</label><input class="inp" id="challXPUser" placeholder="Username..." style="width:100%;"></div>
+              <div class="fgrp"><label class="flbl">CHALLENGE ID</label>
+                <select class="sel" id="challIDSel" style="width:100%;">
+                  <option value="quiz5">quiz5 — Quiz Starter (+30 XP)</option>
+                  <option value="quiz15">quiz15 — Quiz Profi (+80 XP)</option>
+                  <option value="catch30">catch30 — Catch Champion (+50 XP)</option>
+                  <option value="snake5">snake5 — Snake Starter (+60 XP)</option>
+                  <option value="joke3">joke3 — Witz Freak (+20 XP)</option>
+                  <option value="wordle1">wordle1 — Wordle Tag (+50 XP)</option>
+                  <option value="chat5">chat5 — Chatter (+25 XP)</option>
+                  <option value="login">login — Login (+10 XP)</option>
+                </select>
+              </div>
+              <button class="btn sm" onclick="safe(markChallengeComplete)">✅ ALS FERTIG MARKIEREN</button>
+              <div id="challXPFb" class="msg-feedback"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="ico">📋</span>CHALLENGE DEFINITIONEN</div>
+            <div id="challDefs"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CONFIG ===== -->
+      <div class="page" id="p-cfg">
+        <div class="pg-hdr">
+          <div><div class="pg-title">⚙️ CONFIG / DATENBANK</div><div class="pg-sub">Systemeinstellungen & Datenbank-Aktionen</div></div>
+        </div>
+        <div class="g2">
+          <div>
+            <div class="card">
+              <div class="card-head"><span class="ico">👑</span>ADMIN RECHTE</div>
+              <div class="fgrp"><label class="flbl">USERNAME</label><input class="inp" id="admTogUN" placeholder="Username..." style="width:100%;"></div>
+              <div class="btn-row">
+                <button class="btn" onclick="safe(()=>doAdminToggle(true))">👑 ADMIN GEBEN</button>
+                <button class="btn red" onclick="safe(()=>doAdminToggle(false))">✕ ENTZIEHEN</button>
+              </div>
+              <div id="admTogFb" class="msg-feedback"></div>
+            </div>
+            <div class="card" style="border-color:rgba(255,34,85,.15);">
+              <div class="card-head"><span class="ico">🗄️</span>DATENBANK AKTIONEN</div>
+              <p style="font-size:.78rem;color:var(--text2);margin-bottom:.9rem;line-height:1.5;">⚠️ Diese Aktionen sind <b style="color:var(--danger);">nicht rückgängig</b> machbar. Mit Vorsicht verwenden!!</p>
+              <div style="display:flex;flex-direction:column;gap:.5rem;">
+                <button class="btn red" onclick="safe(nukeChat)">🗑️ KOMPLETTEN CHAT LÖSCHEN</button>
+                <button class="btn red" onclick="safe(nukeAnn)">🗑️ ALLE ANKÜNDIGUNGEN LÖSCHEN</button>
+                <button class="btn red" onclick="safe(nukeVotes)">🗑️ ALLE VOTES RESETTEN</button>
+                <button class="btn o" onclick="safe(exportAll)">📤 ALLE DATEN EXPORTIEREN (JSON)</button>
+                <button class="btn b" onclick="safe(exportUsers)">📤 NUR USERS EXPORTIEREN</button>
+              </div>
+              <div id="cfgFb" class="msg-feedback"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="ico">📊</span>XP LEVEL TABELLE</div>
+            <div id="lvlTable" style="max-height:420px;overflow-y:auto;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MODAL -->
+<div id="modal">
+  <div class="modal-box">
+    <div class="modal-ttl" id="mTitle">–</div>
+    <div id="mBody"></div>
+    <div class="modal-foot">
+      <button class="btn sm red" onclick="closeModal()">✕ SCHLIESSEN</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+// ============================================================
+//  CONSTANTS
+// ============================================================
+const LOCAL_ADMIN = {user:'halil', pass:'101918'};
+const ADMIN_USERNAMES = ['halil','roman-owner'];
+const FB_CFG = {
+  apiKey:"AIzaSyAm-_eGrLsHnzsdiDAi1XTFU0fP_1AN8Lk",
+  authDomain:"dzone-9946c.firebaseapp.com",
+  databaseURL:"https://dzone-9946c-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"dzone-9946c",
+  storageBucket:"dzone-9946c.firebasestorage.app",
+  messagingSenderId:"759263965126",
+  appId:"1:759263965126:web:a325a1ce932954bfc00cc7"
+};
+const XP_L=[0,100,250,450,700,1000,1400,1900,2500,3200,4000,5000,6200,7600,9200,11000,13000,15500,18500,22000];
+const LVL_T=['Neuling','Lehrling','Aufsteiger','Fortgeschrittener','Kämpfer','Profi','Elite','Meister','Großmeister','Legende','GOAT 🐐','Mythisch','Unsterblich','Göttlich','Transzendent','Absolut','Jenseits','Unbegreiflich','Omnipotent','7D GOTT 👑'];
+const LVL_E=['😶','🙂','😊','😎','💪','🔥','⚡','🏆','👑','🌟','🐐','💎','🌌','🌠','🔮','⚔️','🧬','🌀','♾️','👑'];
+const BADGES=[
+  {id:'firstLogin',em:'🎉',nm:'Erster Login',dc:'Zum ersten Mal eingeloggt'},
+  {id:'quiz10',em:'🧠',nm:'Quiz-Starter',dc:'10 Quiz-Fragen beantwortet'},
+  {id:'chat10',em:'💬',nm:'Chatter',dc:'10 Chat-Nachrichten gesendet'},
+  {id:'catch50',em:'🎮',nm:'Catch-Pro',dc:'50 Punkte in Catch-Emoji'},
+  {id:'snake20',em:'🐍',nm:'Snake-Meister',dc:'Level 20 in Snake'},
+  {id:'memory4',em:'🧩',nm:'Memory-König',dc:'Memory auf Level 4'},
+  {id:'wordle3',em:'🟩',nm:'Wordle-Streak',dc:'3x Wordle gewonnen'},
+  {id:'login7',em:'🔥',nm:'Treuer User',dc:'7 Tage Login-Streak'},
+  {id:'login30',em:'💎',nm:'Dedication',dc:'30 Tage Login-Streak'},
+  {id:'challenges5',em:'🏆',nm:'Challenge-König',dc:'5 Challenges fertig'},
+  {id:'vote1',em:'⭐',nm:'Voter',dc:'Abgestimmt'},
+  {id:'topVoted',em:'👑',nm:'Beliebtester',dc:'Meiste Votes erhalten'},
+  {id:'quizPerfect',em:'🌟',nm:'Quiz-Perfekt',dc:'Quiz 100% geschafft'},
+  {id:'nightOwl',em:'🦉',nm:'Nachteule',dc:'Nach Mitternacht online'},
+  {id:'speedster',em:'⚡',nm:'Speedster',dc:'Quiz sehr schnell'},
+  {id:'noMistakes',em:'🎯',nm:'Kein Fehler',dc:'Quiz ohne Fehler'},
+];
+const CHALL_DEFS=[
+  {id:'quiz5',ic:'🧠',nm:'Quiz-Starter',dc:'5 Quiz-Fragen',xp:30,tg:5},
+  {id:'quiz15',ic:'📚',nm:'Quiz-Profi',dc:'15 Fragen richtig',xp:80,tg:15},
+  {id:'catch30',ic:'🎮',nm:'Catch-Champion',dc:'30 Punkte Catch-Emoji',xp:50,tg:30},
+  {id:'snake5',ic:'🐍',nm:'Snake-Starter',dc:'Level 5 in Snake',xp:60,tg:5},
+  {id:'joke3',ic:'😂',nm:'Witz-Freak',dc:'3 Witze lesen',xp:20,tg:3},
+  {id:'wordle1',ic:'🟩',nm:'Wordle-Tag',dc:'Wordle lösen',xp:50,tg:1},
+  {id:'chat5',ic:'💬',nm:'Chatter',dc:'5 Chat-Nachrichten',xp:25,tg:5},
+  {id:'login',ic:'🎁',nm:'Täglicher Login',dc:'Einloggen',xp:10,tg:1},
+];
+const HOF_MBR_DEF=[
+  {name:'👑 Alessia 👑 ⟡',emoji:'👑',title:'Vibe Queen'},
+  {name:'🦫 Roman 🦫',emoji:'🦫',title:'Co-Founder'},
+  {name:'👑 Annika 👑 ⟡',emoji:'👑',title:'Energie Boss'},
+  {name:'🐱 Halil 🐱',emoji:'🐱',title:'Web Dev OG'},
+  {name:'⚡ Emir ⚡',emoji:'⚡',title:'Blitz-Boy'},
+  {name:'🏄 Finn 🏄',emoji:'🏄',title:'Chill King'},
+  {name:'🎯 Joscha 🎯',emoji:'🎯',title:'Ziel-Getter'},
+  {name:'🦁 Cornelius 🦁',emoji:'🦁',title:'Der Löwe'},
+  {name:'🚀 Jonas 🚀',emoji:'🚀',title:'Rocket Man'},
+  {name:'🎸 Theodor 🎸',emoji:'🎸',title:'Rock Star'},
+  {name:'👑 Mara 👑',emoji:'👑',title:'Butterfly'},
+  {name:'👑 Frida 👑',emoji:'👑',title:'Artist'},
+  {name:'👑 Malena 👑',emoji:'👑',title:'Shooting Star'},
+  {name:'👑 Jolie 👑',emoji:'👑',title:'Rainbow'},
+  {name:'👑 Julie 👑',emoji:'👑',title:'Lucky Charm'},
+  {name:'🦆 👑 Vanessa 👑 🦆 ⟡',emoji:'👑',title:'Queen'},
+  {name:'👑 Jood 👑',emoji:'👑',title:'Fire Girl'},
+  {name:'🐰 👑 Kiara 👑 🐰',emoji:'👑',title:'Cheetah'},
+  {name:'👑 Clara 👑',emoji:'👑',title:'Moonchild'},
+  {name:'👑 Danelle 👑',emoji:'👑',title:'Diamond'},
+  {name:'👑 Tori 👑',emoji:'👑',title:'Showtime'},
+  {name:'👑 Helene 👑',emoji:'👑',title:'Sunshine'},
+  {name:'🐶 👑 Emily 👑 🐶',emoji:'👑',title:'Music Soul'},
+  {name:'🐈 👑 Emilie 👑 🐈',emoji:'👑',title:'Blüte'},
+  {name:'👑 Emma 👑',emoji:'👑',title:'Unicorn'},
+  {name:'👑 Melissa 👑',emoji:'👑',title:'Queen'},
+];
+const HOF_QT_DEF=[
+  {text:"wir sind einfach anders. und das ist gut so.",author:"— 7D Klassen-Weisheit"},
+  {text:"andere klassen gucken zu, wir machen einfach.",author:"— unbekannter 7D Legende"},
+  {text:"wenn du 7D sagst, meinen alle GOATS.",author:"— Roman 🦫"},
+  {text:"hausaufgaben? noch nie gehört.",author:"— jedes 7D mitglied"},
+  {text:"7D till i die no cap fr fr.",author:"— Halil 🐱"},
+];
+
+// ============================================================
+//  STATE
+// ============================================================
+let fbAuth=null, fbDb=null, fbOk=false;
+let adminUser=null;
+let allUsers={}, chatData={};
+let hofMembers=[...HOF_MBR_DEF], hofQuotes=[...HOF_QT_DEF];
+let xpTargetUid=null, badgeTargetUid=null;
+let actLog=[];
+const MSG_TBL={
+  'auth/wrong-password':'❌ Falsches Passwort!!',
+  'auth/user-not-found':'❌ User nicht gefunden!!',
+  'auth/too-many-requests':'⚠️ Zu viele Versuche!! Kurz warten.',
+  'auth/network-request-failed':'❌ Kein Internet!!'
+};
+
+// ============================================================
+//  BG CANVAS
+// ============================================================
+(function(){
+  const c=document.getElementById('bgC');
+  const ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function init(){W=c.width=innerWidth;H=c.height=innerHeight;pts=[];for(let i=0;i<70;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,s:Math.random()*1.2+.4,a:Math.random()*.35+.08});}
+  function draw(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,Math.PI*2);ctx.fillStyle=`rgba(0,255,136,${p.a})`;ctx.fill();});for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=dx*dx+dy*dy;if(d<8000){ctx.strokeStyle=`rgba(0,255,136,${(1-d/8000)*.05})`;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}}requestAnimationFrame(draw);}
+  window.addEventListener('resize',init);init();draw();
+})();
+
+// ============================================================
+//  CLOCK
+// ============================================================
+setInterval(()=>{const e=document.getElementById('tbClock');if(e)e.textContent=new Date().toLocaleTimeString('de-DE');},1000);
+
+// ============================================================
+//  HELPERS
+// ============================================================
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=String(s);return d.innerHTML;}
+function lvlFromXP(xp){let l=1;for(let i=1;i<XP_L.length;i++){if(xp>=XP_L[i])l=i+1;else break;}return Math.min(l,LVL_T.length);}
+function xpForLvl(l){return XP_L[Math.min(l,XP_L.length-1)]||XP_L[XP_L.length-1];}
+function curXPInLvl(xp){const l=lvlFromXP(xp);return xp-(XP_L[l-1]||0);}
+function xpNeededNxt(xp){const l=lvlFromXP(xp);return (XP_L[l]||XP_L[XP_L.length-1])-(XP_L[l-1]||0);}
+function weekKey(){const d=new Date(),day=d.getDay(),off=day===0?-6:1-day,m=new Date(d.getFullYear(),d.getMonth(),d.getDate()+off);return m.getFullYear()+'-'+String(m.getMonth()+1).padStart(2,'0')+'-'+String(m.getDate()).padStart(2,'0');}
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function fmtTs(ts){try{return new Date(ts).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch{return'–';}}
+function voteKey(n){return(n||'').replace(/[^a-zA-Z]/g,'').toLowerCase();}
+function uidByName(name){const n=name.toLowerCase();return Object.entries(allUsers).find(([,u])=>u.username&&u.username.toLowerCase()===n)?.[0]||null;}
+function lvlEmoji(xp){return LVL_E[Math.min(lvlFromXP(xp)-1,LVL_E.length-1)];}
+
+// safe() wraps async functions to never crash the UI
+function safe(fn){
+  try{const r=fn();if(r&&r.catch)r.catch(e=>showErr('Fehler: '+(e.message||e)));}catch(e){showErr('Fehler: '+(e.message||e));}
+}
+
+let _toastTimer;
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='on'+(type?' '+type:'');clearTimeout(_toastTimer);_toastTimer=setTimeout(()=>t.className='',3000);}
+function showErr(msg){showToast(msg,'err');}
+function showWarn(msg){showToast(msg,'warn');}
+function setFb(id,msg,col){const e=document.getElementById(id);if(e){e.textContent=msg;e.className='msg-feedback '+(col==='g'?'text-green':col==='r'?'text-red':col==='w'?'text-warn':'');}}
+function clearFb(id){setFb(id,'','');}
+
+function openModal(title,html){document.getElementById('mTitle').textContent=title;document.getElementById('mBody').innerHTML=html;document.getElementById('modal').classList.add('on');}
+function closeModal(){document.getElementById('modal').classList.remove('on');}
+
+function addActLog(ico,msg){
+  actLog.unshift({ico,msg,ts:Date.now()});
+  if(actLog.length>100)actLog.pop();
+  renderActLog();
+}
+function renderActLog(){
+  const e=document.getElementById('actLogBody');if(!e)return;
+  if(!actLog.length){e.innerHTML='<div class="empty"><span class="em-ico">📋</span><div class="em-txt">Noch keine Aktionen</div></div>';return;}
+  e.innerHTML=actLog.map(a=>`<div class="act-log-item"><span class="al-ico">${a.ico}</span><span class="al-txt">${a.msg}</span><span class="al-time">${fmtTs(a.ts)}</span></div>`).join('');
+}
+function clearActLog(){actLog=[];renderActLog();showToast('✅ Log geleert!!');}
+
+function loadingHTML(){return '<div class="loading"><span class="spin"></span>Laden...</div>';}
+function emptyHTML(ico='📭',txt='Keine Daten'){return`<div class="empty"><span class="em-ico">${ico}</span><div class="em-txt">${txt}</div></div>`;}
+
+// FB status indicator
+function setFBStatus(ok){
+  fbOk=ok;
+  const d=document.getElementById('fbDot'),t=document.getElementById('fbTxt');
+  if(!d||!t)return;
+  d.className=ok?'ok':'err';
+  t.textContent=ok?'Firebase OK':'Offline';
+}
+
+// ============================================================
+//  FIREBASE LOAD
+// ============================================================
+async function loadFB(){
+  const load=src=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('Script failed: '+src));document.head.appendChild(s);});
+  await load('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+  await load('https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js');
+  await load('https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js');
+  if(!firebase.apps.length)firebase.initializeApp(FB_CFG);
+  fbAuth=firebase.auth();fbDb=firebase.database();
+}
+
+// ============================================================
+//  LOGIN
+// ============================================================
+async function doLogin(){
+  const u=(document.getElementById('lU').value||'').trim().toLowerCase();
+  const p=(document.getElementById('lP').value||'').trim();
+  const btn=document.getElementById('lBtn');
+  const msg=document.getElementById('lMsg');
+  if(!u||!p){msg.textContent='⚠️ Alle Felder ausfüllen!!';return;}
+  btn.disabled=true;btn.textContent='⏳ VERBINDE...';msg.textContent='';
+  try{
+    // Init Firebase first if needed
+    if(!fbDb)await loadFB();
+
+    // Local admin check
+    const isLocalAdmin=u===LOCAL_ADMIN.user&&p===LOCAL_ADMIN.pass;
+    const isOtherAdmin=ADMIN_USERNAMES.includes(u)&&u!==LOCAL_ADMIN.user;
+
+    if(!isLocalAdmin&&!isOtherAdmin){
+      msg.textContent='❌ Keine Admin-Rechte!!';
+      btn.disabled=false;btn.textContent='▶ EINLOGGEN';return;
+    }
+
+    // Firebase auth attempt
+    const fakeEmail=btoa(u).replace(/[^a-zA-Z0-9]/g,'').substring(0,20)+'@7dzone.local';
+    let uid=null;
+    try{
+      const cred=await fbAuth.signInWithEmailAndPassword(fakeEmail,p);
+      uid=cred.user.uid;
+      setFBStatus(true);
+    }catch(fbErr){
+      if(isLocalAdmin){
+        // Local admin can bypass Firebase auth — try to get UID from DB
+        const snap=await fbDb.ref('usernames/'+u).once('value').catch(()=>null);
+        if(snap&&snap.val())uid=snap.val();
+        else uid='local-admin-'+u;
+        setFBStatus(false);
+        showWarn('⚠️ Firebase Auth fehlgeschlagen — eingeschränkter Modus');
+      }else{
+        throw fbErr;
+      }
+    }
+
+    // Check admin flag in DB
+    if(uid&&!uid.startsWith('local-admin-')){
+      try{
+        const admSnap=await fbDb.ref('users/'+uid+'/admin').once('value');
+        const isDBAdmin=admSnap.val()===true||ADMIN_USERNAMES.includes(u);
+        if(!isDBAdmin&&!isLocalAdmin){
+          msg.textContent='❌ Kein Admin in der Datenbank!!';
+          btn.disabled=false;btn.textContent='▶ EINLOGGEN';
+          if(fbAuth)fbAuth.signOut().catch(()=>{});
+          return;
+        }
+      }catch(e){/* DB rules might block - ignore if local admin */}
+    }
+
+    adminUser={uid:uid||'admin',username:u};
+    document.getElementById('sbU').textContent=u;
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').classList.add('on');
+    setFBStatus(fbOk||true);
+    initPanel();
+  }catch(e){
+    msg.textContent=MSG_TBL[e.code]||('❌ Fehler: '+(e.message||e.code||e));
+    btn.disabled=false;btn.textContent='▶ EINLOGGEN';
+  }
+}
+
+function doLogout(){
+  try{if(fbAuth)fbAuth.signOut().catch(()=>{});}catch(e){}
+  location.reload();
+}
+
+// ============================================================
+//  PANEL INIT
+// ============================================================
+function initPanel(){
+  // Nav click handlers
+  document.querySelectorAll('.si').forEach(el=>{
+    el.addEventListener('click',()=>{const sec=el.getAttribute('data-sec');if(sec)showSec(sec,el);});
+  });
+  // Announcement char counter
+  const ta=document.getElementById('annTxt');
+  if(ta)ta.addEventListener('input',()=>{const c=ta.value.length;const el=document.getElementById('annCharCnt');if(el)el.textContent=c+' / 300';});
+  // Set today's date
+  const cd=document.getElementById('chDate');if(cd)cd.value=todayStr();
+  // Init static content
+  renderChallDefs();
+  renderLvlTable();
+  loadVotePersonSelect();
+  // Load dashboard
+  safe(loadDash);
+}
+
+// ============================================================
+//  SECTION SWITCHING
+// ============================================================
+const SEC_META={
+  dash:{title:'📊 DASHBOARD',sub:'Echtzeit-Übersicht der 7D Zone'},
+  lb:{title:'🏆 LEADERBOARD',sub:'Alle User nach XP sortiert'},
+  actlog:{title:'📋 AKTIVITÄTS-LOG',sub:'Admin-Aktionen in dieser Sitzung'},
+  users:{title:'👥 ALLE USERS',sub:'User verwalten & moderieren'},
+  xp:{title:'⚡ XP / LEVEL EDITOR',sub:'XP, Level & Streak bearbeiten'},
+  badges:{title:'🎖️ BADGE MANAGEMENT',sub:'Badges vergeben & entziehen'},
+  bans:{title:'🚫 BAN SYSTEM',sub:'User sperren & entsperren'},
+  chat:{title:'💬 CHAT VERWALTUNG',sub:'Nachrichten moderieren'},
+  ann:{title:'📢 ANKÜNDIGUNGEN',sub:'Nachrichten an alle senden'},
+  votes:{title:'🗳️ VOTE VERWALTUNG',sub:'Hall of Fame Votes'},
+  hof:{title:'🏛️ HALL OF FAME',sub:'Mitglieder & Zitate'},
+  chall:{title:'🎯 CHALLENGES',sub:'Challenge-Fortschritt'},
+  cfg:{title:'⚙️ CONFIG / DATENBANK',sub:'Systemeinstellungen'},
+};
+function showSec(name,navEl){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.si').forEach(s=>s.classList.remove('on'));
+  const pg=document.getElementById('p-'+name);if(pg)pg.classList.add('on');
+  if(navEl)navEl.classList.add('on');
+  else{const found=document.querySelector(`.si[data-sec="${name}"]`);if(found)found.classList.add('on');}
+  const meta=SEC_META[name]||{title:name.toUpperCase(),sub:''};
+  const tt=document.getElementById('tbTitle'),ts=document.getElementById('tbSub');
+  if(tt)tt.textContent=meta.title;if(ts)ts.textContent=meta.sub;
+  document.getElementById('content').scrollTop=0;
+  if(window.innerWidth<=750)document.getElementById('sb').classList.remove('open');
+  // Auto-load on section open
+  const autoLoad={lb:loadLB,users:loadUsers,bans:loadBans,chat:loadChat,ann:loadAnn,votes:loadVotes,hof:renderHoFEditor,xp:loadXPOverview};
+  if(autoLoad[name])safe(autoLoad[name]);
+}
+function toggleSb(){document.getElementById('sb').classList.toggle('open');}
+
+// ============================================================
+//  DB HELPERS
+// ============================================================
+async function dbGet(path){
+  if(!fbDb)throw new Error('Firebase nicht verbunden!!');
+  const snap=await fbDb.ref(path).once('value');
+  return snap.val();
+}
+async function dbSet(path,val){if(!fbDb)throw new Error('Firebase nicht verbunden!!');await fbDb.ref(path).set(val);}
+async function dbRemove(path){if(!fbDb)throw new Error('Firebase nicht verbunden!!');await fbDb.ref(path).remove();}
+async function dbUpdate(updates){if(!fbDb)throw new Error('Firebase nicht verbunden!!');await fbDb.ref().update(updates);}
+async function dbPush(path,val){if(!fbDb)throw new Error('Firebase nicht verbunden!!');const key=fbDb.ref(path).push().key;await fbDb.ref(path+'/'+key).set(val);return key;}
+
+async function getUsers(){
+  const data=await dbGet('users');
+  allUsers=data||{};
+  setFBStatus(true);
+  return allUsers;
+}
+
+// ============================================================
+//  DASHBOARD
+// ============================================================
+async function loadDash(){
+  try{
+    await getUsers();
+    const vals=Object.values(allUsers);
+    const total=vals.length;
+    const admins=vals.filter(u=>u.admin).length;
+    const banned=vals.filter(u=>u.banned).length;
+    const totalXP=vals.reduce((s,u)=>s+(u.xp||0),0);
+    const avgXP=total?Math.round(totalXP/total):0;
+    const topU=vals.filter(u=>u.username).sort((a,b)=>(b.xp||0)-(a.xp||0))[0];
+    // Stats
+    const S=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+    S('ds-u',total);S('ds-a',admins);S('ds-b',banned);
+    S('ds-xp',totalXP.toLocaleString());S('ds-avg',avgXP.toLocaleString());
+    S('ds-top',topU?.username||'–');
+    // Ban badge
+    const bb=document.getElementById('banBadge');
+    if(bb){bb.textContent=banned;bb.style.display=banned>0?'':'none';}
+    // Chat
+    const chatSnap=await dbGet('chat7d');
+    chatData=chatSnap||{};
+    const cmsgCount=Object.keys(chatData).length;
+    S('ds-msg',cmsgCount);
+    document.getElementById('dChatCnt').textContent=cmsgCount+' Nachrichten';
+    // Votes
+    const votes=await dbGet('votes7d')||{};
+    S('ds-v',Object.keys(votes).length);
+    // Top 5
+    const medals=['🥇','🥈','🥉','4️⃣','5️⃣'];
+    const top5=vals.filter(u=>u.username&&u.xp!=null).sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,5);
+    document.getElementById('dTop5').innerHTML=top5.length?top5.map((u,i)=>`
+      <div class="lbrow" style="margin-bottom:.3rem;">
+        <span class="lb-rk" style="color:${i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--text2)'};">${medals[i]}</span>
+        <div class="lb-nm">${esc(u.username)}${u.banned?`<span class="tag b" style="margin-left:.3rem;">BAN</span>`:''}</div>
+        <span class="lb-lv">Lv${lvlFromXP(u.xp||0)}</span>
+        <span class="lb-xp">${(u.xp||0).toLocaleString()}</span>
+      </div>`).join(''):emptyHTML('🏆','Keine Daten');
+    // Last chat
+    const lastMsgs=Object.values(chatData).sort((a,b)=>b.ts-a.ts).slice(0,6);
+    document.getElementById('dChat').innerHTML=lastMsgs.length?lastMsgs.map(m=>`
+      <div class="cmsg${m.uid==='SYSTEM'?' sys':''}">
+        <span class="cm-usr">${esc(m.name||'?')}</span>
+        <span class="cm-txt">${esc(m.text)}</span>
+        <span class="cm-time">${fmtTs(m.ts)}</span>
+      </div>`).join(''):emptyHTML('💬','Keine Nachrichten');
+    // Last ann
+    const annData=await dbGet('announcements7d')||{};
+    const lastAnn=Object.values(annData).sort((a,b)=>b.ts-a.ts).slice(0,3);
+    document.getElementById('dAnn').innerHTML=lastAnn.length?lastAnn.map(a=>`
+      <div class="aitem">
+        <span style="font-size:1.3rem;">📢</span>
+        <div class="ai-body"><div class="ai-txt">${esc(a.text)}</div><div class="ai-meta">von ${esc(a.author||'?')} · ${fmtTs(a.ts)}</div></div>
+      </div>`).join(''):emptyHTML('📭','Keine Ankündigungen');
+    document.getElementById('tbSub').textContent=`${total} User · ${banned} gebannt · Top: ${topU?.username||'–'}`;
+    addActLog('📊','Dashboard geladen — '+total+' User gefunden');
+  }catch(e){showErr('Dashboard: '+e.message);document.getElementById('tbSub').textContent='❌ Fehler beim Laden';}
+}
+
+// ============================================================
+//  LEADERBOARD
+// ============================================================
+async function loadLB(){
+  document.getElementById('lbBody').innerHTML=loadingHTML();
+  try{
+    await getUsers();
+    const entries=Object.values(allUsers).filter(u=>u.username&&u.xp!=null).sort((a,b)=>(b.xp||0)-(a.xp||0));
+    const medals=['🥇','🥈','🥉'];
+    document.getElementById('lbBody').innerHTML=entries.length?entries.map((u,i)=>{
+      const lvl=lvlFromXP(u.xp||0);
+      const pct=Math.min(100,Math.round((curXPInLvl(u.xp||0)/xpNeededNxt(u.xp||0))*100));
+      return`<div class="lbrow">
+        <span class="lb-rk" style="color:${i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--text2)'};">${medals[i]||('#'+(i+1))}</span>
+        <div style="flex:1;">
+          <div class="lb-nm">${esc(u.username)}${u.admin?`<span class="tag a" style="margin-left:.3rem;">ADMIN</span>`:''}${u.banned?`<span class="tag b" style="margin-left:.3rem;">BAN</span>`:''}</div>
+          <div style="font-size:.68rem;color:var(--text2);">${LVL_T[Math.min(lvl-1,LVL_T.length-1)]}</div>
+          <div class="xb"><div class="xbf" style="width:${pct}%;"></div></div>
+        </div>
+        <span class="lb-lv">Lv${lvl}</span>
+        <span class="lb-xp">${(u.xp||0).toLocaleString()} XP</span>
+      </div>`;
+    }).join(''):emptyHTML('🏆','Keine User');
+  }catch(e){document.getElementById('lbBody').innerHTML=`<div style="color:var(--danger);padding:1rem;">❌ ${esc(e.message)}</div>`;}
+}
+
+// ============================================================
+//  USERS
+// ============================================================
+async function loadUsers(){
+  document.getElementById('userBody').innerHTML=loadingHTML();
+  try{await getUsers();filterUsers();}
+  catch(e){document.getElementById('userBody').innerHTML=`<div style="color:var(--danger);padding:1rem;">❌ ${esc(e.message)}</div>`;}
+}
+function filterUsers(){
+  const q=(document.getElementById('uSearch')?.value||'').toLowerCase();
+  const f=document.getElementById('uFilter')?.value||'all';
+  const s=document.getElementById('uSort')?.value||'xp';
+  let entries=Object.entries(allUsers).filter(([,u])=>{
+    if(!u.username)return false;
+    const mq=!q||u.username.toLowerCase().includes(q);
+    const mf=f==='all'||(f==='admin'&&u.admin)||(f==='banned'&&u.banned)||(f==='normal'&&!u.admin&&!u.banned);
+    return mq&&mf;
+  });
+  entries.sort((a,b)=>{
+    if(s==='name')return(a[1].username||'').localeCompare(b[1].username||'');
+    if(s==='level')return lvlFromXP(b[1].xp||0)-lvlFromXP(a[1].xp||0);
+    return (b[1].xp||0)-(a[1].xp||0);
+  });
+  const cnt=document.getElementById('uCount');if(cnt)cnt.textContent=entries.length+' User';
+  const el=document.getElementById('userBody');
+  el.innerHTML=entries.length?entries.map(([uid,u])=>`
+    <div class="urow${u.banned?' banned':u.admin?' admin':''}">
+      <div class="u-ava">${lvlEmoji(u.xp||0)}</div>
+      <div class="u-info">
+        <div class="u-name">${esc(u.username)} ${u.admin?'<span class="tag a">ADMIN</span>':''} ${u.banned?'<span class="tag b">BANNED</span>':''} ${ADMIN_USERNAMES.includes(u.username)?'<span class="tag o">OWNER</span>':''}</div>
+        <div class="u-meta">
+          <span>Lv${lvlFromXP(u.xp||0)} · ${LVL_T[Math.min(lvlFromXP(u.xp||0)-1,LVL_T.length-1)]}</span>
+          <span>⚡ ${(u.xp||0).toLocaleString()} XP</span>
+          ${u.loginStreak?`<span>🔥 ${u.loginStreak}d</span>`:''}
+          ${u.banReason?`<span style="color:var(--danger);">🚫 ${esc(u.banReason)}</span>`:''}
+        </div>
+      </div>
+      <div class="u-acts">
+        <button class="btn xs b" onclick="safe(()=>openUserDetail('${uid}'))">👁️</button>
+        <button class="btn xs" onclick="quickXP('${uid}','${esc(u.username)}')">⚡XP</button>
+        ${u.banned
+          ?`<button class="btn xs" onclick="safe(()=>unbanById('${uid}','${esc(u.username)}'))">✅</button>`
+          :(!ADMIN_USERNAMES.includes(u.username)?`<button class="btn xs red" onclick="safe(()=>banById('${uid}','${esc(u.username)}'))">🚫</button>`:'')
+        }
+        ${!ADMIN_USERNAMES.includes(u.username)?
+          (u.admin
+            ?`<button class="btn xs red" onclick="safe(()=>toggleAdmin('${uid}',true,'${esc(u.username)}'))">✕ADM</button>`
+            :`<button class="btn xs o" onclick="safe(()=>toggleAdmin('${uid}',false,'${esc(u.username)}'))">👑ADM</button>`
+          ):''
+        }
+      </div>
+    </div>`).join(''):emptyHTML('👥','Keine User gefunden');
+}
+function openUserDetail(uid){
+  const u=allUsers[uid];if(!u)return;
+  const lvl=lvlFromXP(u.xp||0);
+  const badges=Object.keys(u.badges||{});
+  openModal('👤 '+esc(u.username),`
+    <div class="g2" style="font-size:.82rem;gap:.5rem;">
+      <div><b class="text-muted">UID:</b><div style="font-size:.68rem;word-break:break-all;">${uid}</div></div>
+      <div><b class="text-muted">Level:</b><span style="color:var(--accent);">Lv${lvl}</span> · ${LVL_T[Math.min(lvl-1,LVL_T.length-1)]}</div>
+      <div><b class="text-muted">Total XP:</b><span style="color:var(--accent);">${(u.xp||0).toLocaleString()}</span></div>
+      <div><b class="text-muted">Streak:</b> 🔥 ${u.loginStreak||0} Tage</div>
+      <div><b class="text-muted">Admin:</b> ${u.admin?'✅ JA':'❌ NEIN'}</div>
+      <div><b class="text-muted">Banned:</b> ${u.banned?'🚫 JA':'✅ NEIN'}</div>
+      ${u.banReason?`<div style="grid-column:1/-1"><b class="text-muted">Ban-Grund:</b> ${esc(u.banReason)}</div>`:''}
+    </div>
+    <div class="divider"></div>
+    <b style="font-family:'Press Start 2P';font-size:.36rem;color:var(--text2);">BADGES (${badges.length}):</b>
+    <div style="font-size:.78rem;color:var(--text2);margin-top:.3rem;line-height:1.7;">${badges.length?badges.map(b=>{const bd=BADGES.find(x=>x.id===b);return bd?`${bd.em} ${bd.nm}`:b;}).join(' · '):' — keine —'}</div>
+  `);
+}
+function quickXP(uid,username){
+  document.getElementById('xpUInput').value=username;
+  showSec('xp');
+  setTimeout(()=>safe(loadXPUser),200);
+}
+
+// ============================================================
+//  XP EDITOR
+// ============================================================
+async function loadXPUser(){
+  const name=(document.getElementById('xpUInput')?.value||'').trim().toLowerCase();
+  if(!name){setFb('xpFeedback','⚠️ Username eingeben!!','w');return;}
+  if(!Object.keys(allUsers).length)await getUsers();
+  xpTargetUid=uidByName(name);
+  if(!xpTargetUid){setFb('xpFeedback','❌ User nicht gefunden!!','r');return;}
+  const u=allUsers[xpTargetUid];
+  refreshXPUI(u.xp||0,u.username,u);
+  setFb('xpFeedback','✅ '+esc(u.username)+' geladen!!','g');
+}
+function refreshXPUI(xp,username,u){
+  const lvl=lvlFromXP(xp);
+  const cur=curXPInLvl(xp),nxt=xpNeededNxt(xp);
+  const pct=Math.min(100,Math.round((cur/nxt)*100));
+  const S=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  S('xi-name',username);S('xi-lv','Lv'+lvl);
+  S('xi-title',LVL_T[Math.min(lvl-1,LVL_T.length-1)]+' '+LVL_E[Math.min(lvl-1,LVL_E.length-1)]);
+  S('xi-cur',cur.toLocaleString()+' XP');S('xi-nxt','/ '+nxt.toLocaleString()+' XP');
+  S('xi-tot',xp.toLocaleString());
+  const bar=document.getElementById('xi-bar');if(bar)bar.style.width=pct+'%';
+  const info=document.getElementById('xpInfo');if(info)info.style.display='block';
+  const sv=document.getElementById('xpSetV');if(sv)sv.value=xp;
+  const sv2=document.getElementById('xpStrV');if(sv2&&u)sv2.value=u.loginStreak||0;
+  const sv3=document.getElementById('xpLvlV');if(sv3)sv3.value=lvl;
+}
+async function doXPAdd(){
+  if(!xpTargetUid){setFb('xpFeedback','⚠️ User erst laden!!','w');return;}
+  const amt=parseInt(document.getElementById('xpAddV')?.value)||0;
+  if(amt<=0){setFb('xpFeedback','⚠️ Betrag > 0!!','w');return;}
+  const cur=allUsers[xpTargetUid]?.xp||0;
+  const nw=cur+amt;
+  await dbSet('users/'+xpTargetUid+'/xp',nw);
+  allUsers[xpTargetUid].xp=nw;
+  refreshXPUI(nw,allUsers[xpTargetUid].username,allUsers[xpTargetUid]);
+  setFb('xpFeedback','✅ +'+amt+' XP!! Total: '+nw.toLocaleString(),'g');
+  showToast('✅ +'+amt+' XP für '+allUsers[xpTargetUid].username+'!!');
+  addActLog('⚡','XP +'+amt+' für <b>'+allUsers[xpTargetUid].username+'</b> (→ '+nw+')');
+}
+async function doXPRem(){
+  if(!xpTargetUid){setFb('xpFeedback','⚠️ User erst laden!!','w');return;}
+  const amt=parseInt(document.getElementById('xpRemV')?.value)||0;
+  if(amt<=0){setFb('xpFeedback','⚠️ Betrag > 0!!','w');return;}
+  const cur=allUsers[xpTargetUid]?.xp||0;
+  const nw=Math.max(0,cur-amt);
+  await dbSet('users/'+xpTargetUid+'/xp',nw);
+  allUsers[xpTargetUid].xp=nw;
+  refreshXPUI(nw,allUsers[xpTargetUid].username,allUsers[xpTargetUid]);
+  setFb('xpFeedback','✅ –'+amt+' XP!! Total: '+nw.toLocaleString(),'g');
+  showToast('✅ –'+amt+' XP von '+allUsers[xpTargetUid].username,'warn');
+  addActLog('⚡','XP –'+amt+' von <b>'+allUsers[xpTargetUid].username+'</b> (→ '+nw+')');
+}
+async function doXPSet(){
+  if(!xpTargetUid){setFb('xpFeedback','⚠️ User erst laden!!','w');return;}
+  const nw=parseInt(document.getElementById('xpSetV')?.value)||0;
+  if(nw<0){setFb('xpFeedback','⚠️ XP >= 0!!','w');return;}
+  if(!confirm('XP von "'+allUsers[xpTargetUid].username+'" auf '+nw+' setzen?'))return;
+  await dbSet('users/'+xpTargetUid+'/xp',nw);
+  allUsers[xpTargetUid].xp=nw;
+  refreshXPUI(nw,allUsers[xpTargetUid].username,allUsers[xpTargetUid]);
+  setFb('xpFeedback','✅ XP auf '+nw+' gesetzt!!','g');
+  showToast('✅ XP = '+nw.toLocaleString()+'!!');
+  addActLog('⚡','XP SET '+nw+' für <b>'+allUsers[xpTargetUid].username+'</b>');
+}
+async function doSetStreak(){
+  if(!xpTargetUid){setFb('xpFeedback','⚠️ User erst laden!!','w');return;}
+  const s=parseInt(document.getElementById('xpStrV')?.value)||0;
+  await dbSet('users/'+xpTargetUid+'/loginStreak',s);
+  if(allUsers[xpTargetUid])allUsers[xpTargetUid].loginStreak=s;
+  setFb('xpFeedback','✅ Streak = '+s+' Tage!!','g');
+  showToast('✅ Streak gesetzt: '+s+' Tage');
+  addActLog('🔥','Streak '+s+' für <b>'+allUsers[xpTargetUid].username+'</b>');
+}
+async function doSetLevel(){
+  if(!xpTargetUid){setFb('xpFeedback','⚠️ User erst laden!!','w');return;}
+  const lvl=Math.max(1,Math.min(20,parseInt(document.getElementById('xpLvlV')?.value)||1));
+  const nw=XP_L[lvl-1]||0;
+  if(!confirm('Level von "'+allUsers[xpTargetUid].username+'" auf '+lvl+' setzen (= '+nw+' XP)?'))return;
+  await dbSet('users/'+xpTargetUid+'/xp',nw);
+  allUsers[xpTargetUid].xp=nw;
+  refreshXPUI(nw,allUsers[xpTargetUid].username,allUsers[xpTargetUid]);
+  setFb('xpFeedback','✅ Level '+lvl+' gesetzt ('+nw+' XP)!!','g');
+  showToast('✅ Level '+lvl+' gesetzt!!');
+  addActLog('👑','Level '+lvl+' für <b>'+allUsers[xpTargetUid].username+'</b>');
+}
+async function loadXPOverview(){
+  const el=document.getElementById('xpOverview');if(!el)return;
+  el.innerHTML=loadingHTML();
+  if(!Object.keys(allUsers).length)await getUsers();
+  const entries=Object.values(allUsers).filter(u=>u.username).sort((a,b)=>(b.xp||0)-(a.xp||0));
+  el.innerHTML=`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>USERNAME</th><th>LVL</th><th>TITLE</th><th>XP</th><th>STREAK</th><th>STATUS</th></tr></thead><tbody>
+    ${entries.map((u,i)=>{const l=lvlFromXP(u.xp||0);return`<tr>
+      <td style="color:var(--text3);">${i+1}</td>
+      <td style="font-weight:900;">${esc(u.username)}</td>
+      <td><span style="font-family:'Press Start 2P';font-size:.4rem;padding:.15rem .4rem;background:rgba(0,255,136,.1);border-radius:4px;color:var(--accent);">Lv${l}</span></td>
+      <td style="font-size:.75rem;color:var(--text2);">${LVL_T[Math.min(l-1,LVL_T.length-1)]}</td>
+      <td style="font-family:'Press Start 2P';font-size:.4rem;color:var(--accent);">${(u.xp||0).toLocaleString()}</td>
+      <td style="color:var(--warn);">${u.loginStreak?'🔥'+u.loginStreak:'–'}</td>
+      <td>${u.admin?'<span class="tag a">ADMIN</span>':''}${u.banned?'<span class="tag b">BANNED</span>':''}</td>
+    </tr>`;}).join('')}
+  </tbody></table></div>`;
+}
+
+// ============================================================
+//  BADGES
+// ============================================================
+async function loadBadgesForUser(){
+  const name=(document.getElementById('bUser')?.value||'').trim().toLowerCase();
+  if(!name){showWarn('⚠️ Username eingeben!!');return;}
+  if(!Object.keys(allUsers).length)await getUsers();
+  badgeTargetUid=uidByName(name);
+  if(!badgeTargetUid){showErr('❌ User nicht gefunden!!');return;}
+  const u=allUsers[badgeTargetUid];
+  const cnt=Object.keys(u.badges||{}).length;
+  const el=document.getElementById('bUserInfo');
+  if(el)el.innerHTML=`Zeige Badges für <b style="color:var(--accent);">${esc(u.username)}</b> — ${cnt} Badge(s)`;
+  renderBadgeGrid(u.badges||{});
+}
+function renderBadgeGrid(userBadges){
+  const el=document.getElementById('badgeGrid');if(!el)return;
+  el.innerHTML=BADGES.map(b=>{
+    const earned=!!userBadges[b.id];
+    return`<div class="bitem${earned?' earned':''}">
+      <span class="b-em">${b.em}</span>
+      <div class="b-nm">${b.nm}</div>
+      <div class="b-dc">${b.dc}</div>
+      <div class="b-btn">
+        ${badgeTargetUid
+          ?(earned
+            ?`<button class="btn xs red" onclick="safe(()=>doRevokeBadge('${b.id}'))">✕ Entziehen</button>`
+            :`<button class="btn xs" onclick="safe(()=>doAwardBadge('${b.id}'))">+ Vergeben</button>`
+          ):''}
+      </div>
+    </div>`;
+  }).join('');
+}
+async function doAwardBadge(id){
+  if(!badgeTargetUid){showWarn('⚠️ User laden!!');return;}
+  await dbSet('users/'+badgeTargetUid+'/badges/'+id,true);
+  if(!allUsers[badgeTargetUid].badges)allUsers[badgeTargetUid].badges={};
+  allUsers[badgeTargetUid].badges[id]=true;
+  renderBadgeGrid(allUsers[badgeTargetUid].badges);
+  showToast('✅ Badge vergeben: '+id);
+  addActLog('🎖️','Badge <b>'+id+'</b> an <b>'+allUsers[badgeTargetUid].username+'</b>');
+}
+async function doRevokeBadge(id){
+  if(!badgeTargetUid)return;
+  await dbRemove('users/'+badgeTargetUid+'/badges/'+id);
+  if(allUsers[badgeTargetUid]?.badges)delete allUsers[badgeTargetUid].badges[id];
+  renderBadgeGrid(allUsers[badgeTargetUid]?.badges||{});
+  showToast('✅ Badge entzogen: '+id,'warn');
+  addActLog('🎖️','Badge <b>'+id+'</b> entzogen von <b>'+allUsers[badgeTargetUid].username+'</b>');
+}
+async function revokeAllBadges(){
+  if(!badgeTargetUid){showWarn('⚠️ User laden!!');return;}
+  if(!confirm('ALLE Badges von "'+allUsers[badgeTargetUid].username+'" entziehen?'))return;
+  await dbRemove('users/'+badgeTargetUid+'/badges');
+  allUsers[badgeTargetUid].badges={};
+  renderBadgeGrid({});
+  showToast('🗑️ Alle Badges entzogen!!','warn');
+  addActLog('🎖️','ALLE Badges entzogen von <b>'+allUsers[badgeTargetUid].username+'</b>');
+}
+
+// ============================================================
+//  BANS
+// ============================================================
+async function loadBans(){
+  document.getElementById('banListBody').innerHTML=loadingHTML();
+  document.getElementById('banUserBody').innerHTML=loadingHTML();
+  try{
+    await getUsers();
+    const banned=Object.entries(allUsers).filter(([,u])=>u.banned&&u.username);
+    const cntEl=document.getElementById('banCnt');if(cntEl)cntEl.textContent='('+banned.length+')';
+    const bb=document.getElementById('banBadge');if(bb){bb.textContent=banned.length;bb.style.display=banned.length>0?'':'none';}
+    document.getElementById('banListBody').innerHTML=banned.length
+      ?banned.map(([uid,u])=>`<div class="urow banned">
+          <div class="u-ava">🚫</div>
+          <div class="u-info">
+            <div class="u-name">${esc(u.username)} <span class="tag b">BANNED</span></div>
+            <div class="u-meta">${u.banReason?`<span style="color:var(--danger);">${esc(u.banReason)}</span>`:''}</div>
+          </div>
+          <button class="btn xs" onclick="safe(()=>unbanById('${uid}','${esc(u.username)}'))">✅ Entbannen</button>
+        </div>`).join('')
+      :emptyHTML('✅','Keine gebannten User');
+    filterBanUserList();
+  }catch(e){document.getElementById('banListBody').innerHTML=`<div style="color:var(--danger);padding:1rem;">❌ ${esc(e.message)}</div>`;}
+}
+function filterBanUserList(){
+  const q=(document.getElementById('banUserSearch')?.value||'').toLowerCase();
+  const entries=Object.entries(allUsers).filter(([,u])=>u.username&&!ADMIN_USERNAMES.includes(u.username)&&(!q||u.username.toLowerCase().includes(q))).sort((a,b)=>(b[1].xp||0)-(a[1].xp||0));
+  document.getElementById('banUserBody').innerHTML=entries.length
+    ?entries.map(([uid,u])=>`<div class="urow${u.banned?' banned':''}">
+        <div class="u-info">
+          <div class="u-name">${esc(u.username)} ${u.admin?'<span class="tag a">ADMIN</span>':''} ${u.banned?'<span class="tag b">BANNED</span>':''}</div>
+          <div class="u-meta"><span>⚡ ${(u.xp||0).toLocaleString()} XP · Lv${lvlFromXP(u.xp||0)}</span></div>
+        </div>
+        <div class="u-acts">
+          ${u.banned
+            ?`<button class="btn xs" onclick="safe(()=>unbanById('${uid}','${esc(u.username)}'))">✅</button>`
+            :`<button class="btn xs red" onclick="safe(()=>banById('${uid}','${esc(u.username)}'))">🚫</button>`
+          }
+          ${u.admin
+            ?`<button class="btn xs red" onclick="safe(()=>toggleAdmin('${uid}',true,'${esc(u.username)}'))">✕ADM</button>`
+            :`<button class="btn xs o" onclick="safe(()=>toggleAdmin('${uid}',false,'${esc(u.username)}'))">👑ADM</button>`
+          }
+        </div>
+      </div>`).join('')
+    :emptyHTML('👥','Keine User');
+}
+async function doBan(){
+  const name=(document.getElementById('banUN')?.value||'').trim();
+  const reason=(document.getElementById('banR')?.value||'').trim()||'Du wurdest von einem Admin gesperrt.';
+  if(!name){setFb('banFb','⚠️ Username eingeben!!','w');return;}
+  if(!Object.keys(allUsers).length)await getUsers();
+  const uid=uidByName(name);
+  if(!uid){setFb('banFb','❌ User nicht gefunden!!','r');return;}
+  if(ADMIN_USERNAMES.includes(allUsers[uid]?.username||'')){setFb('banFb','❌ Admin kann nicht gebannt werden!!','r');return;}
+  if(!confirm('"'+name+'" bannen?\nGrund: '+reason))return;
+  await dbSet('users/'+uid+'/banned',true);
+  await dbSet('users/'+uid+'/banReason',reason);
+  allUsers[uid].banned=true;allUsers[uid].banReason=reason;
+  setFb('banFb','✅ '+name+' wurde gebannt!!','g');
+  showToast('🚫 '+name+' gebannt!!','warn');
+  const u1=document.getElementById('banUN'),u2=document.getElementById('banR');
+  if(u1)u1.value='';if(u2)u2.value='';
+  addActLog('🚫','<b>'+name+'</b> gebannt. Grund: '+reason);
+  loadBans();
+}
+async function banById(uid,username){
+  const reason=prompt('Grund für Ban von "'+username+'" (optional):')||'Du wurdest von einem Admin gesperrt.';
+  if(!confirm('"'+username+'" bannen?'))return;
+  await dbSet('users/'+uid+'/banned',true);
+  await dbSet('users/'+uid+'/banReason',reason);
+  if(allUsers[uid]){allUsers[uid].banned=true;allUsers[uid].banReason=reason;}
+  showToast('🚫 '+username+' gebannt!!','warn');
+  addActLog('🚫','<b>'+username+'</b> gebannt');
+  loadBans();filterUsers();
+}
+async function unbanById(uid,username){
+  if(!confirm('"'+username+'" entsperren?'))return;
+  await dbRemove('users/'+uid+'/banned');
+  await dbRemove('users/'+uid+'/banReason');
+  if(allUsers[uid]){delete allUsers[uid].banned;delete allUsers[uid].banReason;}
+  showToast('✅ '+username+' entsperrt!!');
+  addActLog('✅','<b>'+username+'</b> entsperrt');
+  loadBans();filterUsers();
+}
+async function toggleAdmin(uid,isAdmin,username){
+  if(!confirm('Admin-Rechte von "'+username+'" '+(isAdmin?'entziehen':'geben')+'?'))return;
+  await dbSet('users/'+uid+'/admin',!isAdmin);
+  if(allUsers[uid])allUsers[uid].admin=!isAdmin;
+  showToast((isAdmin?'✅ Admin weg: ':'👑 Admin: ')+username);
+  addActLog('👑','Admin '+(isAdmin?'entfernt von':'gegeben an')+' <b>'+username+'</b>');
+  loadBans();filterUsers();
+}
+
+// ============================================================
+//  CHAT
+// ============================================================
+async function loadChat(){
+  document.getElementById('chatBody').innerHTML=loadingHTML();
+  try{
+    const data=await dbGet('chat7d');
+    chatData=data||{};
+    renderChat();
+  }catch(e){document.getElementById('chatBody').innerHTML=`<div style="color:var(--danger);padding:1rem;">❌ ${esc(e.message)}</div>`;}
+}
+function renderChat(filter=''){
+  let msgs=Object.entries(chatData).sort((a,b)=>b[1].ts-a[1].ts);
+  if(filter)msgs=msgs.filter(([,m])=>(m.text||'').toLowerCase().includes(filter)||(m.name||'').toLowerCase().includes(filter));
+  const el=document.getElementById('chatCntLbl');if(el)el.textContent=Object.keys(chatData).length+' Nachrichten insgesamt';
+  document.getElementById('chatBody').innerHTML=msgs.length
+    ?msgs.map(([key,m])=>`<div class="cmsg${m.uid==='SYSTEM'?' sys':''}" id="cm-${key}">
+        <span class="cm-usr">${esc(m.name||'?')}</span>
+        <span class="cm-txt">${esc(m.text)}</span>
+        <span class="cm-time">${fmtTs(m.ts)}</span>
+        <button class="cm-del" onclick="safe(()=>delChatMsg('${key}'))" title="Löschen">🗑️</button>
+      </div>`).join('')
+    :emptyHTML('💬','Keine Nachrichten');
+}
+function filterChat(){renderChat((document.getElementById('chatSrc')?.value||'').toLowerCase());}
+async function delChatMsg(key){
+  if(!confirm('Nachricht löschen?'))return;
+  await dbRemove('chat7d/'+key);
+  delete chatData[key];
+  renderChat((document.getElementById('chatSrc')?.value||'').toLowerCase());
+  showToast('✅ Nachricht gelöscht!!');
+  addActLog('🗑️','Chat-Nachricht gelöscht');
+}
+async function clearChat(){
+  if(!confirm('KOMPLETTEN CHATVERLAUF LÖSCHEN??\nDas kann NICHT rückgängig gemacht werden!!'))return;
+  await dbRemove('chat7d');
+  chatData={};renderChat();
+  showToast('🗑️ Chat geleert!!','warn');
+  addActLog('🗑️','<b>Kompletter Chat</b> gelöscht');
+}
+
+// ============================================================
+//  ANNOUNCEMENTS
+// ============================================================
+async function loadAnn(){
+  document.getElementById('annBody').innerHTML=loadingHTML();
+  try{
+    const data=await dbGet('announcements7d')||{};
+    const entries=Object.entries(data).sort((a,b)=>b[1].ts-a[1].ts);
+    document.getElementById('annBody').innerHTML=entries.length
+      ?entries.map(([key,a])=>`<div class="aitem">
+          <span style="font-size:1.3rem;">${(document.getElementById('annEmoji')?.value||'📢')}</span>
+          <div class="ai-body">
+            <div class="ai-txt">${esc(a.text)}</div>
+            <div class="ai-meta">von ${esc(a.author||'?')} · ${fmtTs(a.ts)}</div>
+          </div>
+          <button class="btn xs red" onclick="safe(()=>delAnn('${key}'))">🗑️</button>
+        </div>`).join('')
+      :emptyHTML('📭','Keine Ankündigungen');
+  }catch(e){document.getElementById('annBody').innerHTML=`<div style="color:var(--danger);padding:1rem;">❌ ${esc(e.message)}</div>`;}
+}
+async function sendAnn(){
+  const txt=(document.getElementById('annTxt')?.value||'').trim();
+  const emoji=(document.getElementById('annEmoji')?.value||'📢').trim();
+  clearFb('annFb');
+  if(!txt){setFb('annFb','⚠️ Text eingeben!!','w');return;}
+  if(txt.length>300){setFb('annFb','⚠️ Max 300 Zeichen!!','w');return;}
+  setFb('annFb','⏳ Senden...','');
+  const fullText=emoji+' '+txt;
+  const key=await dbPush('announcements7d',{text:txt,author:adminUser.username,ts:Date.now()});
+  await dbPush('chat7d',{uid:'SYSTEM',name:'📢 ADMIN',text:'📢 ANKÜNDIGUNG: '+txt,ts:Date.now(),isAnnouncement:true});
+  const ta=document.getElementById('annTxt');if(ta)ta.value='';
+  const cc=document.getElementById('annCharCnt');if(cc)cc.textContent='0 / 300';
+  setFb('annFb','✅ Ankündigung gesendet!!','g');
+  showToast('📢 Ankündigung gesendet!!');
+  addActLog('📢','Ankündigung gesendet: "'+txt.substring(0,50)+(txt.length>50?'...':'')+'"');
+  loadAnn();
+}
+async function delAnn(key){
+  if(!confirm('Ankündigung löschen?'))return;
+  await dbRemove('announcements7d/'+key);
+  showToast('✅ Gelöscht!!');addActLog('🗑️','Ankündigung gelöscht');loadAnn();
+}
+async function deleteAllAnn(){
+  if(!confirm('ALLE Ankündigungen löschen?'))return;
+  await dbRemove('announcements7d');
+  showToast('🗑️ Alle Ankündigungen gelöscht!!','warn');
+  addActLog('🗑️','<b>Alle Ankündigungen</b> gelöscht');loadAnn();
+}
+
+// ============================================================
+//  VOTES
+// ============================================================
+async function loadVotes(){
+  document.getElementById('votesBody').innerHTML=loadingHTML();
+  try{
+    const data=await dbGet('votes7d')||{};
+    const entries=Object.entries(data).sort((a,b)=>b[1]-a[1]);
+    const maxV=entries.length?entries[0][1]:1;
+    document.getElementById('votesBody').innerHTML=entries.length
+      ?entries.map(([k,v])=>`<div class="vbar-row">
+          <span class="vbar-nm">${esc(k)}</span>
+          <div class="vbar-wrap"><div class="vbar-fill" style="width:${Math.round((v/maxV)*100)}%;"></div></div>
+          <span class="vbar-cnt">${v}</span>
+          <button class="btn xs red" onclick="safe(()=>delVote('${esc(k)}','${esc(k)}'))">✕</button>
+        </div>`).join('')
+      :emptyHTML('🗳️','Keine Votes');
+  }catch(e){document.getElementById('votesBody').innerHTML=`<div style="color:var(--danger);">❌ ${esc(e.message)}</div>`;}
+}
+async function delVote(displayName,key){
+  if(!confirm('"'+displayName+'" aus der Vote-Liste entfernen?'))return;
+  await dbRemove('votes7d/'+voteKey(key));
+  showToast('✅ Vote entfernt!!');addActLog('🗑️','Vote entfernt: '+displayName);loadVotes();
+}
+function loadVotePersonSelect(){
+  const s=document.getElementById('voteSel');if(!s)return;
+  s.innerHTML=HOF_MBR_DEF.map(m=>`<option value="${esc(m.name)}">${esc(m.name)}</option>`).join('');
+}
+async function giveVotes(dir){
+  const person=(document.getElementById('voteSel')?.value||'').trim();
+  const amt=(parseInt(document.getElementById('voteAmt')?.value)||1)*dir;
+  clearFb('voteFb');
+  if(!person){setFb('voteFb','⚠️ Person auswählen!!','w');return;}
+  setFb('voteFb','⏳...','');
+  const k=voteKey(person);
+  await fbDb.ref('votes7d/'+k).transaction(cur=>{const n=(cur||0)+amt;return n<0?0:n;});
+  setFb('voteFb',(dir>0?'✅ +'+Math.abs(amt):'➖ '+Math.abs(amt))+' votes für '+person+'!!','g');
+  showToast((dir>0?'✅ +':'➖')+Math.abs(amt)+' Votes für '+person.substring(0,20));
+  addActLog('🗳️','Votes '+(dir>0?'+'+Math.abs(amt):'-'+Math.abs(amt))+' für <b>'+person+'</b>');
+  loadVotes();
+}
+async function resetVotes(){
+  if(!confirm('ALLE VOTES LÖSCHEN?\nAuch User-Vote-Status dieser Woche?'))return;
+  await dbRemove('votes7d');
+  const users=await dbGet('users')||{};
+  const wk=weekKey();
+  const ups={};
+  Object.keys(users).forEach(uid=>{ups['users/'+uid+'/voted/'+wk]=null;});
+  try{await dbUpdate(ups);}catch(e){}
+  showToast('🗑️ Alle Votes resettet!!','warn');
+  addActLog('🗑️','<b>Alle Votes</b> resettet');loadVotes();
+}
+async function resetUserVote(){
+  const name=(document.getElementById('voteResetU')?.value||'').trim().toLowerCase();
+  clearFb('voteResetFb');
+  if(!name){setFb('voteResetFb','⚠️ Username eingeben!!','w');return;}
+  if(!Object.keys(allUsers).length)await getUsers();
+  const uid=uidByName(name);
+  if(!uid){setFb('voteResetFb','❌ User nicht gefunden!!','r');return;}
+  await dbRemove('users/'+uid+'/voted/'+weekKey());
+  setFb('voteResetFb','✅ Vote von '+name+' resettet!!','g');
+  showToast('✅ Vote resettet: '+name);
+  addActLog('🔄','Vote-Status von <b>'+name+'</b> resettet');
+}
+
+// ============================================================
+//  HALL OF FAME
+// ============================================================
+function renderHoFEditor(){
+  const ml=document.getElementById('hofMList');
+  const mc=document.getElementById('hofMCnt');
+  if(ml){
+    ml.innerHTML=hofMembers.map((m,i)=>`<div class="hof-it">
+      <span class="hof-em">${m.emoji||'👤'}</span>
+      <div class="hof-data"><div class="hof-nm">${esc(m.name)}</div><div class="hof-tl">${esc(m.title)}</div></div>
+      <button class="btn xs red" onclick="safe(()=>delHoFMember(${i}))">✕</button>
+    </div>`).join('');
+  }
+  if(mc)mc.textContent=hofMembers.length;
+  const ql=document.getElementById('hofQList');
+  const qc=document.getElementById('hofQCnt');
+  if(ql){
+    ql.innerHTML=hofQuotes.map((q,i)=>`<div style="padding:.55rem .7rem;background:var(--card2);border:1px solid rgba(0,204,255,.12);border-radius:9px;margin-bottom:.3rem;">
+      <div style="font-size:.82rem;font-style:italic;">"${esc(q.text)}"</div>
+      <div style="font-size:.68rem;color:var(--text2);margin-top:.15rem;">${esc(q.author)}</div>
+      <button class="btn xs red" onclick="safe(()=>delHoFQuote(${i}))" style="margin-top:.3rem;">✕</button>
+    </div>`).join('');
+  }
+  if(qc)qc.textContent=hofQuotes.length;
+}
+function addHoFMember(){
+  const n=(document.getElementById('hofMN')?.value||'').trim();
+  const t=(document.getElementById('hofMT')?.value||'').trim()||'Klassen-Mitglied';
+  const e=(document.getElementById('hofME')?.value||'').trim()||'⭐';
+  if(!n){showWarn('⚠️ Name eingeben!!');return;}
+  hofMembers.push({name:n,title:t,emoji:e});
+  const els=['hofMN','hofMT','hofME'];els.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderHoFEditor();showToast('✅ '+n+' hinzugefügt!!');
+  addActLog('🏛️','HoF-Mitglied hinzugefügt: <b>'+n+'</b>');
+}
+function delHoFMember(i){
+  if(!confirm('Mitglied "'+hofMembers[i]?.name+'" entfernen?'))return;
+  const nm=hofMembers[i]?.name||'?';
+  hofMembers.splice(i,1);renderHoFEditor();
+  showToast('✅ Entfernt!!','warn');addActLog('🏛️','HoF-Mitglied entfernt: '+nm);
+}
+function addHoFQuote(){
+  const t=(document.getElementById('hofQT')?.value||'').trim();
+  const a=(document.getElementById('hofQA')?.value||'').trim()||'— Unbekannt';
+  if(!t){showWarn('⚠️ Zitat eingeben!!');return;}
+  hofQuotes.push({text:t,author:a});
+  const els=['hofQT','hofQA'];els.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderHoFEditor();showToast('✅ Zitat hinzugefügt!!');
+  addActLog('💬','Zitat hinzugefügt: "'+t.substring(0,30)+'..."');
+}
+function delHoFQuote(i){
+  hofQuotes.splice(i,1);renderHoFEditor();showToast('✅ Zitat entfernt!!','warn');
+}
+async function saveHoFToDB(){
+  setFb('hofFb','⏳ Speichern...','');
+  await dbSet('hofConfig',{members:hofMembers,quotes:hofQuotes,updatedBy:adminUser.username,updatedAt:Date.now()});
+  setFb('hofFb','✅ In Firebase gespeichert!!','g');
+  showToast('💾 HoF gespeichert!!');
+  addActLog('💾','HoF in Firebase gespeichert');
+}
+async function loadHoFFromDB(){
+  const data=await dbGet('hofConfig');
+  if(data?.members)hofMembers=data.members;
+  if(data?.quotes)hofQuotes=data.quotes;
+  renderHoFEditor();showToast('🔄 HoF geladen!!');
+  setFb('hofFb','✅ Aus DB geladen!!','g');
+  addActLog('🔄','HoF aus Firebase geladen');
+}
+
+// ============================================================
+//  CHALLENGES
+// ============================================================
+function renderChallDefs(){
+  const el=document.getElementById('challDefs');if(!el)return;
+  el.innerHTML=CHALL_DEFS.map(c=>`<div style="display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--border);">
+    <span style="font-size:1.1rem;">${c.ic}</span>
+    <div style="flex:1;"><div style="font-weight:900;font-size:.8rem;">${c.nm}</div><div style="font-size:.68rem;color:var(--text2);">${c.dc}</div></div>
+    <span style="font-family:'Press Start 2P';font-size:.38rem;color:var(--accent);">+${c.xp}XP</span>
+  </div>`).join('');
+}
+async function resetUserChall(){
+  const name=(document.getElementById('chUN')?.value||'').trim().toLowerCase();
+  const date=(document.getElementById('chDate')?.value||todayStr());
+  clearFb('challFb');
+  if(!name){setFb('challFb','⚠️ Username eingeben!!','w');return;}
+  if(!Object.keys(allUsers).length)await getUsers();
+  const uid=uidByName(name);
+  if(!uid){setFb('challFb','❌ User nicht gefunden!!','r');return;}
+  if(!confirm('Challenges von "'+name+'" am '+date+' resetten?'))return;
+  await dbRemove('users/'+uid+'/challenges/'+date);
+  setFb('challFb','✅ Challenges von '+name+' resettet!!','g');
+  showToast('✅ Challenges resettet!!');
+  addActLog('🔄','Challenges von <b>'+name+'</b> am '+date+' resettet');
+}
+async function resetAllChall(){
+  if(!confirm('Challenges für ALLE User heute resetten??'))return;
+  const today=todayStr();
+  const users=await dbGet('users')||{};
+  const promises=Object.keys(users).map(uid=>dbRemove('users/'+uid+'/challenges/'+today).catch(()=>{}));
+  await Promise.all(promises);
+  setFb('challFb','✅ Alle User Challenges resettet!!','g');
+  showToast('✅ Challenges für alle resettet!!','warn');
+  addActLog('🔄','<b>Alle</b> Challenges für heute resettet');
+}
+async function markChallengeComplete(){
+  const name=(document.getElementById('challXPUser')?.value||'').trim().toLowerCase();
+  const challId=(document.getElementById('challIDSel')?.value||'');
+  clearFb('challXPFb');
+  if(!name){setFb('challXPFb','⚠️ Username eingeben!!','w');return;}
+  if(!Object.keys(allUsers).length)await getUsers();
+  const uid=uidByName(name);
+  if(!uid){setFb('challXPFb','❌ User nicht gefunden!!','r');return;}
+  const today=todayStr();
+  await dbSet('users/'+uid+'/challenges/'+today+'/done/'+challId,true);
+  await dbSet('users/'+uid+'/challenges/'+today+'/progress/'+challId,CHALL_DEFS.find(c=>c.id===challId)?.tg||1);
+  const challXP=CHALL_DEFS.find(c=>c.id===challId)?.xp||0;
+  if(challXP){
+    const curXP=allUsers[uid]?.xp||0;
+    await dbSet('users/'+uid+'/xp',curXP+challXP);
+    allUsers[uid].xp=curXP+challXP;
+  }
+  setFb('challXPFb','✅ Challenge markiert + '+challXP+' XP gegeben!!','g');
+  showToast('✅ Challenge fertig + '+challXP+' XP!!');
+  addActLog('🎯','Challenge <b>'+challId+'</b> für <b>'+name+'</b> abgeschlossen (+'+challXP+'XP)');
+}
+
+// ============================================================
+//  CONFIG
+// ============================================================
+function renderLvlTable(){
+  const el=document.getElementById('lvlTable');if(!el)return;
+  el.innerHTML=`<table class="tbl"><thead><tr><th>LVL</th><th>TITLE</th><th>EMOJI</th><th>XP REQ</th></tr></thead><tbody>
+    ${XP_L.map((xp,i)=>`<tr>
+      <td><span style="font-family:'Press Start 2P';font-size:.38rem;padding:.13rem .38rem;background:rgba(0,255,136,.1);border-radius:4px;color:var(--accent);">Lv${i+1}</span></td>
+      <td style="font-size:.78rem;">${LVL_T[i]||'–'}</td>
+      <td style="font-size:1rem;">${LVL_E[i]||'–'}</td>
+      <td style="font-family:'Press Start 2P';font-size:.38rem;color:var(--accent);">${xp.toLocaleString()}</td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+async function doAdminToggle(give){
+  const name=(document.getElementById('admTogUN')?.value||'').trim().toLowerCase();
+  clearFb('admTogFb');
+  if(!name){setFb('admTogFb','⚠️ Username eingeben!!','w');return;}
+  if(!Object.keys(allUsers).length)await getUsers();
+  const uid=uidByName(name);
+  if(!uid){setFb('admTogFb','❌ User nicht gefunden!!','r');return;}
+  if(!confirm('Admin-Rechte von "'+name+'" '+(give?'geben':'entziehen')+'?'))return;
+  await dbSet('users/'+uid+'/admin',give);
+  if(allUsers[uid])allUsers[uid].admin=give;
+  setFb('admTogFb',(give?'✅ Admin gegeben: ':'✅ Admin entzogen: ')+name,'g');
+  showToast((give?'👑 Admin: ':'✅ Admin weg: ')+name);
+  addActLog('👑','Admin '+(give?'gegeben an':'entzogen von')+' <b>'+name+'</b>');
+}
+async function nukeChat(){if(!confirm('KOMPLETTEN CHAT LÖSCHEN?'))return;await dbRemove('chat7d');chatData={};setFb('cfgFb','✅ Chat geleert!!','g');showToast('🗑️ Chat geleert!!','warn');addActLog('🗑️','<b>Kompletter Chat</b> geleert');}
+async function nukeAnn(){if(!confirm('ALLE ANKÜNDIGUNGEN LÖSCHEN?'))return;await dbRemove('announcements7d');setFb('cfgFb','✅ Ankündigungen geleert!!','g');showToast('🗑️ Ankündigungen geleert!!','warn');addActLog('🗑️','<b>Alle Ankündigungen</b> geleert');}
+async function nukeVotes(){if(!confirm('ALLE VOTES LÖSCHEN?'))return;await dbRemove('votes7d');setFb('cfgFb','✅ Votes geleert!!','g');showToast('🗑️ Votes geleert!!','warn');addActLog('🗑️','<b>Alle Votes</b> geleert');}
+async function exportAll(){
+  setFb('cfgFb','⏳ Exportiere...','');
+  const [u,c,a,v]=await Promise.all([dbGet('users'),dbGet('chat7d'),dbGet('announcements7d'),dbGet('votes7d')]);
+  const blob=new Blob([JSON.stringify({users:u,chat:c,announcements:a,votes:v,by:adminUser.username,at:new Date().toISOString()},null,2)],{type:'application/json'});
+  const lnk=document.createElement('a');lnk.href=URL.createObjectURL(blob);lnk.download='7dzone-full-'+todayStr()+'.json';lnk.click();
+  setFb('cfgFb','✅ Export fertig!!','g');showToast('📤 Export fertig!!');
+  addActLog('📤','Vollständiger Daten-Export');
+}
+async function exportUsers(){
+  const u=await dbGet('users');
+  const blob=new Blob([JSON.stringify(u,null,2)],{type:'application/json'});
+  const lnk=document.createElement('a');lnk.href=URL.createObjectURL(blob);lnk.download='7dzone-users-'+todayStr()+'.json';lnk.click();
+  showToast('📤 User-Export fertig!!');addActLog('📤','User-Export');
+}
+
+// ============================================================
+//  PAGE LOAD
+// ============================================================
+window.addEventListener('load',async()=>{
+  try{await loadFB();setFBStatus(true);}catch(e){setFBStatus(false);document.getElementById('lMsg').textContent='⚠️ Firebase lädt langsam...';}
+});
+</script>
+</body>
+</html>
