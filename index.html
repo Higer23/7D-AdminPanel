@@ -1,967 +1,1633 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="de">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>7D ZONE ADMIN v3</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7D ZONE — ADMIN PANEL 👑</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#03060a;--bg2:#07101a;--card:#0b1825;--b1:#0e2233;--b2:#183348;--g:#00ff88;--b:#00ccff;--o:#ff7700;--r:#ff2255;--y:#ffcc00;--p:#bb44ff;--t:#c8e8f4;--t2:#4a7a94;--t3:#1e4060;--mono:'Share Tech Mono',monospace;--disp:'Orbitron',sans-serif;--body:'Rajdhani',sans-serif}
-*{margin:0;padding:0;box-sizing:border-box}html,body{background:var(--bg);color:var(--t);font-family:var(--body);overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.025) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;z-index:0}
-#app{position:relative;z-index:1;min-height:100vh}
-#top{position:sticky;top:0;z-index:200;height:56px;background:rgba(3,6,10,.97);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 16px;gap:12px;backdrop-filter:blur(20px)}
-.logo{font-family:var(--disp);font-size:.8rem;font-weight:900;color:var(--g);text-shadow:0 0 20px var(--g);letter-spacing:.1em;white-space:nowrap}
-.top-sep{flex:1}
-#wkBadge{font-family:var(--mono);font-size:.58rem;color:var(--b);background:rgba(0,204,255,.07);border:1px solid rgba(0,204,255,.2);padding:3px 10px;border-radius:4px;white-space:nowrap}
-#connDot{width:8px;height:8px;border-radius:50%;background:var(--r);box-shadow:0 0 8px var(--r);animation:pulse 2s infinite;flex-shrink:0}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-#connTxt{font-family:var(--mono);font-size:.58rem;color:var(--t2);white-space:nowrap}
-.tbtn{padding:6px 14px;background:transparent;border:1px solid var(--b1);border-radius:5px;color:var(--t2);font-family:var(--mono);font-size:.58rem;cursor:pointer;transition:.15s;letter-spacing:.08em}
-.tbtn:hover{border-color:var(--g);color:var(--g)}
-#tabs{display:flex;background:rgba(3,6,10,.98);border-bottom:1px solid var(--b1);overflow-x:auto;padding:0 16px;gap:2px;position:sticky;top:56px;z-index:190}
-#tabs::-webkit-scrollbar{height:3px}#tabs::-webkit-scrollbar-thumb{background:var(--b2)}
-.tab{padding:10px 18px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--t2);font-family:var(--body);font-weight:700;font-size:.82rem;cursor:pointer;white-space:nowrap;transition:.15s;letter-spacing:.04em}
-.tab:hover{color:var(--t)}.tab.on{color:var(--g);border-bottom-color:var(--g)}
-#main{padding:20px;max-width:1400px;margin:0 auto}
-.page{display:none;animation:fi .2s ease}.page.on{display:block}
-@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.card{background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:18px;margin-bottom:16px;transition:border-color .2s}.card:hover{border-color:var(--b2)}
-.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
-.ct{font-family:var(--disp);font-size:.65rem;font-weight:700;letter-spacing:.15em}
-.ct.g{color:var(--g)}.ct.b{color:var(--b)}.ct.o{color:var(--o)}.ct.r{color:var(--r)}.ct.y{color:var(--y)}.ct.p{color:var(--p)}
-.btn{padding:7px 16px;border-radius:6px;border:1px solid var(--g);background:transparent;color:var(--g);font-family:var(--mono);font-size:.6rem;cursor:pointer;transition:.15s;letter-spacing:.07em;white-space:nowrap}
-.btn:hover{background:rgba(0,255,136,.1);box-shadow:0 0 12px rgba(0,255,136,.2)}.btn:active{transform:scale(.97)}
-.btn.b{border-color:var(--b);color:var(--b)}.btn.b:hover{background:rgba(0,204,255,.1)}
-.btn.o{border-color:var(--o);color:var(--o)}.btn.o:hover{background:rgba(255,119,0,.1)}
-.btn.r{border-color:var(--r);color:var(--r)}.btn.r:hover{background:rgba(255,34,85,.1)}
-.btn.y{border-color:var(--y);color:var(--y)}.btn.y:hover{background:rgba(255,204,0,.1)}
-.btn.p{border-color:var(--p);color:var(--p)}.btn.p:hover{background:rgba(187,68,255,.1)}
-.btn.solid{background:var(--g);color:#000;font-weight:700;border-color:var(--g)}.btn.solid:hover{background:#00ffaa;box-shadow:0 0 18px rgba(0,255,136,.4)}
-.btn.solid-r{background:var(--r);color:#fff;border-color:var(--r)}.btn.solid-r:hover{background:#ff4477}
-.btn.sm{padding:4px 10px;font-size:.55rem}.btn.big{padding:10px 22px;font-size:.68rem}
-.brow{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-.inp{background:var(--bg2);border:1px solid var(--b2);border-radius:6px;padding:8px 12px;color:var(--t);font-family:var(--mono);font-size:.72rem;outline:none;transition:.2s}
-.inp:focus{border-color:var(--g);box-shadow:0 0 8px rgba(0,255,136,.15)}.inp::placeholder{color:var(--t3)}
-.inp.sm{padding:5px 9px;font-size:.65rem}select.inp{cursor:pointer}
-.lbl{font-family:var(--mono);font-size:.53rem;color:var(--t2);letter-spacing:.12em;display:block;margin-bottom:4px}
-.fg{display:flex;flex-direction:column;gap:4px}
-.gap{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
-.vh{display:grid;grid-template-columns:38px 24px 1fr 110px 150px 70px 180px;align-items:center;gap:10px;padding:8px 14px;font-family:var(--mono);font-size:.52rem;color:var(--t3);letter-spacing:.12em;border-bottom:1px solid var(--b1)}
-.vr{display:grid;grid-template-columns:38px 24px 1fr 110px 150px 70px 180px;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--b1);transition:background .15s}
-.vr:hover{background:rgba(0,255,136,.025)}.vr.selected{background:rgba(0,255,136,.04);border-left:2px solid var(--g)}
-.vrank{font-family:var(--disp);font-size:.8rem;text-align:center}
-.vcheck{width:15px;height:15px;cursor:pointer;accent-color:var(--g)}
-.vname{font-weight:700;font-size:.9rem;color:var(--t)}
-.vval{font-family:var(--disp);font-size:1.1rem;font-weight:700;cursor:pointer}
-.vval-edit{background:var(--bg2);border:1px solid var(--g);border-radius:5px;color:var(--g);font-family:var(--disp);font-size:.9rem;font-weight:700;outline:none;width:100%;padding:4px 8px;text-align:center}
-.vname-edit{background:transparent;border:none;border-bottom:1px solid var(--g);color:var(--t);font-family:var(--body);font-size:.9rem;font-weight:700;outline:none;width:130px;padding:2px 4px}
-.vbarwrap{display:flex;align-items:center;gap:6px}
-.vbar{height:5px;background:var(--b1);border-radius:100px;overflow:hidden;flex:1}
-.vfill{height:100%;border-radius:100px;transition:width .5s cubic-bezier(.4,0,.2,1)}
-.vpct{font-family:var(--mono);font-size:.55rem;color:var(--t3);text-align:right;min-width:32px}
-.vact{display:flex;gap:3px;justify-content:flex-end}
-.inlineHint{cursor:pointer;border-bottom:1px dashed var(--t3);transition:.15s}.inlineHint:hover{border-bottom-color:var(--g);color:var(--g)}
-#selbar{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:8px;padding:10px 16px;margin-bottom:12px;display:none;align-items:center;gap:10px;flex-wrap:wrap;animation:fi .2s ease}
-#selbar.on{display:flex}#selCount{font-family:var(--mono);font-size:.68rem;color:var(--g)}
-.bs{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:100px;font-family:var(--mono);font-size:.58rem;background:rgba(255,34,85,.08);border:1px solid rgba(255,34,85,.2);color:var(--r)}
-.bs.on{background:rgba(0,255,136,.08);border-color:rgba(0,255,136,.25);color:var(--g)}
-.bs .d{width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse 1.5s infinite}
-.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}
-.tc{background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:18px;transition:border-color .2s}.tc:hover{border-color:var(--b2)}
-.ttl{font-family:var(--disp);font-size:.6rem;font-weight:700;letter-spacing:.15em;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--b1)}
-.tdesc{font-size:.78rem;color:var(--t2);margin-bottom:12px;line-height:1.6}
-.uc{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:14px 18px;margin-bottom:9px;transition:border-color .2s}.uc:hover{border-color:var(--b2)}.uc.adm{border-color:rgba(255,204,0,.25)}
-.badge{padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:.5rem;font-weight:700;letter-spacing:.08em}
-.badge.adm{background:var(--y);color:#000}.badge.yes{background:rgba(0,255,136,.1);color:var(--g);border:1px solid rgba(0,255,136,.2)}.badge.no{background:rgba(255,34,85,.08);color:var(--r);border:1px solid rgba(255,34,85,.2)}
-#logBox{position:fixed;bottom:28px;left:0;right:0;height:0;background:rgba(3,6,10,.98);border-top:1px solid var(--b1);overflow:hidden;transition:height .25s;z-index:180;font-family:var(--mono);font-size:.62rem}
-#logBox.on{height:150px}#logInner{height:100%;padding:8px 16px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
-.ll{display:flex;gap:8px}.lt{color:var(--t3);flex-shrink:0}.lm{color:var(--g)}.lm.e{color:var(--r)}.lm.w{color:var(--y)}.lm.i{color:var(--b)}
-#logToggle{position:fixed;bottom:0;right:16px;z-index:181;padding:3px 12px;background:rgba(3,6,10,.98);border:1px solid var(--b1);border-bottom:none;border-radius:5px 5px 0 0;color:var(--t2);font-family:var(--mono);font-size:.56rem;cursor:pointer;transition:.2s}
-#logToggle:hover{color:var(--g);border-color:var(--g)}
-#tc{position:fixed;top:70px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:7px}
-.toast{padding:10px 18px;border-radius:8px;font-family:var(--mono);font-size:.64rem;border-left:3px solid var(--g);background:rgba(7,16,26,.98);color:var(--g);backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(0,0,0,.5);animation:ti .25s ease,to .3s ease 2.7s forwards;max-width:300px}
-.toast.e{border-color:var(--r);color:var(--r)}.toast.w{border-color:var(--y);color:var(--y)}.toast.i{border-color:var(--b);color:var(--b)}
-@keyframes ti{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
-@keyframes to{from{opacity:1}to{opacity:0;transform:translateX(16px)}}
-#modal{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;pointer-events:none;transition:background .25s}
-#modal.on{background:rgba(0,0,0,.88);pointer-events:all}
-#mbox{background:var(--card);border:1px solid var(--b2);border-radius:14px;padding:26px 30px;max-width:460px;width:95%;transform:scale(.9);opacity:0;transition:all .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 60px rgba(0,0,0,.8)}
-#modal.on #mbox{transform:scale(1);opacity:1}
-.mt{font-family:var(--disp);font-size:.82rem;color:var(--g);letter-spacing:.1em;margin-bottom:12px}
-.mb{font-size:.88rem;color:var(--t2);line-height:1.7;margin-bottom:18px}
-.ma{display:flex;gap:8px;justify-content:flex-end}
-.json{background:#020c10;border:1px solid var(--b1);border-radius:8px;padding:16px;font-family:var(--mono);font-size:.65rem;line-height:1.7;white-space:pre-wrap;word-break:break-all;color:#7af0c8;max-height:500px;overflow-y:auto}
-::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:100px}
-.empty{text-align:center;padding:40px;color:var(--t3);font-family:var(--mono);font-size:.7rem}
-.phints{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
-.phint{padding:7px 11px;background:var(--bg2);border:1px solid var(--b1);border-radius:7px;cursor:pointer;font-family:var(--mono);font-size:.65rem;color:var(--b);transition:border-color .2s}
-.phint:hover{border-color:var(--b)}
+:root{
+  --bg:#080810;--card:#0f0f1e;--card2:#141426;--border:#1e1e3a;
+  --accent:#00ff88;--accent2:#00ccff;--danger:#ff3366;--warn:#ff9900;
+  --text:#e8e8f0;--text2:#6b6b8a;
+  --glow:rgba(0,255,136,0.2);--glow2:rgba(0,204,255,0.2);
+  --sidebar:200px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;}
+::selection{background:rgba(0,255,136,0.25);}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+
+/* ===== CANVAS BG ===== */
+#bgCanvas{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.4;}
+
+/* ===== LOGIN ===== */
+#loginScreen{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:var(--bg);}
+#loginScreen canvas{position:absolute;inset:0;pointer-events:none;}
+.login-box{position:relative;z-index:2;background:rgba(15,15,30,0.95);border:1px solid rgba(0,255,136,0.3);border-radius:20px;padding:2.5rem 2rem;max-width:380px;width:92%;box-shadow:0 0 60px rgba(0,255,136,0.1),0 0 120px rgba(0,204,255,0.05);}
+.login-logo{font-family:'Press Start 2P';font-size:0.8rem;color:var(--accent);text-align:center;line-height:1.8;margin-bottom:0.3rem;text-shadow:0 0 20px var(--accent);}
+.login-sub{text-align:center;font-family:'Press Start 2P';font-size:0.42rem;color:var(--text2);margin-bottom:2rem;letter-spacing:0.1em;}
+.login-field{position:relative;margin-bottom:1rem;}
+.login-field label{font-family:'Press Start 2P';font-size:0.42rem;color:var(--text2);display:block;margin-bottom:0.4rem;letter-spacing:0.1em;}
+.login-input{width:100%;background:rgba(0,255,136,0.03);border:1.5px solid var(--border);border-radius:10px;padding:0.75rem 1rem 0.75rem 2.8rem;color:var(--text);font-family:'Nunito';font-size:0.95rem;outline:none;transition:all 0.2s;}
+.login-input:focus{border-color:var(--accent);box-shadow:0 0 12px rgba(0,255,136,0.15);background:rgba(0,255,136,0.05);}
+.login-field .field-icon{position:absolute;left:0.9rem;bottom:0.75rem;font-size:1rem;}
+.login-btn{width:100%;background:linear-gradient(135deg,rgba(0,255,136,0.1),rgba(0,204,255,0.1));border:1.5px solid var(--accent);border-radius:10px;padding:0.85rem;color:var(--accent);font-family:'Press Start 2P';font-size:0.55rem;cursor:pointer;transition:all 0.2s;margin-top:0.5rem;letter-spacing:0.1em;}
+.login-btn:hover{background:var(--accent);color:var(--bg);box-shadow:0 0 20px rgba(0,255,136,0.4);}
+.login-btn:active{transform:scale(0.98);}
+#loginMsg{text-align:center;font-size:0.8rem;min-height:1.2rem;margin-top:0.7rem;color:var(--danger);}
+.login-badge{display:flex;align-items:center;gap:0.5rem;justify-content:center;margin-bottom:1.5rem;padding:0.5rem 1rem;background:rgba(255,51,102,0.08);border:1px solid rgba(255,51,102,0.2);border-radius:100px;}
+.login-badge span{font-family:'Press Start 2P';font-size:0.4rem;color:var(--danger);}
+
+/* ===== MAIN LAYOUT ===== */
+#app{display:none;height:100vh;position:relative;z-index:1;}
+#app.visible{display:flex;}
+
+/* ===== SIDEBAR ===== */
+#sidebar{width:var(--sidebar);background:rgba(8,8,16,0.98);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;flex-shrink:0;position:relative;z-index:10;}
+.sidebar-header{padding:1.2rem 1rem 0.8rem;border-bottom:1px solid var(--border);}
+.sidebar-logo{font-family:'Press Start 2P';font-size:0.55rem;color:var(--accent);line-height:1.8;text-shadow:0 0 10px var(--accent);}
+.sidebar-user{font-size:0.72rem;color:var(--text2);margin-top:0.3rem;}
+.sidebar-user span{color:var(--accent);}
+.sidebar-nav{flex:1;overflow-y:auto;padding:0.5rem 0;}
+.nav-group{padding:0.3rem 0.8rem;font-family:'Press Start 2P';font-size:0.35rem;color:var(--text2);letter-spacing:0.1em;margin-top:0.5rem;opacity:0.6;}
+.nav-item{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 1rem;cursor:pointer;transition:all 0.15s;border-left:3px solid transparent;font-size:0.78rem;color:var(--text2);font-weight:700;margin:0.1rem 0;}
+.nav-item:hover{background:rgba(0,255,136,0.04);color:var(--text);}
+.nav-item.active{background:rgba(0,255,136,0.08);border-left-color:var(--accent);color:var(--accent);}
+.nav-icon{font-size:1rem;width:1.4rem;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-family:'Press Start 2P';font-size:0.32rem;padding:0.15rem 0.4rem;border-radius:100px;}
+.sidebar-footer{padding:0.8rem 1rem;border-top:1px solid var(--border);}
+.logout-btn{width:100%;display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.7rem;background:rgba(255,51,102,0.08);border:1px solid rgba(255,51,102,0.2);border-radius:8px;color:var(--danger);font-family:'Nunito';font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.logout-btn:hover{background:rgba(255,51,102,0.15);border-color:var(--danger);}
+
+/* ===== MAIN CONTENT ===== */
+#main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.topbar{background:rgba(8,8,16,0.95);border-bottom:1px solid var(--border);padding:0.7rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-title{font-family:'Press Start 2P';font-size:0.65rem;color:var(--text);}
+.topbar-sub{font-size:0.75rem;color:var(--text2);}
+.topbar-status{display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;color:var(--text2);}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+.content{flex:1;overflow-y:auto;padding:1.5rem;}
+
+/* ===== PAGE SECTIONS ===== */
+.page-section{display:none;}
+.page-section.active{display:block;}
+
+/* ===== CARDS ===== */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.3rem;margin-bottom:1rem;transition:border-color 0.2s;}
+.card:hover{border-color:rgba(0,255,136,0.2);}
+.card-title{font-family:'Press Start 2P';font-size:0.52rem;color:var(--accent);margin-bottom:1rem;letter-spacing:0.08em;display:flex;align-items:center;gap:0.5rem;}
+.card-title .ct-icon{font-size:1rem;}
+
+/* ===== STAT GRID ===== */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.8rem;margin-bottom:1.2rem;}
+.stat-box{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:1rem 0.8rem;text-align:center;transition:all 0.2s;cursor:default;}
+.stat-box:hover{border-color:var(--accent);box-shadow:0 0 16px var(--glow);}
+.stat-num{font-size:2.2rem;font-weight:900;color:var(--accent);line-height:1;}
+.stat-num.blue{color:var(--accent2);}
+.stat-num.red{color:var(--danger);}
+.stat-num.orange{color:var(--warn);}
+.stat-label{font-family:'Press Start 2P';font-size:0.38rem;color:var(--text2);margin-top:0.4rem;letter-spacing:0.05em;}
+
+/* ===== TABLES ===== */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{font-family:'Press Start 2P';font-size:0.38rem;color:var(--text2);padding:0.6rem 0.8rem;text-align:left;border-bottom:1px solid var(--border);letter-spacing:0.08em;}
+.data-table td{padding:0.55rem 0.8rem;font-size:0.82rem;border-bottom:1px solid rgba(30,30,58,0.5);vertical-align:middle;}
+.data-table tr:hover td{background:rgba(0,255,136,0.02);}
+.data-table tr:last-child td{border-bottom:none;}
+
+/* ===== BUTTONS ===== */
+.btn{padding:0.45rem 1rem;border-radius:8px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-family:'Press Start 2P';font-size:0.45rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn:hover{background:var(--accent);color:var(--bg);}
+.btn.sm{padding:0.3rem 0.7rem;font-size:0.38rem;}
+.btn.xs{padding:0.2rem 0.5rem;font-size:0.33rem;}
+.btn.red{border-color:var(--danger);color:var(--danger);}
+.btn.red:hover{background:var(--danger);color:#fff;}
+.btn.orange{border-color:var(--warn);color:var(--warn);}
+.btn.orange:hover{background:var(--warn);color:#fff;}
+.btn.blue{border-color:var(--accent2);color:var(--accent2);}
+.btn.blue:hover{background:var(--accent2);color:var(--bg);}
+.btn-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.7rem;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+/* ===== INPUTS ===== */
+.input{background:rgba(0,255,136,0.03);border:1.5px solid var(--border);border-radius:8px;padding:0.6rem 0.8rem;color:var(--text);font-family:'Nunito';font-size:0.88rem;outline:none;transition:all 0.2s;}
+.input:focus{border-color:var(--accent);box-shadow:0 0 8px rgba(0,255,136,0.1);}
+.input::placeholder{color:var(--text2);}
+.select{background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:0.55rem 0.7rem;color:var(--text);font-family:'Nunito';font-size:0.88rem;outline:none;cursor:pointer;}
+.select:focus{border-color:var(--accent);}
+.textarea{background:rgba(0,255,136,0.03);border:1.5px solid var(--border);border-radius:8px;padding:0.7rem;color:var(--text);font-family:'Nunito';font-size:0.88rem;outline:none;resize:vertical;min-height:80px;width:100%;transition:all 0.2s;}
+.textarea:focus{border-color:var(--accent);}
+
+/* ===== FORM ROWS ===== */
+.form-row{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-bottom:0.6rem;}
+.form-label{font-family:'Press Start 2P';font-size:0.38rem;color:var(--text2);width:80px;flex-shrink:0;letter-spacing:0.05em;}
+.form-group{margin-bottom:0.8rem;}
+.form-group label{font-family:'Press Start 2P';font-size:0.4rem;color:var(--text2);display:block;margin-bottom:0.35rem;}
+
+/* ===== USER ROWS ===== */
+.user-row{display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0.8rem;background:var(--card2);border:1px solid var(--border);border-radius:10px;margin-bottom:0.4rem;transition:all 0.2s;flex-wrap:wrap;}
+.user-row:hover{border-color:rgba(0,255,136,0.3);}
+.user-row.banned{border-color:rgba(255,51,102,0.3);background:rgba(255,51,102,0.04);}
+.user-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(0,255,136,0.1),rgba(0,204,255,0.1));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.user-info{flex:1;min-width:0;}
+.user-name{font-weight:900;font-size:0.88rem;color:var(--text);}
+.user-meta{font-size:0.72rem;color:var(--text2);display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.1rem;}
+.tag{font-family:'Press Start 2P';font-size:0.32rem;padding:0.15rem 0.4rem;border-radius:4px;white-space:nowrap;}
+.tag.admin{background:rgba(0,255,136,0.1);color:var(--accent);border:1px solid rgba(0,255,136,0.3);}
+.tag.banned{background:rgba(255,51,102,0.1);color:var(--danger);border:1px solid rgba(255,51,102,0.3);}
+.tag.owner{background:rgba(255,153,0,0.1);color:var(--warn);border:1px solid rgba(255,153,0,0.3);}
+
+/* ===== LEADERBOARD ===== */
+.lb-row{display:flex;align-items:center;gap:0.7rem;padding:0.65rem 0.8rem;background:var(--card2);border:1px solid var(--border);border-radius:10px;margin-bottom:0.4rem;transition:all 0.2s;}
+.lb-row:hover{border-color:rgba(0,255,136,0.2);}
+.lb-rank{font-family:'Press Start 2P';font-size:0.45rem;color:var(--text2);min-width:2rem;text-align:center;}
+.lb-rank.gold{color:#ffd700;}
+.lb-rank.silver{color:#c0c0c0;}
+.lb-rank.bronze{color:#cd7f32;}
+.lb-name{flex:1;font-weight:900;font-size:0.88rem;}
+.lb-level{font-size:0.72rem;color:var(--text2);}
+.lb-xp{font-family:'Press Start 2P';font-size:0.45rem;color:var(--accent);}
+.xp-bar-mini{height:4px;background:var(--border);border-radius:100px;overflow:hidden;margin-top:0.2rem;width:80px;}
+.xp-bar-fill{height:100%;background:var(--accent);border-radius:100px;}
+
+/* ===== CHAT MESSAGES ===== */
+.chat-msg{display:flex;gap:0.6rem;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:10px;margin-bottom:0.3rem;background:var(--card2);transition:all 0.2s;}
+.chat-msg:hover{border-color:rgba(0,255,136,0.2);}
+.chat-msg.system{border-color:rgba(0,204,255,0.3);background:rgba(0,204,255,0.05);}
+.chat-msg .msg-user{font-weight:900;font-size:0.8rem;color:var(--accent);}
+.chat-msg.system .msg-user{color:var(--accent2);}
+.chat-msg .msg-text{font-size:0.82rem;color:var(--text);flex:1;}
+.chat-msg .msg-time{font-size:0.65rem;color:var(--text2);white-space:nowrap;}
+.chat-msg .msg-del{background:none;border:none;cursor:pointer;color:var(--text2);font-size:0.9rem;padding:0 0.2rem;transition:color 0.2s;}
+.chat-msg .msg-del:hover{color:var(--danger);}
+
+/* ===== BADGE GRID ===== */
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.6rem;}
+.badge-item{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:0.8rem 0.7rem;text-align:center;transition:all 0.2s;cursor:default;}
+.badge-item:hover{border-color:rgba(0,255,136,0.3);}
+.badge-item.earned{border-color:rgba(0,255,136,0.4);background:rgba(0,255,136,0.05);}
+.badge-emoji{font-size:1.6rem;display:block;margin-bottom:0.3rem;}
+.badge-name{font-family:'Press Start 2P';font-size:0.35rem;color:var(--text);margin-bottom:0.2rem;}
+.badge-desc{font-size:0.65rem;color:var(--text2);}
+
+/* ===== HOF MEMBERS ===== */
+.hof-item{display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0.8rem;background:var(--card2);border:1px solid var(--border);border-radius:10px;margin-bottom:0.35rem;}
+.hof-emoji{font-size:1.3rem;width:2rem;text-align:center;}
+.hof-info{flex:1;}
+.hof-name-text{font-weight:900;font-size:0.85rem;}
+.hof-title-text{font-size:0.7rem;color:var(--text2);}
+
+/* ===== MODAL ===== */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px);}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;max-width:480px;width:100%;box-shadow:0 0 40px rgba(0,255,136,0.1);max-height:85vh;overflow-y:auto;}
+.modal-title{font-family:'Press Start 2P';font-size:0.6rem;color:var(--accent);margin-bottom:1.2rem;}
+.modal-actions{display:flex;justify-content:flex-end;gap:0.5rem;margin-top:1.2rem;}
+
+/* ===== TOAST ===== */
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;padding:0.7rem 1.2rem;border-radius:10px;font-family:'Press Start 2P';font-size:0.45rem;background:var(--card);border:1.5px solid var(--accent);color:var(--accent);box-shadow:0 0 20px rgba(0,255,136,0.2);transform:translateY(20px);opacity:0;transition:all 0.3s;pointer-events:none;}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.error{border-color:var(--danger);color:var(--danger);}
+#toast.warn{border-color:var(--warn);color:var(--warn);}
+
+/* ===== LOADING ===== */
+.loading{text-align:center;padding:2rem;color:var(--text2);font-size:0.85rem;}
+.spin{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin-right:0.5rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ===== PROGRESS BAR ===== */
+.progress-outer{height:6px;background:var(--border);border-radius:100px;overflow:hidden;margin:0.4rem 0;}
+.progress-inner{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width 0.6s;}
+
+/* ===== SEARCH BOX ===== */
+.search-box{display:flex;gap:0.5rem;margin-bottom:1rem;align-items:center;}
+.search-box .input{flex:1;}
+
+/* ===== GRID 2 ===== */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:800px){.grid2{grid-template-columns:1fr;}}
+
+/* ===== MOBILE SIDEBAR ===== */
+#menuToggle{display:none;background:none;border:1.5px solid var(--border);border-radius:8px;color:var(--text2);font-size:1.1rem;cursor:pointer;padding:0.3rem 0.6rem;}
+@media(max-width:768px){
+  #menuToggle{display:block;}
+  #sidebar{position:fixed;left:-220px;top:0;height:100%;z-index:100;transition:left 0.3s;}
+  #sidebar.open{left:0;}
+  .content{padding:1rem;}
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+}
+
+/* ===== ANNOUNCE ITEMS ===== */
+.ann-item{display:flex;align-items:flex-start;gap:0.7rem;padding:0.7rem 0.8rem;background:var(--card2);border:1px solid rgba(0,204,255,0.2);border-radius:10px;margin-bottom:0.35rem;}
+.ann-text{flex:1;font-size:0.85rem;}
+.ann-meta{font-size:0.7rem;color:var(--text2);}
+
+/* ===== XP BADGE ===== */
+.xp-badge-big{display:inline-flex;align-items:center;gap:0.3rem;padding:0.3rem 0.7rem;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);border-radius:100px;font-family:'Press Start 2P';font-size:0.45rem;color:var(--accent);}
+
+/* ===== EMPTY STATE ===== */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--text2);}
+.empty .empty-icon{font-size:2.5rem;display:block;margin-bottom:0.5rem;}
+.empty-text{font-size:0.85rem;}
+
+/* ===== SECTION HEADER ===== */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:0.5rem;}
+.section-title{font-family:'Press Start 2P';font-size:0.7rem;color:var(--text);}
+.section-sub{font-size:0.8rem;color:var(--text2);margin-top:0.2rem;}
+
+/* ===== COLOR DOTS ===== */
+.dot-green{color:var(--accent);}
+.dot-red{color:var(--danger);}
+.dot-blue{color:var(--accent2);}
+.dot-orange{color:var(--warn);}
 </style>
 </head>
 <body>
+
+<canvas id="bgCanvas"></canvas>
+
+<!-- ===== LOGIN ===== -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-size:2.5rem;margin-bottom:0.4rem;">👑</div>
+      <div class="login-logo">7D ZONE<br>ADMIN</div>
+      <div class="login-sub">— SYSTEM CONTROL —</div>
+    </div>
+    <div class="login-badge">
+      <span>⚠️ NUR FÜR ADMINS!!</span>
+    </div>
+    <div class="login-field">
+      <label>USERNAME</label>
+      <div style="position:relative;">
+        <span class="field-icon">👤</span>
+        <input class="login-input" id="lUser" type="text" placeholder="admin username" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+    </div>
+    <div class="login-field">
+      <label>PASSWORT</label>
+      <div style="position:relative;">
+        <span class="field-icon">🔒</span>
+        <input class="login-input" id="lPass" type="password" placeholder="passwort" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+    </div>
+    <button class="login-btn" id="lBtn" onclick="doLogin()">▶ EINLOGGEN</button>
+    <div id="loginMsg"></div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
 <div id="app">
-<div id="top">
-  <span class="logo">🔥 7D ADMIN v3</span>
-  <div class="top-sep"></div>
-  <span id="wkBadge">📅 —</span>
-  <div id="connDot"></div>
-  <span id="connTxt">BAĞLANIYOR</span>
-  <button class="tbtn" onclick="R()">↻ YENİLE</button>
-</div>
 
-<div id="tabs">
-  <button class="tab on"  onclick="T('votes',this)">⭐ OY TABLOSU</button>
-  <button class="tab"     onclick="T('multi',this)">⚡ ÇİFT HEDEF</button>
-  <button class="tab"     onclick="T('bots',this)">🤖 BOTLAR</button>
-  <button class="tab"     onclick="T('users',this)">👥 KULLANICILAR</button>
-  <button class="tab"     onclick="T('tools',this)">🛠️ ARAÇLAR</button>
-  <button class="tab"     onclick="T('raw',this)">📄 RAW JSON</button>
-  <button class="tab"     onclick="T('writer',this)">✏️ DB YAZICI</button>
-  <button class="tab" style="color:var(--r)" onclick="T('danger',this)">⚠️ NUKE</button>
-</div>
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">👑 7D ADMIN</div>
+      <div class="sidebar-user">Eingeloggt als: <span id="sbUser">–</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">ÜBERSICHT</div>
+      <div class="nav-item active" onclick="showSection('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
+      <div class="nav-item" onclick="showSection('leaderboard',this)"><span class="nav-icon">🏆</span>Leaderboard</div>
 
-<div id="main">
+      <div class="nav-group">USER MGMT</div>
+      <div class="nav-item" onclick="showSection('users',this)"><span class="nav-icon">👥</span>Alle Users</div>
+      <div class="nav-item" onclick="showSection('xpeditor',this)"><span class="nav-icon">⚡</span>XP Editor</div>
+      <div class="nav-item" onclick="showSection('badges',this)"><span class="nav-icon">🎖️</span>Badges</div>
+      <div class="nav-item" onclick="showSection('bans',this)"><span class="nav-icon">🚫</span>Ban System<span class="nav-badge" id="banBadge">0</span></div>
 
-<!-- ══════════ VOTES ══════════ -->
-<div class="page on" id="p-votes">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-    <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g)">⭐ OY TABLOSU</div>
-    <div class="brow">
-      <button class="btn sm"     onclick="selAll()">☑ TÜMÜNÜ SEÇ</button>
-      <button class="btn sm b"   onclick="selNone()">☐ SEÇİMİ KALDIR</button>
-      <button class="btn sm o"   onclick="addNewVote()">➕ KİŞİ EKLE</button>
-      <button class="btn solid"  onclick="R()">↻ YENİLE</button>
-      <button class="btn r"      onclick="cfDelAll()">🗑️ TÜMÜNÜ SİL</button>
+      <div class="nav-group">CONTENT</div>
+      <div class="nav-item" onclick="showSection('chat',this)"><span class="nav-icon">💬</span>Chat</div>
+      <div class="nav-item" onclick="showSection('announcements',this)"><span class="nav-icon">📢</span>Ankündigungen</div>
+      <div class="nav-item" onclick="showSection('votes',this)"><span class="nav-icon">🗳️</span>Votes</div>
+      <div class="nav-item" onclick="showSection('hof',this)"><span class="nav-icon">🏛️</span>Hall of Fame</div>
+
+      <div class="nav-group">SYSTEM</div>
+      <div class="nav-item" onclick="showSection('challenges',this)"><span class="nav-icon">🎯</span>Challenges</div>
+      <div class="nav-item" onclick="showSection('config',this)"><span class="nav-icon">⚙️</span>Config</div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">🚪 Ausloggen</button>
     </div>
   </div>
 
-  <div class="card" style="padding:12px 16px;margin-bottom:10px">
-    <div class="gap">
-      <div class="fg"><label class="lbl">ARAMA</label><input id="vsearch" class="inp sm" placeholder="ara..." oninput="renderVotes()" style="width:150px"></div>
-      <div class="fg"><label class="lbl">SIRA</label>
-        <select id="vsort" class="inp sm" onchange="renderVotes()">
-          <option value="desc">Yüksek→Düşük</option><option value="asc">Düşük→Yüksek</option>
-          <option value="az">A→Z</option><option value="za">Z→A</option>
-        </select>
+  <!-- MAIN -->
+  <div id="main">
+    <div class="topbar">
+      <div>
+        <button id="menuToggle" onclick="toggleSidebar()">☰</button>
+        <span class="topbar-title" id="topbarTitle" style="margin-left:0.5rem;">DASHBOARD</span>
+        <div class="topbar-sub" id="topbarSub">Willkommen im Admin Panel!!</div>
       </div>
-      <div class="fg"><label class="lbl">GÖSTER</label>
-        <select id="vshow" class="inp sm" onchange="renderVotes()">
-          <option value="0">Tümü</option><option value="5">Top 5</option>
-          <option value="10">Top 10</option><option value="3">Top 3</option>
-        </select>
+      <div class="topbar-status">
+        <span class="status-dot"></span>
+        <span id="topbarTime">–</span>
       </div>
     </div>
-  </div>
 
-  <div id="selbar">
-    <span id="selCount">0 seçili</span>
-    <div class="fg"><label class="lbl">MİKTAR / METİN</label><input id="selAmt" class="inp sm" value="100" style="width:120px" title="Sayı ya da herhangi bir metin girebilirsin"></div>
-    <button class="btn sm solid" onclick="bulkAdd()">✅ EKLE</button>
-    <button class="btn sm o"     onclick="bulkRemove()">➖ ÇIKAR</button>
-    <button class="btn sm b"     onclick="bulkSet()">📌 SET</button>
-    <button class="btn sm r"     onclick="bulkDelete()">🗑️ SİL</button>
-    <button class="btn sm y"     onclick="bulkMultiply()">✖ ÇARP</button>
-    <button class="btn sm p"     onclick="bulkCustomText()">✏️ ÖZEL METİN</button>
-  </div>
+    <div class="content" id="content">
 
-  <div class="card" style="padding:0;overflow:hidden">
-    <div class="vh"><span>SIRA</span><span>☑</span><span>İSİM (çift tık=düzenle)</span><span>OY (çift tık=düzenle)</span><span>ÇUBUK</span><span>%</span><span>İŞLEMLER</span></div>
-    <div id="voteRows"></div>
-  </div>
-  <div id="voteEmpty" class="empty" style="display:none">📭 OY KAYDI YOK</div>
-</div>
-
-<!-- ══════════ MULTI ══════════ -->
-<div class="page" id="p-multi">
-  <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g);margin-bottom:14px">⚡ ÇİFT HEDEF</div>
-  <div class="tgrid">
-
-    <div class="tc">
-      <div class="ttl b">👥 AYNI ANDA İKİ KİŞİYE OY</div>
-      <div class="tdesc">Seçilen iki kişiye aynı anda işlem yap. Miktar sayı ya da metin olabilir.</div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div class="gap">
-          <div class="fg"><label class="lbl">1. KİŞİ</label><select id="m-t1" class="inp" style="width:150px"><option value="">Seç...</option></select></div>
-          <div class="fg"><label class="lbl">2. KİŞİ</label><select id="m-t2" class="inp" style="width:150px"><option value="">Seç...</option></select></div>
+      <!-- ======== DASHBOARD ======== -->
+      <div class="page-section active" id="sec-dashboard">
+        <div class="section-header">
+          <div>
+            <div class="section-title">📊 DASHBOARD</div>
+            <div class="section-sub">Echtzeit-Übersicht der 7D Zone</div>
+          </div>
+          <button class="btn sm" onclick="loadDashboard()">🔄 Aktualisieren</button>
         </div>
-        <div class="fg"><label class="lbl">MİKTAR / METİN (örn: 500 veya "lieber")</label><input id="m-amt" class="inp" value="100" style="width:100%"></div>
-        <div class="brow">
-          <button class="btn solid big" onclick="dualAdd()">✅ İKİSİNE EKLE</button>
-          <button class="btn o"         onclick="dualRemove()">➖ İKİSİNDEN ÇIKAR</button>
-          <button class="btn b"         onclick="dualSet()">📌 İKİSİNE SET</button>
-          <button class="btn r"         onclick="dualDelete()">🗑️ İKİSİNİ SİL</button>
+
+        <div class="stat-grid" id="dashStats">
+          <div class="stat-box"><div class="stat-num" id="ds-users">–</div><div class="stat-label">TOTAL USERS</div></div>
+          <div class="stat-box"><div class="stat-num blue" id="ds-admins">–</div><div class="stat-label">ADMINS</div></div>
+          <div class="stat-box"><div class="stat-num red" id="ds-banned">–</div><div class="stat-label">GEBANNT</div></div>
+          <div class="stat-box"><div class="stat-num orange" id="ds-totalxp">–</div><div class="stat-label">TOTAL XP</div></div>
+          <div class="stat-box"><div class="stat-num" id="ds-messages">–</div><div class="stat-label">CHAT MSGS</div></div>
+          <div class="stat-box"><div class="stat-num blue" id="ds-announcements">–</div><div class="stat-label">ANKÜNDIGUNGEN</div></div>
+          <div class="stat-box"><div class="stat-num orange" id="ds-votes">–</div><div class="stat-label">VOTE EINTRÄGE</div></div>
+          <div class="stat-box"><div class="stat-num" id="ds-topuser">–</div><div class="stat-label">TOP USER</div></div>
         </div>
-        <div id="m-res" style="font-family:var(--mono);font-size:.65rem;color:var(--g);min-height:18px"></div>
-      </div>
-    </div>
 
-    <div class="tc">
-      <div class="ttl o">⇄ OY TAKASI</div>
-      <div class="tdesc">İki kişinin oy değerini birbiriyle takas et.</div>
-      <div class="gap" style="margin-bottom:12px">
-        <div class="fg"><label class="lbl">1. KİŞİ</label><select id="sw-t1" class="inp" style="width:140px"></select></div>
-        <div class="fg"><label class="lbl">2. KİŞİ</label><select id="sw-t2" class="inp" style="width:140px"></select></div>
-      </div>
-      <button class="btn o big" onclick="swapVotes()">⇄ TAKAS ET</button>
-    </div>
-
-    <div class="tc">
-      <div class="ttl p">📋 OY KOPYALA</div>
-      <div class="tdesc">Birinin oy değerini diğerine kopyala.</div>
-      <div class="gap" style="margin-bottom:12px">
-        <div class="fg"><label class="lbl">KAYNAK</label><select id="cp-src" class="inp" style="width:140px"></select></div>
-        <div class="fg"><label class="lbl">HEDEF</label><select id="cp-dst" class="inp" style="width:140px"></select></div>
-      </div>
-      <button class="btn p big" onclick="copyVotes()">📋 KOPYALA</button>
-    </div>
-
-    <div class="tc">
-      <div class="ttl y">✖ TOPLU ÇARP</div>
-      <div class="tdesc">Tüm sayısal oyları bir sayıyla çarp.</div>
-      <div class="fg" style="margin-bottom:12px"><label class="lbl">ÇARPAN</label><input id="mul-x" class="inp" value="2" type="number" step="0.1" style="width:100px"></div>
-      <button class="btn y big" onclick="multiplyAll()">✖ TÜMÜNÜ ÇARP</button>
-    </div>
-
-  </div>
-</div>
-
-<!-- ══════════ BOTS ══════════ -->
-<div class="page" id="p-bots">
-  <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g);margin-bottom:14px">🤖 BOTLAR</div>
-  <div class="tgrid">
-
-    <div class="tc">
-      <div class="ttl g">🛡️ KORUMA BOTU</div>
-      <div class="tdesc">Oy min değerin altına düşerse otomatik düzeltir.</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="fg"><label class="lbl">HEDEF KİŞİ</label><select id="lb-t" class="inp"></select></div>
-        <div class="gap">
-          <div class="fg"><label class="lbl">MİNİMUM</label><input id="lb-min" class="inp" value="500" type="number" style="width:90px"></div>
-          <div class="fg"><label class="lbl">ARALIK (SN)</label><input id="lb-int" class="inp" value="5" type="number" style="width:90px"></div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">🏆</span> TOP 5 LEADERBOARD</div>
+            <div id="dashTop5"><div class="loading"><span class="spin"></span>Laden...</div></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">📢</span> LETZTE ANKÜNDIGUNGEN</div>
+            <div id="dashAnn"><div class="loading"><span class="spin"></span>Laden...</div></div>
+            <div class="btn-row" style="margin-top:0.8rem;">
+              <button class="btn sm" onclick="showSection('announcements',document.querySelector('.nav-item:nth-child(11)'))">+ Neue senden</button>
+            </div>
+          </div>
         </div>
-        <div class="fg"><label class="lbl">KORUMA DEĞERİ (min altındaysa set edilecek)</label><input id="lb-set" class="inp" value="999" placeholder="999 veya 'lieber'"></div>
-        <div class="brow"><button class="btn solid" onclick="lockStart()">▶ BAŞLAT</button><button class="btn r" onclick="lockStop()">⏹ DURDUR</button></div>
-        <div class="bs" id="lb-status"><div class="d"></div>KAPALI</div>
-        <div id="lb-log" style="font-family:var(--mono);font-size:.56rem;color:var(--t3);max-height:48px;overflow-y:auto;margin-top:3px"></div>
-      </div>
-    </div>
 
-    <div class="tc">
-      <div class="ttl b">⚡ OTO OY EKLEME</div>
-      <div class="tdesc">Her N saniyede seçilen kişiye X oy ekler.</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="fg"><label class="lbl">HEDEF</label><select id="ab-t" class="inp"></select></div>
-        <div class="gap">
-          <div class="fg"><label class="lbl">EKLE</label><input id="ab-amt" class="inp" value="10" type="number" style="width:80px"></div>
-          <div class="fg"><label class="lbl">ARALIK (SN)</label><input id="ab-int" class="inp" value="10" type="number" style="width:80px"></div>
-          <div class="fg"><label class="lbl">MAX (0=∞)</label><input id="ab-max" class="inp" value="0" type="number" style="width:80px"></div>
-        </div>
-        <div class="brow"><button class="btn solid" onclick="autoAddStart()">▶ BAŞLAT</button><button class="btn r" onclick="autoAddStop()">⏹ DURDUR</button></div>
-        <div class="bs" id="ab-status"><div class="d"></div>KAPALI</div>
-        <div id="ab-log" style="font-family:var(--mono);font-size:.56rem;color:var(--t3);max-height:48px;overflow-y:auto;margin-top:3px"></div>
-      </div>
-    </div>
-
-    <div class="tc">
-      <div class="ttl r">🔻 OTO OY SİLME</div>
-      <div class="tdesc">Her N saniyede seçilen kişiden X oy çıkarır.</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="fg"><label class="lbl">HEDEF</label><select id="rb-t" class="inp"></select></div>
-        <div class="gap">
-          <div class="fg"><label class="lbl">ÇIKAR</label><input id="rb-amt" class="inp" value="10" type="number" style="width:80px"></div>
-          <div class="fg"><label class="lbl">ARALIK (SN)</label><input id="rb-int" class="inp" value="10" type="number" style="width:80px"></div>
-          <div class="fg"><label class="lbl">MİN SINIR</label><input id="rb-min" class="inp" value="0" type="number" style="width:80px"></div>
-        </div>
-        <div class="brow"><button class="btn solid-r" onclick="autoRemStart()">▶ BAŞLAT</button><button class="btn r" onclick="autoRemStop()">⏹ DURDUR</button></div>
-        <div class="bs" id="rb-status"><div class="d"></div>KAPALI</div>
-        <div id="rb-log" style="font-family:var(--mono);font-size:.56rem;color:var(--t3);max-height:48px;overflow-y:auto;margin-top:3px"></div>
-      </div>
-    </div>
-
-    <div class="tc">
-      <div class="ttl o">🚀 ÇOKLU HEDEF BOTU</div>
-      <div class="tdesc">Birden fazla kişiye aynı anda oto oy ekler.</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="fg"><label class="lbl">HEDEFLER (virgülle)</label><input id="mb-t" class="inp" value="halil" placeholder="halil,roman"></div>
-        <div class="gap">
-          <div class="fg"><label class="lbl">OY/KİŞİ</label><input id="mb-amt" class="inp" value="5" type="number" style="width:80px"></div>
-          <div class="fg"><label class="lbl">ARALIK (SN)</label><input id="mb-int" class="inp" value="15" type="number" style="width:80px"></div>
-        </div>
-        <div class="brow"><button class="btn solid" onclick="multiStart()">▶ BAŞLAT</button><button class="btn r" onclick="multiStop()">⏹ DURDUR</button></div>
-        <div class="bs" id="mb-status"><div class="d"></div>KAPALI</div>
-        <div id="mb-log" style="font-family:var(--mono);font-size:.56rem;color:var(--t3);max-height:48px;overflow-y:auto;margin-top:3px"></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ══════════ USERS ══════════ -->
-<div class="page" id="p-users">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-    <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g)">👥 KULLANICILAR</div>
-    <div class="brow">
-      <input id="usearch" class="inp sm" placeholder="🔍 ara..." oninput="renderUsers()" style="width:160px">
-      <button class="btn sm o" onclick="resetAllVoted()">🔄 TÜM OY KAYDI SİL</button>
-      <button class="btn solid" onclick="R()">↻ YENİLE</button>
-    </div>
-  </div>
-  <div id="userList"><div class="empty">Yükleniyor...</div></div>
-</div>
-
-<!-- ══════════ TOOLS ══════════ -->
-<div class="page" id="p-tools">
-  <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g);margin-bottom:14px">🛠️ ARAÇLAR</div>
-  <div class="tgrid">
-
-    <div class="tc">
-      <div class="ttl g">🐱 HALİL VOTE BOMBA</div>
-      <div class="tdesc">Halil'e hızlıca istediğin kadar oy ekle.</div>
-      <div class="fg" style="margin-bottom:10px"><label class="lbl">MİKTAR</label><input id="t-hamt" class="inp" value="999" type="number"></div>
-      <button class="btn solid big" onclick="halilBomb()">🚀 EKLE</button>
-      <div id="t-hres" style="margin-top:8px;font-family:var(--mono);font-size:.65rem;color:var(--g);min-height:18px"></div>
-    </div>
-
-    <div class="tc">
-      <div class="ttl y">🏆 SADECE HALİL</div>
-      <div class="tdesc">Tüm oyları sil, yalnızca Halil'e set et.</div>
-      <div class="fg" style="margin-bottom:10px"><label class="lbl">HALİL OY</label><input id="t-ohamt" class="inp" value="9999" type="number"></div>
-      <button class="btn y big" onclick="onlyHalil()">⚡ UYGULA</button>
-    </div>
-
-    <div class="tc">
-      <div class="ttl b">📊 OY NORMALIZE</div>
-      <div class="tdesc">Tüm sayısal oyları 0-100 arasına normalize et.</div>
-      <button class="btn b big" onclick="normalizeVotes()">📊 NORMALİZE ET</button>
-    </div>
-
-    <div class="tc">
-      <div class="ttl o">🎲 RASTGELE OY</div>
-      <div class="tdesc">Tüm kişilere rastgele oy ata.</div>
-      <div class="gap" style="margin-bottom:10px">
-        <div class="fg"><label class="lbl">MİN</label><input id="t-rmin" class="inp" value="1" type="number" style="width:80px"></div>
-        <div class="fg"><label class="lbl">MAX</label><input id="t-rmax" class="inp" value="1000" type="number" style="width:80px"></div>
-      </div>
-      <button class="btn o big" onclick="randomizeAll()">🎲 UYGULA</button>
-    </div>
-
-    <div class="tc">
-      <div class="ttl p">⬆ HERKESE SET</div>
-      <div class="tdesc">Herkese aynı değeri set et (metin de olabilir).</div>
-      <div class="fg" style="margin-bottom:10px"><label class="lbl">DEĞER / METİN</label><input id="t-setall" class="inp" value="100" placeholder='100 veya "lieber"'></div>
-      <button class="btn p big" onclick="setAll()">📌 HERKESE SET</button>
-    </div>
-
-    <div class="tc">
-      <div class="ttl r">➕ HERKESE EKLE</div>
-      <div class="tdesc">Herkese aynı miktarda oy ekle.</div>
-      <div class="fg" style="margin-bottom:10px"><label class="lbl">MİKTAR</label><input id="t-addall" class="inp" value="100" type="number"></div>
-      <button class="btn r big" onclick="addAll()">➕ HERKESE EKLE</button>
-    </div>
-
-    <div class="tc">
-      <div class="ttl g">💾 JSON İMPORT</div>
-      <div class="tdesc">votes7d formatında JSON veri yükle.</div>
-      <textarea id="t-import" class="inp" style="width:100%;min-height:70px;resize:vertical" placeholder='{"halil":100,"roman":50}'></textarea>
-      <button class="btn solid" style="margin-top:8px" onclick="importJSON()">📥 İMPORT</button>
-    </div>
-
-    <div class="tc">
-      <div class="ttl b">💾 JSON EXPORT</div>
-      <div class="tdesc">Vote verisini kopyala veya dosya olarak indir.</div>
-      <div class="brow">
-        <button class="btn b big" onclick="copyVoteJSON()">📋 KOPYALA</button>
-        <button class="btn big" onclick="downloadJSON()">💾 İNDİR</button>
-      </div>
-    </div>
-
-    <div class="tc">
-      <div class="ttl y">🔓 ADMİN VER/AL</div>
-      <div class="tdesc">Kullanıcı adıyla admin yetkisi yönet.</div>
-      <div class="gap" style="margin-bottom:10px">
-        <div class="fg"><label class="lbl">USERNAME</label><input id="t-admu" class="inp" placeholder="roman" style="width:130px"></div>
-        <div class="fg"><label class="lbl">İŞLEM</label>
-          <select id="t-adma" class="inp" style="width:110px"><option value="1">Admin Ver</option><option value="0">Admin Al</option></select>
+        <div class="card">
+          <div class="card-title"><span class="ct-icon">💬</span> LETZTE CHAT NACHRICHTEN</div>
+          <div id="dashChat"><div class="loading"><span class="spin"></span>Laden...</div></div>
         </div>
       </div>
-      <button class="btn y big" onclick="toggleAdmin()">⚡ UYGULA</button>
-      <div id="t-admres" style="margin-top:8px;font-family:var(--mono);font-size:.63rem;color:var(--g);min-height:18px"></div>
-    </div>
 
-    <div class="tc">
-      <div class="ttl o">🔢 İSTATİSTİKLER</div>
-      <div id="t-stats" style="font-family:var(--mono);font-size:.65rem;color:var(--t2);line-height:1.9"></div>
-      <button class="btn o" style="margin-top:10px" onclick="calcStats()">📊 HESAPLA</button>
-    </div>
-
-    <div class="tc">
-      <div class="ttl p">🗓️ HAFTA MARKER</div>
-      <div class="tdesc">voteWeekMarker oku veya sil.</div>
-      <div class="brow" style="margin-bottom:8px">
-        <button class="btn b" onclick="readWM()">👁️ OKU</button>
-        <button class="btn r" onclick="delWM()">🗑️ SİL</button>
+      <!-- ======== LEADERBOARD ======== -->
+      <div class="page-section" id="sec-leaderboard">
+        <div class="section-header">
+          <div>
+            <div class="section-title">🏆 XP LEADERBOARD</div>
+            <div class="section-sub">Top Spieler nach XP sortiert</div>
+          </div>
+          <button class="btn sm" onclick="loadLeaderboard()">🔄 Laden</button>
+        </div>
+        <div class="card">
+          <div id="lbList"><div class="loading"><span class="spin"></span>Laden...</div></div>
+        </div>
       </div>
-      <div id="t-wkres" style="font-family:var(--mono);font-size:.63rem;color:var(--t2);min-height:18px"></div>
-    </div>
 
-  </div>
-</div>
-
-<!-- ══════════ RAW ══════════ -->
-<div class="page" id="p-raw">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-    <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g)">📄 RAW JSON</div>
-    <div class="brow">
-      <select id="rs" class="inp sm" onchange="renderRaw()">
-        <option value="all">TÜM VERİ</option><option value="votes7d">Votes</option>
-        <option value="users">Users</option><option value="usernames">Usernames</option>
-      </select>
-      <button class="btn sm solid" onclick="R()">↻ YENİLE</button>
-      <button class="btn sm b" onclick="copyRaw()">📋 KOPYALA</button>
-      <button class="btn sm"   onclick="dlRaw()">💾 İNDİR</button>
-    </div>
-  </div>
-  <div id="rawBox" class="json">Yükleniyor...</div>
-</div>
-
-<!-- ══════════ WRITER ══════════ -->
-<div class="page" id="p-writer">
-  <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g);margin-bottom:14px">✏️ DB YAZICI</div>
-  <div class="card">
-    <div class="ch"><div class="ct b">📍 PATH & DEĞER</div></div>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <div class="fg"><label class="lbl">PATH</label><input id="w-path" class="inp" placeholder="/votes7d/halil" style="width:100%"></div>
-      <div class="fg"><label class="lbl">DEĞER (sayı, "metin", veya JSON)</label>
-        <textarea id="w-val" class="inp" style="width:100%;min-height:70px;resize:vertical" placeholder='999 veya "lieber" veya {"key":"val"}'></textarea>
+      <!-- ======== USERS ======== -->
+      <div class="page-section" id="sec-users">
+        <div class="section-header">
+          <div>
+            <div class="section-title">👥 ALLE USERS</div>
+            <div class="section-sub">Userliste verwalten</div>
+          </div>
+          <button class="btn sm" onclick="loadUsers()">🔄 Laden</button>
+        </div>
+        <div class="search-box">
+          <input class="input" id="userSearch" placeholder="🔍 User suchen..." oninput="filterUsers()" style="max-width:320px;">
+          <select class="select" id="userFilter" onchange="filterUsers()">
+            <option value="all">Alle User</option>
+            <option value="admin">Nur Admins</option>
+            <option value="banned">Nur Gebannte</option>
+            <option value="normal">Normale User</option>
+          </select>
+        </div>
+        <div id="userList"><div class="loading"><span class="spin"></span>Laden...</div></div>
       </div>
-      <div class="brow">
-        <button class="btn solid" onclick="wSet()">📌 YAZ (PUT)</button>
-        <button class="btn b"     onclick="wGet()">👁️ OKU (GET)</button>
-        <button class="btn o"     onclick="wPatch()">🔄 PATCH</button>
-        <button class="btn r"     onclick="wDel()">🗑️ SİL</button>
+
+      <!-- ======== XP EDITOR ======== -->
+      <div class="page-section" id="sec-xpeditor">
+        <div class="section-header">
+          <div>
+            <div class="section-title">⚡ XP EDITOR</div>
+            <div class="section-sub">XP & Level manuell bearbeiten</div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">🔍</span> USER AUSWÄHLEN</div>
+            <div class="form-group">
+              <label>USERNAME</label>
+              <div class="form-row" style="margin-bottom:0;">
+                <input class="input" id="xpUser" placeholder="Username eingeben..." style="flex:1;">
+                <button class="btn sm" onclick="loadUserXPData()">LADEN</button>
+              </div>
+            </div>
+            <div id="xpUserInfo" style="display:none;margin-top:0.8rem;">
+              <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:0.8rem;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+                  <span style="font-weight:900;" id="xpuName">–</span>
+                  <span class="xp-badge-big" id="xpuLevel">Lv1</span>
+                </div>
+                <div style="font-size:0.78rem;color:var(--text2);" id="xpuTitle">–</div>
+                <div class="progress-outer"><div class="progress-inner" id="xpuBar" style="width:0%;"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text2);">
+                  <span id="xpuCurrent">0 XP</span><span id="xpuNext">/ 0 XP</span>
+                </div>
+                <div style="margin-top:0.5rem;font-family:'Press Start 2P';font-size:0.45rem;color:var(--accent);">TOTAL: <span id="xpuTotal">0</span> XP</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">✏️</span> XP BEARBEITEN</div>
+            <div class="form-group">
+              <label>XP HINZUFÜGEN</label>
+              <div class="form-row">
+                <input class="input" id="xpAdd" type="number" min="1" value="100" placeholder="XP Menge" style="flex:1;">
+                <button class="btn sm" onclick="doAddXP()">+ GEBEN</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>XP ENTFERNEN</label>
+              <div class="form-row">
+                <input class="input" id="xpRemove" type="number" min="1" value="100" placeholder="XP Menge" style="flex:1;">
+                <button class="btn sm red" onclick="doRemoveXP()">– NEHMEN</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>XP DIREKT SETZEN</label>
+              <div class="form-row">
+                <input class="input" id="xpSet" type="number" min="0" value="0" placeholder="Neuer XP Wert" style="flex:1;">
+                <button class="btn sm orange" onclick="doSetXP()">SET</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>STREAK SETZEN</label>
+              <div class="form-row">
+                <input class="input" id="streakSet" type="number" min="0" value="0" placeholder="Streak Tage" style="flex:1;">
+                <button class="btn sm blue" onclick="doSetStreak()">SET STREAK</button>
+              </div>
+            </div>
+            <div id="xpMsg" style="font-size:0.75rem;color:var(--accent);min-height:1rem;margin-top:0.3rem;font-family:'Press Start 2P';font-size:0.4rem;"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="ct-icon">📋</span> ALLE USER XP ÜBERSICHT</div>
+          <div id="xpOverview"><div class="loading"><span class="spin"></span>Laden...</div></div>
+        </div>
       </div>
+
+      <!-- ======== BADGES ======== -->
+      <div class="page-section" id="sec-badges">
+        <div class="section-header">
+          <div>
+            <div class="section-title">🎖️ BADGE MANAGEMENT</div>
+            <div class="section-sub">Badges vergeben & entziehen</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card-title"><span class="ct-icon">🔍</span> USER AUSWÄHLEN</div>
+          <div class="form-row">
+            <input class="input" id="badgeUser" placeholder="Username eingeben..." style="flex:1;max-width:300px;">
+            <button class="btn sm" onclick="loadUserBadges()">LADEN</button>
+          </div>
+          <div id="badgeUserName" style="font-size:0.8rem;color:var(--text2);margin-top:0.5rem;"></div>
+        </div>
+        <div id="badgeGrid" class="badge-grid">
+          <div class="loading"><span class="spin"></span>User laden...</div>
+        </div>
+      </div>
+
+      <!-- ======== BANS ======== -->
+      <div class="page-section" id="sec-bans">
+        <div class="section-header">
+          <div>
+            <div class="section-title">🚫 BAN SYSTEM</div>
+            <div class="section-sub">User sperren & entsperren</div>
+          </div>
+          <button class="btn sm" onclick="loadBans()">🔄 Laden</button>
+        </div>
+
+        <div class="card" style="border-color:rgba(255,51,102,0.2);margin-bottom:1rem;">
+          <div class="card-title"><span class="ct-icon">🚫</span> USER BANNEN</div>
+          <div class="form-group">
+            <label>USERNAME</label>
+            <input class="input" id="banUsername" placeholder="Username eingeben..." style="width:100%;max-width:320px;">
+          </div>
+          <div class="form-group">
+            <label>BAN-GRUND</label>
+            <input class="input" id="banReason" placeholder="Grund eingeben..." style="width:100%;max-width:400px;">
+          </div>
+          <div class="btn-row">
+            <button class="btn red" onclick="doBanUser()">🚫 BANNEN</button>
+          </div>
+          <div id="banMsg" style="font-family:'Press Start 2P';font-size:0.4rem;color:var(--accent);margin-top:0.5rem;min-height:1rem;"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ct-icon">📋</span> GEBANNTE USER</div>
+          <div id="banList"><div class="loading"><span class="spin"></span>Laden...</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ct-icon">👥</span> ALLE USER (ADMIN VERWALTUNG)</div>
+          <div id="fullUserList"><div class="loading"><span class="spin"></span>Laden...</div></div>
+        </div>
+      </div>
+
+      <!-- ======== CHAT ======== -->
+      <div class="page-section" id="sec-chat">
+        <div class="section-header">
+          <div>
+            <div class="section-title">💬 CHAT VERWALTUNG</div>
+            <div class="section-sub">Nachrichten einsehen & moderieren</div>
+          </div>
+          <div class="btn-row" style="margin-top:0;">
+            <button class="btn sm" onclick="loadChatMessages()">🔄 Laden</button>
+            <button class="btn sm red" onclick="clearAllChat()">🗑️ Alles löschen</button>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;flex-wrap:wrap;gap:0.4rem;">
+            <div style="font-size:0.82rem;color:var(--text2);" id="chatCount">0 Nachrichten</div>
+            <input class="input" id="chatSearch" placeholder="🔍 Suchen..." style="max-width:200px;" oninput="filterChat()">
+          </div>
+          <div id="chatList" style="max-height:400px;overflow-y:auto;"><div class="loading"><span class="spin"></span>Laden...</div></div>
+        </div>
+      </div>
+
+      <!-- ======== ANNOUNCEMENTS ======== -->
+      <div class="page-section" id="sec-announcements">
+        <div class="section-header">
+          <div>
+            <div class="section-title">📢 ANKÜNDIGUNGEN</div>
+            <div class="section-sub">Nachrichten an alle User senden</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ct-icon">✍️</span> NEUE ANKÜNDIGUNG</div>
+          <div class="form-group">
+            <label>NACHRICHT</label>
+            <textarea class="textarea" id="annText" placeholder="Deine Ankündigung an die Klasse 7D..."></textarea>
+          </div>
+          <div class="btn-row">
+            <button class="btn" onclick="sendAnnouncement()">📢 AN ALLE SENDEN</button>
+          </div>
+          <div id="annMsg" style="font-family:'Press Start 2P';font-size:0.4rem;color:var(--accent);margin-top:0.5rem;min-height:1rem;"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="display:flex;justify-content:space-between;">
+            <span><span class="ct-icon">📋</span> ANKÜNDIGUNG VERLAUF</span>
+            <button class="btn xs red" onclick="deleteAllAnnouncements()">🗑️ ALLE LÖSCHEN</button>
+          </div>
+          <button class="btn sm" onclick="loadAnnouncements()" style="margin-bottom:0.8rem;">🔄 Laden</button>
+          <div id="annList"><div class="loading"><span class="spin"></span>Laden...</div></div>
+        </div>
+      </div>
+
+      <!-- ======== VOTES ======== -->
+      <div class="page-section" id="sec-votes">
+        <div class="section-header">
+          <div>
+            <div class="section-title">🗳️ VOTE VERWALTUNG</div>
+            <div class="section-sub">Hall of Fame Votes managen</div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">📊</span> AKTUELLE VOTES</div>
+            <button class="btn sm" onclick="loadVotes()" style="margin-bottom:0.8rem;">🔄 Laden</button>
+            <div id="voteList"><div class="loading"><span class="spin"></span>Laden...</div></div>
+            <div class="btn-row" style="margin-top:1rem;">
+              <button class="btn red" onclick="resetVotes()">🗑️ ALLE VOTES RESETTEN</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">✏️</span> VOTES MANUELL ÄNDERN</div>
+            <div class="form-group">
+              <label>PERSON</label>
+              <select class="select" id="votePersonSel" style="width:100%;"></select>
+            </div>
+            <div class="form-group">
+              <label>ANZAHL VOTES</label>
+              <input class="input" id="voteAmount" type="number" min="1" value="1" style="width:100%;">
+            </div>
+            <div class="btn-row">
+              <button class="btn" onclick="giveVotes(1)">✅ + GEBEN</button>
+              <button class="btn red" onclick="giveVotes(-1)">➖ NEHMEN</button>
+            </div>
+            <div class="form-group" style="margin-top:0.8rem;">
+              <label>USER VOTE-STATUS RESETTEN</label>
+              <div class="form-row" style="margin-bottom:0;">
+                <input class="input" id="voteResetUser" placeholder="Username..." style="flex:1;">
+                <button class="btn sm orange" onclick="resetUserVote()">RESET</button>
+              </div>
+            </div>
+            <div id="voteMsg" style="font-family:'Press Start 2P';font-size:0.4rem;color:var(--accent);margin-top:0.5rem;min-height:1rem;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======== HOF ======== -->
+      <div class="page-section" id="sec-hof">
+        <div class="section-header">
+          <div>
+            <div class="section-title">🏛️ HALL OF FAME</div>
+            <div class="section-sub">Klassen-Mitglieder & Zitate verwalten</div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">👥</span> MITGLIEDER</div>
+            <div id="hofMemberList" style="margin-bottom:0.8rem;max-height:300px;overflow-y:auto;"></div>
+            <div style="border-top:1px solid var(--border);padding-top:0.8rem;">
+              <div style="font-family:'Press Start 2P';font-size:0.4rem;color:var(--text2);margin-bottom:0.5rem;">NEUES MITGLIED HINZUFÜGEN</div>
+              <div class="form-group">
+                <label>NAME (mit Emoji)</label>
+                <input class="input" id="hofNewName" placeholder="z.B. 🚀 Max 🚀" style="width:100%;">
+              </div>
+              <div class="form-group">
+                <label>TITEL</label>
+                <input class="input" id="hofNewTitle" placeholder="z.B. Rocket Man" style="width:100%;">
+              </div>
+              <div class="form-group">
+                <label>EMOJI</label>
+                <input class="input" id="hofNewEmoji" placeholder="z.B. 🚀" style="width:100%;max-width:100px;">
+              </div>
+              <button class="btn sm" onclick="addHofMember()">+ HINZUFÜGEN</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">💬</span> ZITATE</div>
+            <div id="hofQuoteList" style="margin-bottom:0.8rem;max-height:300px;overflow-y:auto;"></div>
+            <div style="border-top:1px solid var(--border);padding-top:0.8rem;">
+              <div style="font-family:'Press Start 2P';font-size:0.4rem;color:var(--text2);margin-bottom:0.5rem;">NEUES ZITAT HINZUFÜGEN</div>
+              <div class="form-group">
+                <label>ZITAT TEXT</label>
+                <textarea class="textarea" id="hofNewQuote" placeholder="Ein weises Zitat..." style="min-height:60px;"></textarea>
+              </div>
+              <div class="form-group">
+                <label>AUTOR</label>
+                <input class="input" id="hofNewAuthor" placeholder="— Autor Name" style="width:100%;">
+              </div>
+              <button class="btn sm" onclick="addHofQuote()">+ HINZUFÜGEN</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:0;">
+          <div class="card-title"><span class="ct-icon">💾</span> ÄNDERUNGEN SPEICHERN</div>
+          <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.8rem;">Speichert die HoF-Daten in die Firebase Datenbank (persistent).</p>
+          <div class="btn-row">
+            <button class="btn" onclick="saveHofToFirebase()">💾 IN DATENBANK SPEICHERN</button>
+            <button class="btn blue" onclick="loadHofFromFirebase()">🔄 AUS DATENBANK LADEN</button>
+          </div>
+          <div id="hofMsg" style="font-family:'Press Start 2P';font-size:0.4rem;color:var(--accent);margin-top:0.5rem;min-height:1rem;"></div>
+        </div>
+      </div>
+
+      <!-- ======== CHALLENGES ======== -->
+      <div class="page-section" id="sec-challenges">
+        <div class="section-header">
+          <div>
+            <div class="section-title">🎯 CHALLENGES</div>
+            <div class="section-sub">Tägliche Challenges verwalten</div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">🔄</span> CHALLENGE RESET</div>
+            <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.8rem;">Challenge-Fortschritt für einen User zurücksetzen.</p>
+            <div class="form-group">
+              <label>USERNAME</label>
+              <input class="input" id="chUser" placeholder="Username..." style="width:100%;max-width:280px;">
+            </div>
+            <div class="form-group">
+              <label>DATUM (YYYY-MM-DD)</label>
+              <input class="input" id="chDate" type="date" style="width:100%;max-width:200px;">
+            </div>
+            <div class="btn-row">
+              <button class="btn orange" onclick="resetUserChallenges()">🔄 CHALLENGES RESETTEN</button>
+              <button class="btn red" onclick="resetTodayChallengeAll()">⚠️ HEUTE FÜR ALLE</button>
+            </div>
+            <div id="chMsg" style="font-family:'Press Start 2P';font-size:0.4rem;color:var(--accent);margin-top:0.5rem;min-height:1rem;"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">📋</span> CHALLENGE DEFINITIONEN</div>
+            <div id="challengeDefs"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======== CONFIG ======== -->
+      <div class="page-section" id="sec-config">
+        <div class="section-header">
+          <div>
+            <div class="section-title">⚙️ SYSTEM CONFIG</div>
+            <div class="section-sub">Erweiterte Einstellungen</div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">📊</span> XP LEVEL TABELLE</div>
+            <div id="xpLevelTable" style="max-height:350px;overflow-y:auto;"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">🗄️</span> DATENBANK AKTIONEN</div>
+            <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem;">Gefährliche Aktionen — mit Vorsicht verwenden!!</p>
+            <div style="display:flex;flex-direction:column;gap:0.6rem;">
+              <button class="btn red" onclick="nukeChat()">🗑️ KOMPLETTEN CHAT LÖSCHEN</button>
+              <button class="btn red" onclick="nukeAnnouncements()">🗑️ ALLE ANKÜNDIGUNGEN LÖSCHEN</button>
+              <button class="btn red" onclick="nukeVotes()">🗑️ ALLE VOTES RESETTEN</button>
+              <button class="btn orange" onclick="exportData()">📤 DATEN EXPORTIEREN (JSON)</button>
+            </div>
+            <div id="configMsg" style="font-family:'Press Start 2P';font-size:0.4rem;color:var(--accent);margin-top:0.8rem;min-height:1rem;"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="ct-icon">👑</span> ADMIN RECHTE VERGEBEN</div>
+          <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.8rem;">Admin-Rechte für User erteilen oder entziehen.</p>
+          <div class="form-row">
+            <input class="input" id="adminToggleUser" placeholder="Username..." style="flex:1;max-width:280px;">
+            <button class="btn" onclick="doAdminToggle(true)">👑 ADMIN GEBEN</button>
+            <button class="btn red" onclick="doAdminToggle(false)">✕ ADMIN ENTZIEHEN</button>
+          </div>
+          <div id="adminToggleMsg" style="font-family:'Press Start 2P';font-size:0.4rem;color:var(--accent);margin-top:0.5rem;min-height:1rem;"></div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-title" id="modalTitle">Modal</div>
+    <div id="modalContent"></div>
+    <div class="modal-actions">
+      <button class="btn sm red" onclick="closeModal()">✕ SCHLIESSEN</button>
     </div>
-  </div>
-  <div class="card" id="wRes" style="display:none">
-    <div class="ch"><div class="ct g">📤 SONUÇ</div></div>
-    <div class="json" id="wResContent"></div>
-  </div>
-  <div class="card">
-    <div class="ch"><div class="ct y">📚 HIZLI PATH'LER</div></div>
-    <div class="phints" id="pathHints"></div>
   </div>
 </div>
 
-<!-- ══════════ DANGER ══════════ -->
-<div class="page" id="p-danger">
-  <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--r);margin-bottom:14px">⚠️ TEHLİKELİ — GERİ ALINAMAZ</div>
-  <div class="tgrid">
-    <div class="tc" style="border-color:rgba(255,34,85,.25)">
-      <div class="ttl r">🗑️ TÜM VOTE SİL</div>
-      <p class="tdesc">votes7d tamamen silinir.</p>
-      <button class="btn solid-r big" onclick="cfDelAll()">🗑️ SİL</button>
-    </div>
-    <div class="tc" style="border-color:rgba(255,119,0,.25)">
-      <div class="ttl o">🔄 OY KAYITLARINI SİFIRLA</div>
-      <p class="tdesc">Tüm users voted flag silinir, herkes tekrar oy verebilir.</p>
-      <button class="btn o big" onclick="resetAllVoted()">🔄 SIFIRLA</button>
-    </div>
-    <div class="tc" style="border-color:rgba(255,34,85,.4)">
-      <div class="ttl r">💣 TAM NUKE</div>
-      <p class="tdesc">votes7d + voted kayıtları + weekMarker silinir.</p>
-      <button class="btn solid-r big" onclick="nuke()">💣 NUKE</button>
-    </div>
-    <div class="tc" style="border-color:rgba(187,68,255,.25)">
-      <div class="ttl p">📭 HERKESE 0 YAZ</div>
-      <p class="tdesc">Tüm oy değerleri sıfır yapılır, isimler korunur.</p>
-      <button class="btn p big" onclick="zeroAll()">📭 SIFIRLA</button>
-    </div>
-    <div class="tc" style="border-color:rgba(255,34,85,.25)">
-      <div class="ttl r">👤 UID İLE KULLANICI SİL</div>
-      <div class="fg" style="margin-bottom:10px"><label class="lbl">UID</label><input id="d-uid" class="inp" placeholder="Firebase UID"></div>
-      <button class="btn solid-r" onclick="delByUid()">🗑️ SİL</button>
-    </div>
-    <div class="tc" style="border-color:rgba(255,204,0,.25)">
-      <div class="ttl y">🗓️ HAFTA MARKER SİL</div>
-      <p class="tdesc">Site bir sonraki açılışta sıfırlama yapar.</p>
-      <button class="btn y big" onclick="delWM()">🗓️ SİL</button>
-    </div>
-  </div>
-</div>
-
-</div></div>
-
-<button id="logToggle" onclick="toggleLog()">▲ LOG (0)</button>
-<div id="logBox"><div id="logInner"></div></div>
-<div id="tc"></div>
-<div id="modal">
-  <div id="mbox">
-    <div class="mt" id="mt">ONAY</div>
-    <div class="mb" id="mb">Emin misin?</div>
-    <div class="ma"><button class="btn" onclick="cModal()">İPTAL</button><button class="btn solid-r" id="mok">ONAYLA</button></div>
-  </div>
-</div>
+<div id="toast">✅ Done!!</div>
 
 <script>
-const BASE='https://dzone-9946c-default-rtdb.europe-west1.firebasedatabase.app';
-let DB={votes:{},users:{},usernames:{}};
-let SEL=new Set(),logN=0,mcb=null;
-let lockBot=null,addBot=null,remBot=null,mulBot=null;
+// ===== FIREBASE CONFIG =====
+const FB_CONFIG = {
+  apiKey:"AIzaSyAm-_eGrLsHnzsdiDAi1XTFU0fP_1AN8Lk",
+  authDomain:"dzone-9946c.firebaseapp.com",
+  databaseURL:"https://dzone-9946c-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"dzone-9946c",
+  storageBucket:"dzone-9946c.firebasestorage.app",
+  messagingSenderId:"759263965126",
+  appId:"1:759263965126:web:a325a1ce932954bfc00cc7"
+};
+const ADMIN_USERNAME = 'roman-owner';
 
-// ─ Firebase REST ─
-async function fbGet(p){try{const r=await fetch(BASE+p+'.json');if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}catch(e){log('GET ERR '+p+': '+e.message,'e');return null;}}
-async function fbSet(p,v){try{const r=await fetch(BASE+p+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)});if(!r.ok)throw new Error('HTTP '+r.status);log('SET '+p);return await r.json();}catch(e){log('SET ERR '+p+': '+e.message,'e');return null;}}
-async function fbPatch(p,v){try{const r=await fetch(BASE+p+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}catch(e){log('PATCH ERR '+p+': '+e.message,'e');return null;}}
-async function fbDel(p){try{const r=await fetch(BASE+p+'.json',{method:'DELETE'});if(!r.ok)throw new Error('HTTP '+r.status);log('DEL '+p,'w');return true;}catch(e){log('DEL ERR '+p+': '+e.message,'e');return false;}}
+// ===== LEVEL DATA =====
+const XP_LEVELS=[0,100,250,450,700,1000,1400,1900,2500,3200,4000,5000,6200,7600,9200,11000,13000,15500,18500,22000];
+const LEVEL_TITLES=['Neuling','Lehrling','Aufsteiger','Fortgeschrittener','Kämpfer','Profi','Elite','Meister','Großmeister','Legende','GOAT 🐐','Mythisch','Unsterblich','Göttlich','Transzendent','Absolut','Jenseits','Unbegreiflich','Omnipotent','7D GOTT 👑'];
+const LEVEL_EMOJIS=['😶','🙂','😊','😎','💪','🔥','⚡','🏆','👑','🌟','🐐','💎','🌌','🌠','🔮','⚔️','🧬','🌀','♾️','👑'];
+const ALL_BADGES=[
+  {id:'firstLogin',emoji:'🎉',name:'Erster Login',desc:'Zum ersten Mal eingeloggt'},
+  {id:'quiz10',emoji:'🧠',name:'Quiz-Starter',desc:'10 Quiz-Fragen beantwortet'},
+  {id:'chat10',emoji:'💬',name:'Chatter',desc:'10 Chat-Nachrichten gesendet'},
+  {id:'catch50',emoji:'🎮',name:'Catch-Pro',desc:'50 Punkte in Catch-Emoji'},
+  {id:'snake20',emoji:'🐍',name:'Snake-Meister',desc:'Level 20 in Snake'},
+  {id:'memory4',emoji:'🧩',name:'Memory-König',desc:'Memory auf Level 4 gelöst'},
+  {id:'wordle3',emoji:'🟩',name:'Wordle-Streak',desc:'3x Wordle in Folge gewonnen'},
+  {id:'login7',emoji:'🔥',name:'Treuer User',desc:'7 Tage Login-Streak'},
+  {id:'login30',emoji:'💎',name:'Dedication',desc:'30 Tage Login-Streak'},
+  {id:'challenges5',emoji:'🏆',name:'Challenge-König',desc:'5 Challenges abgeschlossen'},
+  {id:'vote1',emoji:'⭐',name:'Voter',desc:'Abgestimmt'},
+  {id:'topVoted',emoji:'👑',name:'Beliebtester',desc:'Meiste Votes erhalten'},
+  {id:'quizPerfect',emoji:'🌟',name:'Quiz-Perfekt',desc:'Quiz 100% geschafft'},
+  {id:'nightOwl',emoji:'🦉',name:'Nachteule',desc:'Nach Mitternacht online'},
+  {id:'speedster',emoji:'⚡',name:'Speedster',desc:'Quiz super schnell'},
+  {id:'noMistakes',emoji:'🎯',name:'Kein Fehler',desc:'Quiz ohne Fehler abgeschlossen'}
+];
+const HOF_MEMBERS_DEFAULT=[
+  {name:'👑 Alessia 👑 ⟡',emoji:'👑',title:'Vibe Queen'},
+  {name:'🦫 Roman 🦫',emoji:'🦫',title:'Co-Founder'},
+  {name:'👑 Annika 👑 ⟡',emoji:'👑',title:'Energie Boss'},
+  {name:'🐱 Halil 🐱',emoji:'🐱',title:'Web Dev OG'},
+  {name:'⚡ Emir ⚡',emoji:'⚡',title:'Blitz-Boy'},
+  {name:'🏄 Finn 🏄',emoji:'🏄',title:'Chill King'},
+  {name:'🎯 Joscha 🎯',emoji:'🎯',title:'Ziel-Getter'},
+  {name:'🦁 Cornelius 🦁',emoji:'🦁',title:'Der Löwe'},
+  {name:'🚀 Jonas 🚀',emoji:'🚀',title:'Rocket Man'},
+  {name:'🎸 Theodor 🎸',emoji:'🎸',title:'Rock Star'},
+  {name:'👑 Mara 👑',emoji:'👑',title:'Butterfly'},
+  {name:'👑 Frida 👑',emoji:'👑',title:'Artist'},
+  {name:'👑 Malena 👑',emoji:'👑',title:'Shooting Star'},
+  {name:'👑 Jolie 👑',emoji:'👑',title:'Rainbow'},
+  {name:'👑 Julie 👑',emoji:'👑',title:'Lucky Charm'},
+  {name:'🦆 👑 Vanessa 👑 🦆 ⟡',emoji:'👑',title:'Queen'},
+  {name:'👑 Jood 👑',emoji:'👑',title:'Fire Girl'},
+  {name:'🐰 👑 Kiara 👑 🐰',emoji:'👑',title:'Cheetah'},
+  {name:'👑 Clara 👑',emoji:'👑',title:'Moonchild'},
+  {name:'👑 Danelle 👑',emoji:'👑',title:'Diamond'},
+  {name:'👑 Tori 👑',emoji:'👑',title:'Showtime'},
+  {name:'👑 Helene 👑',emoji:'👑',title:'Sunshine'},
+  {name:'🐶 👑 Emily 👑 🐶',emoji:'👑',title:'Music Soul'},
+  {name:'🐈 👑 Emilie 👑 🐈',emoji:'👑',title:'Blüte'},
+  {name:'👑 Emma 👑',emoji:'👑',title:'Unicorn'},
+  {name:'👑 Melissa 👑',emoji:'👑',title:'Queen'},
+];
+const HOF_QUOTES_DEFAULT=[
+  {text:"wir sind einfach anders. und das ist gut so.",author:"— 7D Klassen-Weisheit"},
+  {text:"andere klassen gucken zu, wir machen einfach.",author:"— unbekannter 7D Legende"},
+  {text:"wenn du 7D sagst, meinen alle GOATS.",author:"— Roman 🦫"},
+  {text:"hausaufgaben? noch nie gehört.",author:"— jedes 7D mitglied"},
+  {text:"7D till i die no cap fr fr.",author:"— Halil 🐱"},
+];
+const CHALLENGE_DEFS=[
+  {id:'quiz5',icon:'🧠',title:'Quiz-Starter',desc:'Beantworte 5 Quiz-Fragen',xp:30,target:5,type:'quiz'},
+  {id:'quiz15',icon:'📚',title:'Quiz-Profi',desc:'Beantworte 15 Fragen richtig',xp:80,target:15,type:'quizCorrect'},
+  {id:'catch30',icon:'🎮',title:'Catch-Champion',desc:'Erreiche 30 Punkte in Catch-Emoji',xp:50,target:30,type:'catchScore'},
+  {id:'snake5',icon:'🐍',title:'Snake-Starter',desc:'Erreiche Level 5 in Snake',xp:60,target:5,type:'snakeLevel'},
+  {id:'joke3',icon:'😂',title:'Witz-Freak',desc:'Lies 3 Witze',xp:20,target:3,type:'joke'},
+  {id:'wordle1',icon:'🟩',title:'Wordle-Tag',desc:'Löse das heutige Wordle',xp:50,target:1,type:'wordleWin'},
+  {id:'chat5',icon:'💬',title:'Chatter',desc:'Sende 5 Chat-Nachrichten',xp:25,target:5,type:'chatMsg'},
+  {id:'login',icon:'🎁',title:'Täglicher Login',desc:'Melde dich an',xp:10,target:1,type:'auto'},
+];
 
-// ─ Parse val ─
-function parseVal(s){s=s.trim();try{return JSON.parse(s);}catch{return s;}}
-function numVal(v){const n=parseFloat(v);return isNaN(n)?0:n;}
+// ===== STATE =====
+let fbAuth=null, fbDb=null, adminUser=null;
+let allUsers={}, chatMessages={}, hofMembers=[...HOF_MEMBERS_DEFAULT], hofQuotes=[...HOF_QUOTES_DEFAULT];
+let currentSection='dashboard';
+let cachedUsers=null;
 
-// ─ Week key ─
-function wk(){const d=new Date(),day=d.getDay(),off=day===0?-6:1-day,m=new Date(d.getFullYear(),d.getMonth(),d.getDate()+off);return m.getFullYear()+'-'+String(m.getMonth()+1).padStart(2,'0')+'-'+String(m.getDate()).padStart(2,'0');}
+// ===== BG CANVAS =====
+const bgCanvas=document.getElementById('bgCanvas');
+const bgCtx=bgCanvas.getContext('2d');
+let bgW,bgH,bgParticles=[];
+function bgResize(){bgW=bgCanvas.width=window.innerWidth;bgH=bgCanvas.height=window.innerHeight;}
+window.addEventListener('resize',bgResize);bgResize();
+function bgInit(){bgParticles=[];for(let i=0;i<60;i++)bgParticles.push({x:Math.random()*bgW,y:Math.random()*bgH,vx:(Math.random()-.5)*0.3,vy:(Math.random()-.5)*0.3,size:Math.random()*1.5+0.5,alpha:Math.random()*0.4+0.1});}
+function bgAnimate(){bgCtx.clearRect(0,0,bgW,bgH);bgParticles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=bgW;if(p.x>bgW)p.x=0;if(p.y<0)p.y=bgH;if(p.y>bgH)p.y=0;bgCtx.beginPath();bgCtx.arc(p.x,p.y,p.size,0,Math.PI*2);bgCtx.fillStyle=`rgba(0,255,136,${p.alpha})`;bgCtx.fill();});for(let i=0;i<bgParticles.length;i++){for(let j=i+1;j<bgParticles.length;j++){const dx=bgParticles[i].x-bgParticles[j].x,dy=bgParticles[i].y-bgParticles[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){bgCtx.strokeStyle=`rgba(0,255,136,${(1-d/100)*0.06})`;bgCtx.lineWidth=1;bgCtx.beginPath();bgCtx.moveTo(bgParticles[i].x,bgParticles[i].y);bgCtx.lineTo(bgParticles[j].x,bgParticles[j].y);bgCtx.stroke();}}}requestAnimationFrame(bgAnimate);}
+bgInit();bgAnimate();
 
-// ─ Load all ─
-async function R(){
-  setConn(null);toast('↻ Yükleniyor...','i');
-  const[v,u,un]=await Promise.all([fbGet('/votes7d'),fbGet('/users'),fbGet('/usernames')]);
-  DB.votes=v||{};DB.users=u||{};DB.usernames=un||{};
-  setConn(true);
-  document.getElementById('wkBadge').textContent='📅 '+wk();
-  renderVotes();renderUsers();fillSelects();renderRaw();calcStats();buildPathHints();
-  toast('✅ Yüklendi: '+Object.keys(DB.votes).length+' vote, '+Object.keys(DB.users).length+' kullanıcı');
-  log('Veri yüklendi','i');
-}
+// ===== CLOCK =====
+setInterval(()=>{const el=document.getElementById('topbarTime');if(el)el.textContent=new Date().toLocaleTimeString('de-DE');},1000);
 
-function setConn(ok){
-  const d=document.getElementById('connDot'),t=document.getElementById('connTxt');
-  if(ok===null){d.style.background='var(--y)';d.style.boxShadow='0 0 8px var(--y)';t.textContent='YÜKLENİYOR';}
-  else if(ok){d.style.background='var(--g)';d.style.boxShadow='0 0 8px var(--g)';t.textContent='BAĞLI';}
-  else{d.style.background='var(--r)';d.style.boxShadow='0 0 8px var(--r)';t.textContent='HATA';}
-}
+// ===== HELPERS =====
+function getLevelFromXp(xp){let lvl=1;for(let i=1;i<XP_LEVELS.length;i++){if(xp>=XP_LEVELS[i])lvl=i+1;else break;}return Math.min(lvl,LEVEL_TITLES.length);}
+function getXpForLevel(lvl){return XP_LEVELS[Math.min(lvl,XP_LEVELS.length-1)]||XP_LEVELS[XP_LEVELS.length-1];}
+function getCurrentXpInLevel(xp){const lvl=getLevelFromXp(xp);const base=getXpForLevel(lvl-1)||0;return xp-base;}
+function getXpNeededForNextLevel(xp){const lvl=getLevelFromXp(xp);const next=getXpForLevel(lvl);const base=getXpForLevel(lvl-1)||0;return next-base;}
+function voteKey(name){return name.replace(/[^a-zA-Z]/g,'').toLowerCase();}
+function getWeekKey(){const d=new Date();const day=d.getDay();const mo=day===0?-6:1-day;const mon=new Date(d.getFullYear(),d.getMonth(),d.getDate()+mo);return mon.getFullYear()+'-'+String(mon.getMonth()+1).padStart(2,'0')+'-'+String(mon.getDate()).padStart(2,'0');}
+function getTodayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function fmtTime(ts){return new Date(ts).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}
+function escHtml(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function uidFromUsername(uname){const u=Object.entries(allUsers).find(([,v])=>v.username&&v.username.toLowerCase()===uname.toLowerCase());return u?u[0]:null;}
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='',2500);}
+function setMsg(id,msg,color='var(--accent)'){const el=document.getElementById(id);if(el){el.textContent=msg;el.style.color=color;}}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('show');}
+function openModal(title,content){document.getElementById('modalTitle').textContent=title;document.getElementById('modalContent').innerHTML=content;document.getElementById('modalOverlay').classList.add('show');}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
 
-// ─ Votes render ─
-function getEntries(){
-  let e=Object.entries(DB.votes);
-  const q=(document.getElementById('vsearch')||{}).value||'';
-  if(q)e=e.filter(([k])=>k.toLowerCase().includes(q.toLowerCase()));
-  const s=(document.getElementById('vsort')||{}).value||'desc';
-  if(s==='desc')e.sort((a,b)=>numVal(b[1])-numVal(a[1]));
-  else if(s==='asc')e.sort((a,b)=>numVal(a[1])-numVal(b[1]));
-  else if(s==='az')e.sort((a,b)=>a[0].localeCompare(b[0]));
-  else e.sort((a,b)=>b[0].localeCompare(a[0]));
-  const sh=parseInt((document.getElementById('vshow')||{}).value||'0');
-  if(sh>0)e=e.slice(0,sh);
-  return e;
-}
-
-function renderVotes(){
-  const rows=document.getElementById('voteRows');
-  const empty=document.getElementById('voteEmpty');
-  const entries=getEntries();
-  if(!entries.length){rows.innerHTML='';empty.style.display='block';updateSelBar();return;}
-  empty.style.display='none';
-  const numEntries=entries.filter(([,v])=>!isNaN(parseFloat(v)));
-  const maxV=numEntries.length?Math.max(...numEntries.map(([,v])=>numVal(v)),1):1;
-  const medals=['🥇','🥈','🥉'];
-  const cols=['#ffd700','#c0c0c0','#cd7f32','var(--g)'];
-  rows.innerHTML=entries.map(([key,val],i)=>{
-    const nv=numVal(val),isText=isNaN(parseFloat(val));
-    const pct=isText?0:Math.round((nv/maxV)*100);
-    const col=i<3?cols[i]:'var(--g)';
-    const medal=i<3?medals[i]:`<span style="font-size:.7rem;color:var(--t3)">#${i+1}</span>`;
-    return`<div class="vr${SEL.has(key)?' selected':''}" id="vr-${key}">
-<div class="vrank" style="color:${col}">${medal}</div>
-<input type="checkbox" class="vcheck" ${SEL.has(key)?'checked':''} onchange="toggleSel('${key}',this.checked)">
-<div class="vname"><span class="inlineHint" title="Çift tık = İsmi değiştir" ondblclick="startRenameVote(this,'${key}')">${key}</span></div>
-<div><span class="vval inlineHint" style="color:${col}" title="Çift tık = Değeri düzenle (metin/sayı girebilirsin)" ondblclick="startEditVal(this,'${key}','${val}')">${val}</span></div>
-<div class="vbarwrap"><div class="vbar"><div class="vfill" style="width:${pct}%;background:${col}"></div></div></div>
-<div class="vpct">${isText?'—':pct+'%'}</div>
-<div class="vact">
-  <button class="btn sm" onclick="qAdd('${key}',1)">+1</button>
-  <button class="btn sm" onclick="qAdd('${key}',10)">+10</button>
-  <button class="btn sm" onclick="qAdd('${key}',100)">+100</button>
-  <button class="btn sm r" onclick="qDel('${key}')">🗑</button>
-</div>
-</div>`;
-  }).join('');
-  updateSelBar();
-}
-
-function startEditVal(el,key,cur){
-  const inp=document.createElement('input');
-  inp.className='vval-edit';inp.value=cur;inp.style.width='100px';
-  el.replaceWith(inp);inp.focus();inp.select();
-  const save=async()=>{
-    const raw=inp.value.trim();if(raw===''){renderVotes();return;}
-    const v=parseVal(raw);
-    await fbSet('/votes7d/'+key,v);DB.votes[key]=v;
-    renderVotes();fillSelects();toast(`📌 ${key} = ${raw}`);
-  };
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter')save();if(e.key==='Escape')renderVotes();});
-  inp.addEventListener('blur',save);
-}
-
-function startRenameVote(el,key){
-  const inp=document.createElement('input');
-  inp.className='vname-edit';inp.value=key;
-  el.replaceWith(inp);inp.focus();inp.select();
-  const save=async()=>{
-    const nk=inp.value.trim().toLowerCase().replace(/\s+/g,'');
-    if(!nk||nk===key){renderVotes();return;}
-    const v=DB.votes[key];
-    await fbSet('/votes7d/'+nk,v);await fbDel('/votes7d/'+key);
-    DB.votes[nk]=v;delete DB.votes[key];SEL.delete(key);
-    renderVotes();fillSelects();toast(`✏️ ${key} → ${nk}`);
-  };
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter')save();if(e.key==='Escape')renderVotes();});
-  inp.addEventListener('blur',save);
-}
-
-// ─ Selection ─
-function toggleSel(key,on){on?SEL.add(key):SEL.delete(key);updateSelBar();}
-function selAll(){getEntries().forEach(([k])=>SEL.add(k));renderVotes();}
-function selNone(){SEL.clear();renderVotes();}
-function updateSelBar(){
-  const sb=document.getElementById('selbar');
-  const sc=document.getElementById('selCount');
-  if(SEL.size>0){sb.classList.add('on');sc.textContent=SEL.size+' kişi seçili: '+[...SEL].join(', ');}
-  else sb.classList.remove('on');
-}
-
-async function bulkAdd(){
-  const raw=document.getElementById('selAmt').value.trim();
-  const v=parseVal(raw);const isNum=typeof v==='number';
-  for(const k of SEL){const cur=isNum?numVal(DB.votes[k]||0)+v:v;await fbSet('/votes7d/'+k,cur);DB.votes[k]=cur;}
-  toast(`✅ ${SEL.size} kişiye +${raw}`);SEL.clear();renderVotes();fillSelects();
-}
-async function bulkRemove(){
-  const a=parseFloat(document.getElementById('selAmt').value)||0;
-  for(const k of SEL){const nv=Math.max(0,numVal(DB.votes[k]||0)-a);await fbSet('/votes7d/'+k,nv);DB.votes[k]=nv;}
-  toast(`➖ ${SEL.size} kişiden -${a}`,'w');SEL.clear();renderVotes();fillSelects();
-}
-async function bulkSet(){
-  const raw=document.getElementById('selAmt').value.trim();
-  const v=parseVal(raw);
-  for(const k of SEL){await fbSet('/votes7d/'+k,v);DB.votes[k]=v;}
-  toast(`📌 ${SEL.size} kişiye set: ${raw}`);SEL.clear();renderVotes();fillSelects();
-}
-async function bulkDelete(){
-  showModal('TOPLU SİL',`${SEL.size} kişinin oyu silinsin mi?`,async()=>{
-    for(const k of SEL){await fbDel('/votes7d/'+k);delete DB.votes[k];}
-    toast(`🗑️ ${SEL.size} kişi silindi`,'w');SEL.clear();renderVotes();fillSelects();
-  });
-}
-async function bulkMultiply(){
-  const x=parseFloat(document.getElementById('selAmt').value)||1;
-  for(const k of SEL){const nv=Math.round(numVal(DB.votes[k]||0)*x);await fbSet('/votes7d/'+k,nv);DB.votes[k]=nv;}
-  toast(`✖ ${SEL.size} kişi × ${x}`);SEL.clear();renderVotes();fillSelects();
-}
-async function bulkCustomText(){
-  const txt=prompt('Seçili herkese yazılacak metin/değer:');
-  if(txt===null)return;
-  const v=parseVal(txt);
-  for(const k of SEL){await fbSet('/votes7d/'+k,v);DB.votes[k]=v;}
-  toast(`✏️ ${SEL.size} kişiye: ${txt}`);SEL.clear();renderVotes();fillSelects();
-}
-
-// ─ Quick ops ─
-async function qAdd(k,n){const nv=numVal(DB.votes[k]||0)+n;await fbSet('/votes7d/'+k,nv);DB.votes[k]=nv;renderVotes();toast(`+${n} → ${k}: ${nv}`);}
-async function qDel(k){showModal('SİL',`"${k}" silinsin mi?`,async()=>{await fbDel('/votes7d/'+k);delete DB.votes[k];SEL.delete(k);renderVotes();fillSelects();toast(`🗑️ ${k}`,'w');});}
-async function addNewVote(){
-  const name=prompt('Yeni kişi adı:');if(!name)return;
-  const val=prompt('Oy değeri (sayı veya metin):','0');if(val===null)return;
-  const v=parseVal(val);const key=name.toLowerCase().trim().replace(/\s+/g,'');
-  await fbSet('/votes7d/'+key,v);DB.votes[key]=v;renderVotes();fillSelects();toast(`➕ ${key} eklendi`);
-}
-async function cfDelAll(){showModal('TÜM VOTE SİL','Tüm oy verileri silinecek!',async()=>{await fbDel('/votes7d');DB.votes={};SEL.clear();renderVotes();fillSelects();toast('🗑️ Tümü silindi','w');});}
-
-// ─ Fill selects ─
-function fillSelects(){
-  const keys=Object.keys(DB.votes);
-  const ids=['m-t1','m-t2','sw-t1','sw-t2','cp-src','cp-dst','lb-t','ab-t','rb-t'];
-  ids.forEach(id=>{
-    const el=document.getElementById(id);if(!el)return;
-    const cur=el.value;
-    el.innerHTML='<option value="">Seç...</option>'+keys.map(k=>`<option value="${k}">${k}</option>`).join('');
-    if(cur&&keys.includes(cur))el.value=cur;else if(keys.includes('halil'))el.value='halil';
+// ===== FIREBASE LOAD =====
+function loadFirebase(){
+  return new Promise((res,rej)=>{
+    const s1=document.createElement('script');
+    s1.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
+    s1.onload=()=>{
+      const s2=document.createElement('script');s2.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js';
+      s2.onload=()=>{
+        const s3=document.createElement('script');s3.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js';
+        s3.onload=()=>{const app=firebase.initializeApp(FB_CONFIG);fbAuth=firebase.auth();fbDb=firebase.database();res();};
+        s3.onerror=rej;document.head.appendChild(s3);
+      };s2.onerror=rej;document.head.appendChild(s2);
+    };s1.onerror=rej;document.head.appendChild(s1);
   });
 }
 
-// ─ Dual target ─
-async function dualAdd(){
-  const t1=document.getElementById('m-t1').value,t2=document.getElementById('m-t2').value;
-  const raw=document.getElementById('m-amt').value.trim();
-  const v=parseVal(raw);const isNum=typeof v==='number';
-  const res=[];
-  for(const t of[t1,t2].filter(Boolean)){
-    const nv=isNum?numVal(DB.votes[t]||0)+v:v;
-    await fbSet('/votes7d/'+t,nv);DB.votes[t]=nv;res.push(`${t}→${nv}`);
+// ===== LOGIN =====
+async function doLogin(){
+  const username=document.getElementById('lUser').value.trim().toLowerCase();
+  const pass=document.getElementById('lPass').value;
+  const btn=document.getElementById('lBtn');
+  const msg=document.getElementById('loginMsg');
+  if(!username||!pass){msg.textContent='Username und Passwort eingeben!!';return;}
+  btn.textContent='⏳ LADEN...';btn.disabled=true;msg.textContent='';
+  try{
+    if(!fbAuth){await loadFirebase();}
+    // Check if admin
+    const usnap=await fbDb.ref('usernames/'+username).once('value');
+    if(!usnap.exists()){msg.textContent='❌ Username nicht gefunden!!';btn.textContent='▶ EINLOGGEN';btn.disabled=false;return;}
+    const uid=usnap.val();
+    const admSnap=await fbDb.ref('users/'+uid+'/admin').once('value');
+    const isAdmin=admSnap.val()===true||username===ADMIN_USERNAME;
+    if(!isAdmin){msg.textContent='❌ Keine Admin-Rechte!!';btn.textContent='▶ EINLOGGEN';btn.disabled=false;return;}
+    const fakeEmail=btoa(username).replace(/[^a-zA-Z0-9]/g,'').substring(0,20)+'@7dzone.local';
+    await fbAuth.signInWithEmailAndPassword(fakeEmail,pass);
+    adminUser={uid,username};
+    document.getElementById('sbUser').textContent=username;
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').classList.add('visible');
+    initAdminPanel();
+  }catch(e){
+    let txt='❌ Fehler: '+e.code;
+    if(e.code==='auth/wrong-password'||e.code==='auth/user-not-found')txt='❌ Falsches Passwort!!';
+    else if(e.code==='auth/too-many-requests')txt='⚠️ Zu viele Versuche!!';
+    msg.textContent=txt;btn.textContent='▶ EINLOGGEN';btn.disabled=false;
   }
-  const r=document.getElementById('m-res');r.style.color='var(--g)';
-  r.textContent=res.length?'✅ '+res.join('  |  '):'⚠️ Hedef seçmedin!';
-  renderVotes();fillSelects();if(res.length)toast('⚡ '+res.join(' | '));
 }
-async function dualRemove(){
-  const t1=document.getElementById('m-t1').value,t2=document.getElementById('m-t2').value;
-  const a=parseFloat(document.getElementById('m-amt').value)||0;
-  const res=[];
-  for(const t of[t1,t2].filter(Boolean)){
-    const nv=Math.max(0,numVal(DB.votes[t]||0)-a);await fbSet('/votes7d/'+t,nv);DB.votes[t]=nv;res.push(`${t}→${nv}`);
-  }
-  const r=document.getElementById('m-res');r.style.color='var(--o)';r.textContent='➖ '+(res.length?res.join(' | '):'Hedef yok');
-  renderVotes();fillSelects();
-}
-async function dualSet(){
-  const t1=document.getElementById('m-t1').value,t2=document.getElementById('m-t2').value;
-  const raw=document.getElementById('m-amt').value.trim();const v=parseVal(raw);
-  for(const t of[t1,t2].filter(Boolean)){await fbSet('/votes7d/'+t,v);DB.votes[t]=v;}
-  document.getElementById('m-res').textContent='📌 Set: '+raw;renderVotes();fillSelects();toast('📌 Çift set: '+raw);
-}
-async function dualDelete(){
-  const t1=document.getElementById('m-t1').value,t2=document.getElementById('m-t2').value;
-  const targets=[t1,t2].filter(Boolean);
-  if(!targets.length){toast('Hedef seç!','e');return;}
-  showModal('ÇİFT SİL',`${targets.join(' ve ')} silinsin mi?`,async()=>{
-    for(const t of targets){await fbDel('/votes7d/'+t);delete DB.votes[t];}
-    renderVotes();fillSelects();toast('🗑️ Silindi','w');
-  });
-}
-async function swapVotes(){
-  const t1=document.getElementById('sw-t1').value,t2=document.getElementById('sw-t2').value;
-  if(!t1||!t2||t1===t2){toast('2 farklı kişi seç!','e');return;}
-  const v1=DB.votes[t1],v2=DB.votes[t2];
-  await fbSet('/votes7d/'+t1,v2);await fbSet('/votes7d/'+t2,v1);
-  DB.votes[t1]=v2;DB.votes[t2]=v1;
-  renderVotes();toast(`⇄ Takas: ${t1}(${v1}) ↔ ${t2}(${v2})`);
-}
-async function copyVotes(){
-  const src=document.getElementById('cp-src').value,dst=document.getElementById('cp-dst').value;
-  if(!src||!dst){toast('Seç!','e');return;}
-  const v=DB.votes[src];await fbSet('/votes7d/'+dst,v);DB.votes[dst]=v;
-  renderVotes();toast(`📋 ${src}→${dst}: ${v}`);
-}
-async function multiplyAll(){
-  const x=parseFloat(document.getElementById('mul-x').value)||1;
-  for(const[k,v]of Object.entries(DB.votes)){if(!isNaN(parseFloat(v))){const nv=Math.round(numVal(v)*x);await fbSet('/votes7d/'+k,nv);DB.votes[k]=nv;}}
-  renderVotes();toast(`✖ Tümü × ${x}`);
+function doLogout(){if(fbAuth)fbAuth.signOut();location.reload();}
+
+// ===== INIT =====
+function initAdminPanel(){
+  loadDashboard();
+  loadChallengesDefs();
+  loadXPLevelTable();
+  loadVotePersonSelect();
+  // Set date default
+  const d=document.getElementById('chDate');if(d)d.value=getTodayStr();
 }
 
-// ─ Bots ─
-function bLog(id,msg){const el=document.getElementById(id);if(el){el.innerHTML=`[${new Date().toLocaleTimeString('tr')}] ${msg}<br>`+el.innerHTML;}}
+// ===== SECTION NAV =====
+function showSection(name,el){
+  document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const sec=document.getElementById('sec-'+name);
+  if(sec)sec.classList.add('active');
+  if(el)el.classList.add('active');
+  currentSection=name;
+  const titles={dashboard:'📊 DASHBOARD',leaderboard:'🏆 LEADERBOARD',users:'👥 ALLE USERS',xpeditor:'⚡ XP EDITOR',badges:'🎖️ BADGE MANAGEMENT',bans:'🚫 BAN SYSTEM',chat:'💬 CHAT VERWALTUNG',announcements:'📢 ANKÜNDIGUNGEN',votes:'🗳️ VOTE VERWALTUNG',hof:'🏛️ HALL OF FAME',challenges:'🎯 CHALLENGES',config:'⚙️ SYSTEM CONFIG'};
+  document.getElementById('topbarTitle').textContent=titles[name]||name.toUpperCase();
+  if(name==='users')loadUsers();
+  if(name==='leaderboard')loadLeaderboard();
+  if(name==='bans')loadBans();
+  if(name==='chat')loadChatMessages();
+  if(name==='announcements')loadAnnouncements();
+  if(name==='votes'){loadVotes();loadVotePersonSelect();}
+  if(name==='hof')renderHofEditor();
+  if(name==='xpeditor')loadXPOverview();
+  if(name==='badges'){loadBadgeGrid(null);}
+  document.getElementById('content').scrollTop=0;
+  if(window.innerWidth<=768)document.getElementById('sidebar').classList.remove('open');
+}
 
-function lockStart(){
-  if(lockBot)clearInterval(lockBot);
-  const t=document.getElementById('lb-t').value||'halil';
-  const mn=parseFloat(document.getElementById('lb-min').value)||500;
-  const iv=parseInt(document.getElementById('lb-int').value)||5;
-  const sv=parseVal(document.getElementById('lb-set').value||'999');
-  const el=document.getElementById('lb-status');el.className='bs on';el.innerHTML=`<div class="d"></div>AKTİF → ${t} min:${mn} @${iv}sn`;
-  log(`Koruma botu: ${t} min=${mn}`,'i');
-  lockBot=setInterval(async()=>{
-    const cur=await fbGet('/votes7d/'+t);
-    if(cur===null||numVal(cur)<mn){await fbSet('/votes7d/'+t,sv);DB.votes[t]=sv;renderVotes();bLog('lb-log',`🛡️→${sv}`);log(`Koruma: ${t}→${sv}`);}
-  },iv*1000);
-}
-function lockStop(){if(lockBot){clearInterval(lockBot);lockBot=null;}const el=document.getElementById('lb-status');el.className='bs';el.innerHTML='<div class="d"></div>KAPALI';toast('⏹ Koruma durduruldu','w');}
+// ===== DASHBOARD =====
+async function loadDashboard(){
+  try{
+    const snap=await fbDb.ref('users').once('value');
+    allUsers=snap.val()||{};
+    cachedUsers=allUsers;
+    const vals=Object.values(allUsers);
+    const totalUsers=vals.length;
+    const admins=vals.filter(u=>u.admin).length;
+    const banned=vals.filter(u=>u.banned).length;
+    const totalXP=vals.reduce((s,u)=>s+(u.xp||0),0);
+    const topUser=vals.filter(u=>u.username).sort((a,b)=>(b.xp||0)-(a.xp||0))[0];
+    document.getElementById('ds-users').textContent=totalUsers;
+    document.getElementById('ds-admins').textContent=admins;
+    document.getElementById('ds-banned').textContent=banned;
+    document.getElementById('ds-totalxp').textContent=totalXP.toLocaleString();
+    document.getElementById('ds-topuser').textContent=topUser?topUser.username:'–';
+    document.getElementById('banBadge').textContent=banned;
 
-function autoAddStart(){
-  if(addBot)clearInterval(addBot);
-  const t=document.getElementById('ab-t').value||'halil';
-  const a=parseFloat(document.getElementById('ab-amt').value)||10;
-  const iv=parseInt(document.getElementById('ab-int').value)||10;
-  const mx=parseInt(document.getElementById('ab-max').value)||0;
-  const el=document.getElementById('ab-status');el.className='bs on';el.innerHTML=`<div class="d"></div>AKTİF +${a}/${iv}sn`;
-  addBot=setInterval(async()=>{
-    const cur=numVal(DB.votes[t]||0);
-    if(mx>0&&cur>=mx){autoAddStop();toast('Max oya ulaşıldı','i');return;}
-    const nv=cur+a;await fbSet('/votes7d/'+t,nv);DB.votes[t]=nv;renderVotes();bLog('ab-log',`+${a}→${nv}`);
-  },iv*1000);
-}
-function autoAddStop(){if(addBot){clearInterval(addBot);addBot=null;}const el=document.getElementById('ab-status');el.className='bs';el.innerHTML='<div class="d"></div>KAPALI';toast('⏹ Oto ekleme durduruldu','w');}
+    const chatSnap=await fbDb.ref('chat7d').once('value');
+    const msgs=chatSnap.val()||{};
+    document.getElementById('ds-messages').textContent=Object.keys(msgs).length;
 
-function autoRemStart(){
-  if(remBot)clearInterval(remBot);
-  const t=document.getElementById('rb-t').value||'halil';
-  const a=parseFloat(document.getElementById('rb-amt').value)||10;
-  const iv=parseInt(document.getElementById('rb-int').value)||10;
-  const mn=parseFloat(document.getElementById('rb-min').value)||0;
-  const el=document.getElementById('rb-status');el.className='bs on';el.innerHTML=`<div class="d"></div>AKTİF -${a}/${iv}sn`;
-  remBot=setInterval(async()=>{
-    const cur=numVal(DB.votes[t]||0);
-    if(cur<=mn){autoRemStop();return;}
-    const nv=Math.max(mn,cur-a);await fbSet('/votes7d/'+t,nv);DB.votes[t]=nv;renderVotes();bLog('rb-log',`-${a}→${nv}`);
-  },iv*1000);
-}
-function autoRemStop(){if(remBot){clearInterval(remBot);remBot=null;}const el=document.getElementById('rb-status');el.className='bs';el.innerHTML='<div class="d"></div>KAPALI';toast('⏹ Oto silme durduruldu','w');}
+    const annSnap=await fbDb.ref('announcements7d').once('value');
+    document.getElementById('ds-announcements').textContent=Object.keys(annSnap.val()||{}).length;
 
-function multiStart(){
-  if(mulBot)clearInterval(mulBot);
-  const targets=document.getElementById('mb-t').value.split(',').map(s=>s.trim()).filter(Boolean);
-  const a=parseFloat(document.getElementById('mb-amt').value)||5;
-  const iv=parseInt(document.getElementById('mb-int').value)||15;
-  const el=document.getElementById('mb-status');el.className='bs on';el.innerHTML=`<div class="d"></div>AKTİF [${targets.join(',')}] +${a}/${iv}sn`;
-  mulBot=setInterval(async()=>{
-    for(const t of targets){const nv=numVal(DB.votes[t]||0)+a;await fbSet('/votes7d/'+t,nv);DB.votes[t]=nv;}
-    renderVotes();bLog('mb-log',`+${a}→[${targets.join(',')}]`);
-  },iv*1000);
-}
-function multiStop(){if(mulBot){clearInterval(mulBot);mulBot=null;}const el=document.getElementById('mb-status');el.className='bs';el.innerHTML='<div class="d"></div>KAPALI';toast('⏹ Çoklu bot durduruldu','w');}
+    const voteSnap=await fbDb.ref('votes7d').once('value');
+    document.getElementById('ds-votes').textContent=Object.keys(voteSnap.val()||{}).length;
 
-// ─ Tools ─
-async function halilBomb(){
-  const a=parseInt(document.getElementById('t-hamt').value)||999;
-  const cur=numVal(DB.votes['halil']||0),nv=cur+a;
-  await fbSet('/votes7d/halil',nv);DB.votes['halil']=nv;
-  document.getElementById('t-hres').textContent=`🐱 ${cur}+${a}=${nv}`;
-  renderVotes();fillSelects();toast(`🐱 Halil: ${nv}`);
-}
-async function onlyHalil(){
-  const a=parseInt(document.getElementById('t-ohamt').value)||9999;
-  showModal('SADECE HALİL',`Tüm oylar silinecek, Halil=${a} yazılacak.`,async()=>{
-    await fbDel('/votes7d');await fbSet('/votes7d/halil',a);DB.votes={halil:a};renderVotes();fillSelects();toast(`⭐ Sadece Halil: ${a}`);
-  });
-}
-async function normalizeVotes(){
-  const e=Object.entries(DB.votes).filter(([,v])=>!isNaN(parseFloat(v)));
-  const mx=Math.max(...e.map(([,v])=>numVal(v)),1);
-  for(const[k,v]of e){const nv=Math.round((numVal(v)/mx)*100);await fbSet('/votes7d/'+k,nv);DB.votes[k]=nv;}
-  renderVotes();toast('📊 Normalize edildi (0-100)');
-}
-async function randomizeAll(){
-  const mn=parseInt(document.getElementById('t-rmin').value)||1,mx=parseInt(document.getElementById('t-rmax').value)||1000;
-  for(const k of Object.keys(DB.votes)){const v=Math.floor(Math.random()*(mx-mn+1))+mn;await fbSet('/votes7d/'+k,v);DB.votes[k]=v;}
-  renderVotes();toast('🎲 Rastgele oy atandı');
-}
-async function setAll(){
-  const raw=document.getElementById('t-setall').value.trim();const v=parseVal(raw);
-  for(const k of Object.keys(DB.votes)){await fbSet('/votes7d/'+k,v);DB.votes[k]=v;}
-  renderVotes();toast(`📌 Herkese: ${raw}`);
-}
-async function addAll(){
-  const a=parseFloat(document.getElementById('t-addall').value)||100;
-  for(const[k,v]of Object.entries(DB.votes)){const nv=numVal(v)+a;await fbSet('/votes7d/'+k,nv);DB.votes[k]=nv;}
-  renderVotes();toast(`➕ Herkese +${a}`);
-}
-function importJSON(){
-  const txt=document.getElementById('t-import').value.trim();
-  try{const d=JSON.parse(txt);showModal('JSON İMPORT','Mevcut veri ezilecek!',async()=>{await fbSet('/votes7d',d);DB.votes=d;renderVotes();fillSelects();toast('📥 İmport tamam');});}
-  catch{toast('Geçersiz JSON!','e');}
-}
-function copyVoteJSON(){navigator.clipboard.writeText(JSON.stringify(DB.votes,null,2)).then(()=>toast('📋 Kopyalandı')).catch(()=>toast('Hata','e'));}
-function downloadJSON(){const b=new Blob([JSON.stringify(DB.votes,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`votes-${Date.now()}.json`;a.click();URL.revokeObjectURL(u);toast('💾 İndiriliyor');}
-async function toggleAdmin(){
-  const un=document.getElementById('t-admu').value.trim().toLowerCase();
-  const give=document.getElementById('t-adma').value==='1';
-  const res=document.getElementById('t-admres');
-  if(!un){res.textContent='⚠️ Username gir!';return;}
-  const uid=DB.usernames[un];
-  if(!uid){res.style.color='var(--r)';res.textContent=`❌ "${un}" bulunamadı!`;return;}
-  await fbSet('/users/'+uid+'/admin',give);if(DB.users[uid])DB.users[uid].admin=give;
-  res.style.color='var(--g)';res.textContent=give?`👑 ${un} admin!`:`❌ ${un} admin değil`;
-  renderUsers();toast(give?`👑 ${un} admin!`:`❌ ${un} admin değil`);
-}
-function calcStats(){
-  const vals=Object.values(DB.votes).map(v=>numVal(v));
-  const total=vals.reduce((a,b)=>a+b,0),avg=vals.length?Math.round(total/vals.length):0;
-  const mx=vals.length?Math.max(...vals):0,mn=vals.length?Math.min(...vals):0;
-  const txtCount=Object.values(DB.votes).filter(v=>isNaN(parseFloat(v))).length;
-  const el=document.getElementById('t-stats');if(!el)return;
-  el.innerHTML=`TOPLAM OY: <span style="color:var(--g)">${total}</span><br>KİŞİ: <span style="color:var(--b)">${vals.length}</span><br>ORTALAMA: <span style="color:var(--y)">${avg}</span><br>MAX: <span style="color:var(--g)">${mx}</span><br>MİN: <span style="color:var(--r)">${mn}</span><br>METİN DEĞER: <span style="color:var(--o)">${txtCount}</span><br>KULLANICI: <span style="color:var(--p)">${Object.keys(DB.users).length}</span>`;
-}
-async function readWM(){const v=await fbGet('/voteWeekMarker');document.getElementById('t-wkres').textContent=v?'Marker: '+JSON.stringify(v):'Bulunamadı';}
-async function delWM(){showModal('MARKER SİL','voteWeekMarker silinsin mi?',async()=>{await fbDel('/voteWeekMarker');document.getElementById('t-wkres').textContent='Silindi ✓';toast('Marker silindi','w');});}
+    // Top 5
+    const top5=vals.filter(u=>u.username&&u.xp!=null).sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,5);
+    const medals=['🥇','🥈','🥉','4️⃣','5️⃣'];
+    document.getElementById('dashTop5').innerHTML=top5.length?top5.map((u,i)=>`
+      <div class="lb-row">
+        <div class="lb-rank ${i<3?['gold','silver','bronze'][i]:''}">${medals[i]||i+1}</div>
+        <div style="flex:1;font-weight:900;">${escHtml(u.username)}${u.banned?'<span class="tag banned" style="margin-left:0.3rem;">BANNED</span>':''}</div>
+        <div class="lb-level">Lv${getLevelFromXp(u.xp||0)}</div>
+        <div class="lb-xp">${(u.xp||0).toLocaleString()} XP</div>
+      </div>`).join(''):`<div class="empty"><span class="empty-icon">📭</span><div class="empty-text">Keine Daten</div></div>`;
 
-// ─ Users ─
-function renderUsers(){
+    // Last 5 chat
+    const chatVals=Object.values(msgs).sort((a,b)=>b.ts-a.ts).slice(0,5);
+    document.getElementById('dashChat').innerHTML=chatVals.length?chatVals.map(m=>`
+      <div class="chat-msg${m.uid==='SYSTEM'?' system':''}">
+        <div class="msg-user">${escHtml(m.name||'?')}</div>
+        <div class="msg-text">${escHtml(m.text)}</div>
+        <div class="msg-time">${fmtTime(m.ts)}</div>
+      </div>`).join(''):`<div class="empty"><span class="empty-icon">💬</span><div class="empty-text">Keine Nachrichten</div></div>`;
+
+    // Last 3 ann
+    const annVals=Object.values(annSnap.val()||{}).sort((a,b)=>b.ts-a.ts).slice(0,3);
+    document.getElementById('dashAnn').innerHTML=annVals.length?annVals.map(a=>`
+      <div class="ann-item">
+        <div style="flex:1;">
+          <div class="ann-text">${escHtml(a.text)}</div>
+          <div class="ann-meta">von ${escHtml(a.author||'?')} · ${fmtTime(a.ts)}</div>
+        </div>
+      </div>`).join(''):`<div class="empty"><span class="empty-icon">📭</span><div class="empty-text">Keine Ankündigungen</div></div>`;
+  }catch(e){toast('❌ Dashboard Fehler: '+e.message,'error');}
+}
+
+// ===== LEADERBOARD =====
+async function loadLeaderboard(){
+  document.getElementById('lbList').innerHTML='<div class="loading"><span class="spin"></span>Laden...</div>';
+  try{
+    const snap=await fbDb.ref('users').once('value');
+    const users=snap.val()||{};
+    const entries=Object.values(users).filter(u=>u.username&&u.xp!=null).sort((a,b)=>(b.xp||0)-(a.xp||0));
+    const medals=['🥇','🥈','🥉'];
+    document.getElementById('lbList').innerHTML=entries.length?entries.map((u,i)=>{
+      const lvl=getLevelFromXp(u.xp||0);
+      const inLvl=getCurrentXpInLevel(u.xp||0);
+      const needed=getXpNeededForNextLevel(u.xp||0);
+      const pct=Math.min((inLvl/needed)*100,100);
+      return `<div class="lb-row">
+        <div class="lb-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${medals[i]||('#'+(i+1))}</div>
+        <div style="flex:1;">
+          <div style="font-weight:900;">${escHtml(u.username)}${u.admin?'<span class="tag admin" style="margin-left:0.3rem;">ADMIN</span>':''}${u.banned?'<span class="tag banned" style="margin-left:0.3rem;">BANNED</span>':''}</div>
+          <div style="font-size:0.7rem;color:var(--text2);">${LEVEL_TITLES[Math.min(lvl-1,LEVEL_TITLES.length-1)]}</div>
+          <div class="xp-bar-mini"><div class="xp-bar-fill" style="width:${pct}%;"></div></div>
+        </div>
+        <div class="lb-level">Lv${lvl}</div>
+        <div class="lb-xp">${(u.xp||0).toLocaleString()} XP</div>
+      </div>`;
+    }).join(''):`<div class="empty"><span class="empty-icon">🏆</span><div class="empty-text">Keine User gefunden</div></div>`;
+  }catch(e){document.getElementById('lbList').innerHTML=`<div style="color:var(--danger);">❌ Fehler: ${e.message}</div>`;}
+}
+
+// ===== USERS =====
+async function loadUsers(){
+  document.getElementById('userList').innerHTML='<div class="loading"><span class="spin"></span>Laden...</div>';
+  try{
+    const snap=await fbDb.ref('users').once('value');
+    allUsers=snap.val()||{};cachedUsers=allUsers;
+    filterUsers();
+  }catch(e){document.getElementById('userList').innerHTML=`<div style="color:var(--danger);">❌ ${e.message}</div>`;}
+}
+function filterUsers(){
+  const q=(document.getElementById('userSearch')?.value||'').toLowerCase();
+  const f=document.getElementById('userFilter')?.value||'all';
+  const entries=Object.entries(allUsers).filter(([uid,u])=>{
+    if(!u.username)return false;
+    const matchQ=!q||u.username.toLowerCase().includes(q);
+    const matchF=f==='all'||(f==='admin'&&u.admin)||(f==='banned'&&u.banned)||(f==='normal'&&!u.admin&&!u.banned);
+    return matchQ&&matchF;
+  }).sort((a,b)=>(b[1].xp||0)-(a[1].xp||0));
   const el=document.getElementById('userList');
-  const week=wk();
-  const q=(document.getElementById('usearch')||{}).value||'';
-  let entries=Object.entries(DB.users).filter(([,u])=>u);
-  if(q)entries=entries.filter(([uid,u])=>(u.username||'').toLowerCase().includes(q.toLowerCase())||uid.includes(q));
-  if(!entries.length){el.innerHTML='<div class="empty">KULLANICI BULUNAMADI</div>';return;}
-  el.innerHTML=entries.map(([uid,u])=>{
-    const un=u.username||'???',isAdmin=u.admin===true,voted=u.voted&&u.voted[week];
-    let vd='❌ Oy vermedi';if(voted){try{const a=JSON.parse(voted);vd='✅ '+(Array.isArray(a)?a.join(', '):voted);}catch{vd='✅ '+voted;}}
-    return`<div class="uc${isAdmin?' adm':''}">
-<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px">
-  <div>
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
-      <span style="font-family:var(--disp);font-size:.85rem;font-weight:700">${isAdmin?'👑':'👤'} ${un}</span>
-      ${isAdmin?'<span class="badge adm">ADMIN</span>':''}
-      <span class="badge ${voted?'yes':'no'}">${voted?'OY VERDİ':'OY VERMEDİ'}</span>
+  el.innerHTML=entries.length?entries.map(([uid,u])=>`
+    <div class="user-row${u.banned?' banned':''}">
+      <div class="user-avatar">${LEVEL_EMOJIS[Math.min(getLevelFromXp(u.xp||0)-1,LEVEL_EMOJIS.length-1)]}</div>
+      <div class="user-info">
+        <div class="user-name">${escHtml(u.username)} ${u.admin?'<span class="tag admin">ADMIN</span>':''} ${u.banned?'<span class="tag banned">BANNED</span>':''} ${u.username===ADMIN_USERNAME?'<span class="tag owner">OWNER</span>':''}</div>
+        <div class="user-meta">
+          <span>Lv${getLevelFromXp(u.xp||0)} — ${LEVEL_TITLES[Math.min(getLevelFromXp(u.xp||0)-1,LEVEL_TITLES.length-1)]}</span>
+          <span>⚡ ${(u.xp||0).toLocaleString()} XP</span>
+          ${u.loginStreak?`<span>🔥 ${u.loginStreak}d streak</span>`:''}
+          ${u.banReason?`<span style="color:var(--danger);">Grund: ${escHtml(u.banReason)}</span>`:''}
+        </div>
+      </div>
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+        <button class="btn xs" onclick="quickUserDetail('${uid}')">👁️</button>
+        <button class="btn xs blue" onclick="quickXPEdit('${uid}','${escHtml(u.username)}')">⚡ XP</button>
+        ${u.banned
+          ?`<button class="btn xs" onclick="unbanUserById('${uid}','${escHtml(u.username)}')">✅ Entbannen</button>`
+          :`<button class="btn xs red" onclick="banUserById('${uid}','${escHtml(u.username)}')">🚫 Bannen</button>`
+        }
+        ${u.username!==ADMIN_USERNAME?`<button class="btn xs ${u.admin?'red orange':'orange'}" onclick="toggleAdminById('${uid}',${!!u.admin},'${escHtml(u.username)}')">${u.admin?'❌ Admin':'👑 Admin'}</button>`:''}
+      </div>
+    </div>`).join(''):`<div class="empty"><span class="empty-icon">👥</span><div class="empty-text">Keine User gefunden</div></div>`;
+}
+async function quickUserDetail(uid){
+  const u=allUsers[uid];if(!u)return;
+  const badges=u.badges?Object.keys(u.badges).join(', '):'keine';
+  const lvl=getLevelFromXp(u.xp||0);
+  openModal(`👤 ${u.username}`,`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.82rem;">
+      <div><b>UID:</b> <span style="color:var(--text2);font-size:0.7rem;">${uid}</span></div>
+      <div><b>Level:</b> ${lvl} — ${LEVEL_TITLES[Math.min(lvl-1,LEVEL_TITLES.length-1)]}</div>
+      <div><b>XP:</b> ${(u.xp||0).toLocaleString()}</div>
+      <div><b>Streak:</b> ${u.loginStreak||0} Tage</div>
+      <div><b>Admin:</b> ${u.admin?'✅ JA':'❌ NEIN'}</div>
+      <div><b>Banned:</b> ${u.banned?'🚫 JA':'✅ NEIN'}</div>
+      ${u.banReason?`<div style="grid-column:1/-1;"><b>Ban-Grund:</b> ${escHtml(u.banReason)}</div>`:''}
     </div>
-    <div style="font-family:var(--mono);font-size:.52rem;color:var(--t3);margin-bottom:2px">UID: ${uid}</div>
-    <div style="font-size:.78rem;color:var(--t2)">${vd}</div>
-  </div>
-  <div class="brow">
-    <button class="btn sm ${isAdmin?'r':'y'}" onclick="toggleAdminUID('${uid}',${isAdmin})">${isAdmin?'❌ ADMİN AL':'👑 VER'}</button>
-    <button class="btn sm o" onclick="resetUserVote('${uid}')">🔄 OY KAYDI SİL</button>
-    <button class="btn sm r" onclick="delUser('${uid}','${un}')">🗑️ SİL</button>
-  </div>
-</div>
-<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
-  <div class="fg"><label class="lbl">YENİ İSİM</label><input id="un-${uid}" class="inp sm" value="${un}" style="width:140px"></div>
-  <button class="btn sm" onclick="renameUser('${uid}')">✏️ KAYDET</button>
-  <div class="fg"><label class="lbl">OY KAYDI YAZ</label><input id="uv-${uid}" class="inp sm" placeholder='["Halil"]' style="width:160px"></div>
-  <button class="btn sm b" onclick="setUserVoteRec('${uid}')">📌 YAZ</button>
-</div>
-</div>`;
+    <div style="margin-top:0.8rem;"><b style="font-family:'Press Start 2P';font-size:0.4rem;">BADGES:</b><div style="font-size:0.78rem;color:var(--text2);margin-top:0.3rem;">${badges}</div></div>
+  `);
+}
+function quickXPEdit(uid,username){
+  document.getElementById('xpUser').value=username;
+  showSection('xpeditor',document.querySelectorAll('.nav-item')[6]);
+  setTimeout(()=>loadUserXPData(),300);
+}
+
+// ===== XP EDITOR =====
+let xpTargetUid=null;
+async function loadUserXPData(){
+  const uname=document.getElementById('xpUser').value.trim().toLowerCase();
+  if(!uname)return;
+  if(!cachedUsers){const s=await fbDb.ref('users').once('value');allUsers=s.val()||{};cachedUsers=allUsers;}
+  const uid=uidFromUsername(uname);
+  if(!uid){setMsg('xpMsg','❌ User nicht gefunden!!');return;}
+  xpTargetUid=uid;
+  const u=allUsers[uid];
+  const xp=u.xp||0;const lvl=getLevelFromXp(xp);
+  const inLvl=getCurrentXpInLevel(xp);const needed=getXpNeededForNextLevel(xp);
+  const pct=Math.min((inLvl/needed)*100,100);
+  document.getElementById('xpuName').textContent=u.username;
+  document.getElementById('xpuLevel').textContent='Lv'+lvl;
+  document.getElementById('xpuTitle').textContent=LEVEL_TITLES[Math.min(lvl-1,LEVEL_TITLES.length-1)]+' '+LEVEL_EMOJIS[Math.min(lvl-1,LEVEL_EMOJIS.length-1)];
+  document.getElementById('xpuBar').style.width=pct+'%';
+  document.getElementById('xpuCurrent').textContent=inLvl.toLocaleString()+' XP';
+  document.getElementById('xpuNext').textContent='/ '+needed.toLocaleString()+' XP';
+  document.getElementById('xpuTotal').textContent=xp.toLocaleString();
+  document.getElementById('xpUserInfo').style.display='block';
+  document.getElementById('xpSet').value=xp;
+  setMsg('xpMsg','✅ User geladen: '+u.username);
+}
+async function doAddXP(){
+  if(!xpTargetUid){setMsg('xpMsg','⚠️ User erst laden!!');return;}
+  const amount=parseInt(document.getElementById('xpAdd').value)||0;
+  if(amount<=0){setMsg('xpMsg','⚠️ Menge > 0!!');return;}
+  const cur=(allUsers[xpTargetUid]?.xp)||0;
+  const newXP=cur+amount;
+  await fbDb.ref('users/'+xpTargetUid+'/xp').set(newXP);
+  allUsers[xpTargetUid].xp=newXP;
+  toast(`✅ +${amount} XP für ${allUsers[xpTargetUid].username}!!`);
+  setMsg('xpMsg','✅ +'+amount+' XP hinzugefügt!! Total: '+newXP);
+  loadUserXPData();
+}
+async function doRemoveXP(){
+  if(!xpTargetUid){setMsg('xpMsg','⚠️ User erst laden!!');return;}
+  const amount=parseInt(document.getElementById('xpRemove').value)||0;
+  if(amount<=0){setMsg('xpMsg','⚠️ Menge > 0!!');return;}
+  const cur=(allUsers[xpTargetUid]?.xp)||0;
+  const newXP=Math.max(0,cur-amount);
+  await fbDb.ref('users/'+xpTargetUid+'/xp').set(newXP);
+  allUsers[xpTargetUid].xp=newXP;
+  toast(`✅ -${amount} XP von ${allUsers[xpTargetUid].username}`,'warn');
+  setMsg('xpMsg','✅ -'+amount+' XP entfernt!! Total: '+newXP);
+  loadUserXPData();
+}
+async function doSetXP(){
+  if(!xpTargetUid){setMsg('xpMsg','⚠️ User erst laden!!');return;}
+  const newXP=parseInt(document.getElementById('xpSet').value)||0;
+  if(newXP<0){setMsg('xpMsg','⚠️ XP >= 0!!');return;}
+  if(!confirm(`XP von "${allUsers[xpTargetUid].username}" auf ${newXP} setzen?`))return;
+  await fbDb.ref('users/'+xpTargetUid+'/xp').set(newXP);
+  allUsers[xpTargetUid].xp=newXP;
+  toast('✅ XP auf '+newXP+' gesetzt!!');
+  setMsg('xpMsg','✅ XP auf '+newXP+' gesetzt!!');
+  loadUserXPData();
+}
+async function doSetStreak(){
+  if(!xpTargetUid){setMsg('xpMsg','⚠️ User erst laden!!');return;}
+  const s=parseInt(document.getElementById('streakSet').value)||0;
+  await fbDb.ref('users/'+xpTargetUid+'/loginStreak').set(s);
+  toast('✅ Streak auf '+s+' gesetzt!!');
+  setMsg('xpMsg','✅ Streak = '+s+' gesetzt!!');
+}
+async function loadXPOverview(){
+  const el=document.getElementById('xpOverview');
+  el.innerHTML='<div class="loading"><span class="spin"></span>Laden...</div>';
+  if(!cachedUsers){const s=await fbDb.ref('users').once('value');allUsers=s.val()||{};cachedUsers=allUsers;}
+  const entries=Object.values(allUsers).filter(u=>u.username).sort((a,b)=>(b.xp||0)-(a.xp||0));
+  el.innerHTML=`<div class="data-table" style="width:100%;overflow-x:auto;"><table class="data-table" style="width:100%;">
+    <thead><tr><th>USERNAME</th><th>LEVEL</th><th>TOTAL XP</th><th>TITLE</th><th>STATUS</th></tr></thead>
+    <tbody>${entries.map(u=>{const lvl=getLevelFromXp(u.xp||0);return`<tr>
+      <td style="font-weight:900;">${escHtml(u.username)}</td>
+      <td><span class="xp-badge-big">Lv${lvl}</span></td>
+      <td style="font-family:'Press Start 2P';font-size:0.45rem;color:var(--accent);">${(u.xp||0).toLocaleString()}</td>
+      <td style="font-size:0.75rem;color:var(--text2);">${LEVEL_TITLES[Math.min(lvl-1,LEVEL_TITLES.length-1)]}</td>
+      <td>${u.admin?'<span class="tag admin">ADMIN</span>':''}${u.banned?'<span class="tag banned">BANNED</span>':''}</td>
+    </tr>`;}).join('')}</tbody>
+  </table></div>`;
+}
+
+// ===== BADGES =====
+let badgeTargetUid=null;
+async function loadUserBadges(){
+  const uname=document.getElementById('badgeUser').value.trim().toLowerCase();
+  if(!uname){toast('⚠️ Username eingeben!!','warn');return;}
+  if(!cachedUsers){const s=await fbDb.ref('users').once('value');allUsers=s.val()||{};cachedUsers=allUsers;}
+  const uid=uidFromUsername(uname);
+  if(!uid){toast('❌ User nicht gefunden!!','error');return;}
+  badgeTargetUid=uid;
+  const u=allUsers[uid];
+  document.getElementById('badgeUserName').innerHTML=`<span style="font-weight:900;">${escHtml(u.username)}</span> <span style="color:var(--text2);">— ${Object.keys(u.badges||{}).length} Badges</span>`;
+  loadBadgeGrid(u.badges||{});
+}
+function loadBadgeGrid(userBadges){
+  const el=document.getElementById('badgeGrid');
+  el.innerHTML=ALL_BADGES.map(b=>{
+    const earned=userBadges&&userBadges[b.id];
+    return `<div class="badge-item${earned?' earned':''}">
+      <span class="badge-emoji">${b.emoji}</span>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-desc">${b.desc}</div>
+      ${badgeTargetUid?`<div class="btn-row" style="margin-top:0.5rem;justify-content:center;">
+        ${earned
+          ?`<button class="btn xs red" onclick="revokeBadge('${b.id}')">✕ Entziehen</button>`
+          :`<button class="btn xs" onclick="awardBadge('${b.id}')">+ Geben</button>`
+        }
+      </div>`:''}
+    </div>`;
   }).join('');
 }
-async function toggleAdminUID(uid,isAdmin){await fbSet('/users/'+uid+'/admin',!isAdmin);if(DB.users[uid])DB.users[uid].admin=!isAdmin;renderUsers();toast(isAdmin?'❌ Admin alındı':'👑 Admin verildi');}
-async function resetUserVote(uid){const week=wk();await fbDel('/users/'+uid+'/voted/'+week);if(DB.users[uid]&&DB.users[uid].voted)delete DB.users[uid].voted[week];renderUsers();toast('🔄 Oy kaydı silindi');}
-async function delUser(uid,un){showModal('SİL',`"${un}" silinsin mi?`,async()=>{await fbDel('/users/'+uid);await fbDel('/usernames/'+un.toLowerCase());delete DB.users[uid];renderUsers();toast(`🗑️ ${un}`,'w');});}
-async function renameUser(uid){const nn=document.getElementById('un-'+uid).value.trim();if(!nn){toast('İsim gir!','e');return;}const old=DB.users[uid]?DB.users[uid].username:null;await fbSet('/users/'+uid+'/username',nn);if(old)await fbDel('/usernames/'+old.toLowerCase());await fbSet('/usernames/'+nn.toLowerCase(),uid);if(DB.users[uid])DB.users[uid].username=nn;renderUsers();toast(`✏️ ${old}→${nn}`);}
-async function setUserVoteRec(uid){const val=document.getElementById('uv-'+uid).value.trim();if(!val){toast('Değer gir!','e');return;}const week=wk();await fbSet('/users/'+uid+'/voted/'+week,val);if(DB.users[uid]){if(!DB.users[uid].voted)DB.users[uid].voted={};DB.users[uid].voted[week]=val;}renderUsers();toast('📌 Oy kaydı yazıldı');}
-async function resetAllVoted(){showModal('TOPLU SIFIRLA','Tüm kullanıcıların oy kaydı silinsin mi?',async()=>{const week=wk();await Promise.all(Object.keys(DB.users).map(uid=>{if(DB.users[uid]&&DB.users[uid].voted&&DB.users[uid].voted[week]){delete DB.users[uid].voted[week];return fbDel('/users/'+uid+'/voted/'+week);}return Promise.resolve();}));renderUsers();toast('🔄 Tüm oy kayıtları silindi','w');});}
-
-// ─ Raw ─
-function renderRaw(){
-  const s=(document.getElementById('rs')||{}).value||'all';
-  let d;if(s==='votes7d')d=DB.votes;else if(s==='users')d=DB.users;else if(s==='usernames')d=DB.usernames;else d=DB;
-  const box=document.getElementById('rawBox');if(box)box.textContent=JSON.stringify(d,null,2);
+async function awardBadge(badgeId){
+  if(!badgeTargetUid){toast('⚠️ User laden!!','warn');return;}
+  await fbDb.ref('users/'+badgeTargetUid+'/badges/'+badgeId).set(true);
+  if(!allUsers[badgeTargetUid].badges)allUsers[badgeTargetUid].badges={};
+  allUsers[badgeTargetUid].badges[badgeId]=true;
+  toast('✅ Badge vergeben: '+badgeId);
+  loadBadgeGrid(allUsers[badgeTargetUid].badges);
 }
-function copyRaw(){const s=document.getElementById('rs').value;let d;if(s==='votes7d')d=DB.votes;else if(s==='users')d=DB.users;else if(s==='usernames')d=DB.usernames;else d=DB;navigator.clipboard.writeText(JSON.stringify(d,null,2)).then(()=>toast('📋 Kopyalandı'));}
-function dlRaw(){const s=document.getElementById('rs').value;let d;if(s==='votes7d')d=DB.votes;else if(s==='users')d=DB.users;else if(s==='usernames')d=DB.usernames;else d=DB;const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`7dzone-${s}-${Date.now()}.json`;a.click();URL.revokeObjectURL(u);toast('💾 İndiriliyor');}
-
-// ─ Writer ─
-async function wGet(){const p=document.getElementById('w-path').value.trim();if(!p){toast('Path gir!','e');return;}const d=await fbGet(p);showWRes(d);toast('👁️ Okundu','i');}
-async function wSet(){const p=document.getElementById('w-path').value.trim();let v=document.getElementById('w-val').value.trim();if(!p){toast('Path gir!','e');return;}v=parseVal(v);const r=await fbSet(p,v);showWRes(r);toast('📌 Yazıldı');R();}
-async function wPatch(){const p=document.getElementById('w-path').value.trim();let v=document.getElementById('w-val').value.trim();if(!p){toast('Path gir!','e');return;}try{v=JSON.parse(v);}catch{toast('Geçersiz JSON!','e');return;}const r=await fbPatch(p,v);showWRes(r);toast('🔄 Güncellendi');R();}
-async function wDel(){const p=document.getElementById('w-path').value.trim();if(!p){toast('Path gir!','e');return;}showModal('SİL',`"${p}" silinsin mi?`,async()=>{await fbDel(p);showWRes(null);toast('🗑️ Silindi','w');R();});}
-function showWRes(d){document.getElementById('wRes').style.display='block';document.getElementById('wResContent').textContent=JSON.stringify(d,null,2);}
-function buildPathHints(){
-  const ph=['/votes7d','/votes7d/halil','/users','/usernames','/voteWeekMarker'];
-  const el=document.getElementById('pathHints');if(!el)return;
-  el.innerHTML=ph.map(p=>`<div class="phint" onclick="document.getElementById('w-path').value='${p}'">${p}</div>`).join('');
+async function revokeBadge(badgeId){
+  if(!badgeTargetUid)return;
+  await fbDb.ref('users/'+badgeTargetUid+'/badges/'+badgeId).remove();
+  delete allUsers[badgeTargetUid].badges[badgeId];
+  toast('✅ Badge entzogen: '+badgeId,'warn');
+  loadBadgeGrid(allUsers[badgeTargetUid].badges);
 }
 
-// ─ Danger ─
-async function nuke(){showModal('💣 TAM NUKE','votes7d + voted + weekMarker SİLİNECEK!',async()=>{const week=wk();await fbDel('/votes7d');await fbDel('/voteWeekMarker');await Promise.all(Object.keys(DB.users).map(uid=>fbDel('/users/'+uid+'/voted/'+week)));DB.votes={};Object.values(DB.users).forEach(u=>{if(u&&u.voted)delete u.voted[week];});renderVotes();renderUsers();fillSelects();toast('💣 NUKE tamam','w');});}
-async function delByUid(){const uid=document.getElementById('d-uid').value.trim();if(!uid){toast('UID gir!','e');return;}showModal('SİL',`UID: "${uid}" silinsin mi?`,async()=>{await fbDel('/users/'+uid);delete DB.users[uid];renderUsers();toast('🗑️ Silindi','w');});}
-async function zeroAll(){showModal('SIFIRLA','Tüm oylar 0 yapılsın mı?',async()=>{for(const k of Object.keys(DB.votes)){await fbSet('/votes7d/'+k,0);DB.votes[k]=0;}renderVotes();toast('📭 Tümü 0','w');});}
-
-// ─ UI ─
-function T(name,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.getElementById('p-'+name).classList.add('on');
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
-  if(btn)btn.classList.add('on');
-  if(name==='raw')renderRaw();
-  if(name==='tools')calcStats();
-  window.scrollTo({top:0,behavior:'smooth'});
+// ===== BANS =====
+async function loadBans(){
+  document.getElementById('banList').innerHTML='<div class="loading"><span class="spin"></span>Laden...</div>';
+  document.getElementById('fullUserList').innerHTML='<div class="loading"><span class="spin"></span>Laden...</div>';
+  try{
+    const snap=await fbDb.ref('users').once('value');
+    allUsers=snap.val()||{};cachedUsers=allUsers;
+    const banned=Object.entries(allUsers).filter(([,u])=>u.banned&&u.username);
+    document.getElementById('banList').innerHTML=banned.length?banned.map(([uid,u])=>`
+      <div class="user-row banned">
+        <div class="user-avatar">🚫</div>
+        <div class="user-info">
+          <div class="user-name">${escHtml(u.username)} <span class="tag banned">BANNED</span></div>
+          ${u.banReason?`<div style="font-size:0.75rem;color:var(--danger);">Grund: ${escHtml(u.banReason)}</div>`:''}
+        </div>
+        <button class="btn xs" onclick="unbanUserById('${uid}','${escHtml(u.username)}')">✅ Entbannen</button>
+      </div>`).join(''):`<div class="empty"><span class="empty-icon">✅</span><div class="empty-text">Keine gebannten User</div></div>`;
+    // Full user list
+    const all=Object.entries(allUsers).filter(([,u])=>u.username&&u.username!==ADMIN_USERNAME).sort((a,b)=>(b[1].xp||0)-(a[1].xp||0));
+    document.getElementById('fullUserList').innerHTML=all.map(([uid,u])=>`
+      <div class="user-row${u.banned?' banned':''}">
+        <div class="user-info">
+          <div class="user-name">${escHtml(u.username)} ${u.admin?'<span class="tag admin">ADMIN</span>':''} ${u.banned?'<span class="tag banned">BANNED</span>':''}</div>
+          <div style="font-size:0.72rem;color:var(--text2);">⚡ ${(u.xp||0).toLocaleString()} XP · Lv${getLevelFromXp(u.xp||0)}</div>
+        </div>
+        <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
+          ${u.banned
+            ?`<button class="btn xs" onclick="unbanUserById('${uid}','${escHtml(u.username)}')">✅ Entbannen</button>`
+            :`<button class="btn xs red" onclick="banUserById('${uid}','${escHtml(u.username)}')">🚫 Bannen</button>`
+          }
+          ${!u.admin?`<button class="btn xs orange" onclick="toggleAdminById('${uid}',false,'${escHtml(u.username)}')">👑 Admin</button>`:
+            `<button class="btn xs red" style="border-color:var(--warn);color:var(--warn);" onclick="toggleAdminById('${uid}',true,'${escHtml(u.username)}')">✕ Admin</button>`}
+        </div>
+      </div>`).join('');
+  }catch(e){toast('❌ Fehler: '+e.message,'error');}
 }
-function toast(msg,t){const el=document.createElement('div');el.className='toast '+(t||'');el.textContent=msg;document.getElementById('tc').appendChild(el);setTimeout(()=>{if(el.parentNode)el.parentNode.removeChild(el);},3000);}
-function log(msg,t){logN++;const l=document.createElement('div');l.className='ll';l.innerHTML=`<span class="lt">${new Date().toLocaleTimeString('tr')}</span><span class="lm ${t||''}">${msg}</span>`;const i=document.getElementById('logInner');i.appendChild(l);i.scrollTop=i.scrollHeight;document.getElementById('logToggle').textContent=`▲ LOG (${logN})`;}
-let logOpen=false;
-function toggleLog(){logOpen=!logOpen;document.getElementById('logBox').classList.toggle('on',logOpen);document.getElementById('logToggle').textContent=(logOpen?'▼':'▲')+` LOG (${logN})`;}
-function showModal(title,body,cb){document.getElementById('mt').textContent=title;document.getElementById('mb').textContent=body;document.getElementById('modal').classList.add('on');mcb=cb;}
-function cModal(){document.getElementById('modal').classList.remove('on');mcb=null;}
-document.getElementById('mok').onclick=async()=>{if(mcb)await mcb();cModal();};
-document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))cModal();});
+async function doBanUser(){
+  const uname=document.getElementById('banUsername').value.trim();
+  const reason=document.getElementById('banReason').value.trim()||'Du wurdest von einem Admin gesperrt.';
+  if(!uname){setMsg('banMsg','⚠️ Username eingeben!!');return;}
+  if(!cachedUsers){const s=await fbDb.ref('users').once('value');allUsers=s.val()||{};cachedUsers=allUsers;}
+  const uid=uidFromUsername(uname);
+  if(!uid){setMsg('banMsg','❌ User nicht gefunden!!');return;}
+  if(!confirm(`"${uname}" wirklich bannen?\nGrund: ${reason}`))return;
+  await fbDb.ref('users/'+uid+'/banned').set(true);
+  await fbDb.ref('users/'+uid+'/banReason').set(reason);
+  allUsers[uid].banned=true;allUsers[uid].banReason=reason;
+  toast('🚫 '+uname+' wurde gebannt!!','warn');
+  setMsg('banMsg','🚫 '+uname+' gebannt!!');
+  document.getElementById('banUsername').value='';document.getElementById('banReason').value='';
+  loadBans();
+}
+async function banUserById(uid,username){
+  const reason=prompt(`Grund für Ban von "${username}":`)||'Du wurdest von einem Admin gesperrt.';
+  if(!confirm(`"${username}" wirklich bannen?`))return;
+  await fbDb.ref('users/'+uid+'/banned').set(true);
+  await fbDb.ref('users/'+uid+'/banReason').set(reason);
+  if(allUsers[uid]){allUsers[uid].banned=true;allUsers[uid].banReason=reason;}
+  toast('🚫 '+username+' gebannt!!','warn');
+  loadBans();loadUsers();
+}
+async function unbanUserById(uid,username){
+  if(!confirm(`"${username}" entsperren?`))return;
+  await fbDb.ref('users/'+uid+'/banned').remove();
+  await fbDb.ref('users/'+uid+'/banReason').remove();
+  if(allUsers[uid]){delete allUsers[uid].banned;delete allUsers[uid].banReason;}
+  toast('✅ '+username+' entsperrt!!');
+  loadBans();loadUsers();
+}
+async function toggleAdminById(uid,isAdmin,username){
+  if(!confirm(`Admin-Rechte von "${username}" ${isAdmin?'entziehen':'geben'}?`))return;
+  await fbDb.ref('users/'+uid+'/admin').set(!isAdmin);
+  if(allUsers[uid])allUsers[uid].admin=!isAdmin;
+  toast((isAdmin?'✅ Admin entfernt: ':'👑 Admin gegeben: ')+username);
+  loadBans();loadUsers();
+}
+async function doAdminToggle(give){
+  const uname=document.getElementById('adminToggleUser').value.trim().toLowerCase();
+  if(!uname){setMsg('adminToggleMsg','⚠️ Username eingeben!!');return;}
+  if(!cachedUsers){const s=await fbDb.ref('users').once('value');allUsers=s.val()||{};cachedUsers=allUsers;}
+  const uid=uidFromUsername(uname);
+  if(!uid){setMsg('adminToggleMsg','❌ User nicht gefunden!!');return;}
+  await fbDb.ref('users/'+uid+'/admin').set(give);
+  if(allUsers[uid])allUsers[uid].admin=give;
+  toast((give?'👑 Admin gegeben: ':'✅ Admin entfernt: ')+uname);
+  setMsg('adminToggleMsg',(give?'👑 Admin gegeben: ':'✅ Admin entfernt: ')+uname);
+}
 
-R();log('7D Zone Admin v3 başlatıldı','i');
+// ===== CHAT =====
+let chatData={};
+async function loadChatMessages(){
+  document.getElementById('chatList').innerHTML='<div class="loading"><span class="spin"></span>Laden...</div>';
+  try{
+    const snap=await fbDb.ref('chat7d').orderByChild('ts').limitToLast(100).once('value');
+    chatData=snap.val()||{};
+    renderChat(chatData);
+  }catch(e){toast('❌ '+e.message,'error');}
+}
+function renderChat(data){
+  const msgs=Object.entries(data).sort((a,b)=>b[1].ts-a.ts);
+  document.getElementById('chatCount').textContent=msgs.length+' Nachrichten';
+  document.getElementById('chatList').innerHTML=msgs.length?msgs.map(([key,m])=>`
+    <div class="chat-msg${m.uid==='SYSTEM'?' system':''}" id="cm-${key}">
+      <div class="msg-user">${escHtml(m.name||'?')}</div>
+      <div class="msg-text">${escHtml(m.text)}</div>
+      <div class="msg-time">${fmtTime(m.ts)}</div>
+      <button class="msg-del" onclick="deleteChatMsg('${key}')" title="Löschen">🗑️</button>
+    </div>`).join(''):`<div class="empty"><span class="empty-icon">💬</span><div class="empty-text">Keine Nachrichten</div></div>`;
+}
+function filterChat(){
+  const q=(document.getElementById('chatSearch')?.value||'').toLowerCase();
+  if(!q){renderChat(chatData);return;}
+  const filtered=Object.fromEntries(Object.entries(chatData).filter(([,m])=>(m.text||'').toLowerCase().includes(q)||(m.name||'').toLowerCase().includes(q)));
+  renderChat(filtered);
+}
+async function deleteChatMsg(key){
+  if(!confirm('Nachricht löschen?'))return;
+  await fbDb.ref('chat7d/'+key).remove();
+  delete chatData[key];
+  renderChat(chatData);
+  toast('✅ Nachricht gelöscht!!');
+}
+async function clearAllChat(){
+  if(!confirm('KOMPLETTEN CHATVERLAUF WIRKLICH LÖSCHEN??\nDas kann nicht rückgängig gemacht werden!!'))return;
+  await fbDb.ref('chat7d').remove();
+  chatData={};renderChat(chatData);
+  toast('🗑️ Chat geleert!!','warn');
+}
+
+// ===== ANNOUNCEMENTS =====
+async function loadAnnouncements(){
+  document.getElementById('annList').innerHTML='<div class="loading"><span class="spin"></span>Laden...</div>';
+  try{
+    const snap=await fbDb.ref('announcements7d').once('value');
+    const data=snap.val()||{};
+    const entries=Object.entries(data).sort((a,b)=>b[1].ts-a[1].ts);
+    document.getElementById('annList').innerHTML=entries.length?entries.map(([key,a])=>`
+      <div class="ann-item">
+        <div style="font-size:1.5rem;">📢</div>
+        <div style="flex:1;">
+          <div class="ann-text">${escHtml(a.text)}</div>
+          <div class="ann-meta">von ${escHtml(a.author||'?')} · ${fmtTime(a.ts)}</div>
+        </div>
+        <button class="btn xs red" onclick="deleteAnnouncement('${key}')">🗑️</button>
+      </div>`).join(''):`<div class="empty"><span class="empty-icon">📭</span><div class="empty-text">Keine Ankündigungen</div></div>`;
+  }catch(e){toast('❌ '+e.message,'error');}
+}
+async function sendAnnouncement(){
+  const text=document.getElementById('annText').value.trim();
+  const msg=document.getElementById('annMsg');
+  if(!text){setMsg('annMsg','⚠️ Text eingeben!!');return;}
+  if(text.length>300){setMsg('annMsg','⚠️ Max 300 Zeichen!!');return;}
+  setMsg('annMsg','⏳ Senden...');
+  try{
+    const key=fbDb.ref('announcements7d').push().key;
+    await fbDb.ref('announcements7d/'+key).set({text,author:adminUser.username,ts:Date.now()});
+    const chatKey=fbDb.ref('chat7d').push().key;
+    await fbDb.ref('chat7d/'+chatKey).set({uid:'SYSTEM',name:'📢 ADMIN',text:'📢 ANKÜNDIGUNG: '+text,ts:Date.now(),isAnnouncement:true});
+    document.getElementById('annText').value='';
+    setMsg('annMsg','✅ Ankündigung gesendet!!');
+    toast('📢 Ankündigung gesendet!!');
+    loadAnnouncements();
+  }catch(e){setMsg('annMsg','❌ Fehler: '+e.message);}
+}
+async function deleteAnnouncement(key){
+  if(!confirm('Ankündigung löschen?'))return;
+  await fbDb.ref('announcements7d/'+key).remove();
+  loadAnnouncements();
+  toast('✅ Gelöscht!!');
+}
+async function deleteAllAnnouncements(){
+  if(!confirm('ALLE Ankündigungen löschen?'))return;
+  await fbDb.ref('announcements7d').remove();
+  loadAnnouncements();
+  toast('🗑️ Alle Ankündigungen gelöscht!!','warn');
+}
+
+// ===== VOTES =====
+async function loadVotes(){
+  document.getElementById('voteList').innerHTML='<div class="loading"><span class="spin"></span>Laden...</div>';
+  try{
+    const snap=await fbDb.ref('votes7d').once('value');
+    const data=snap.val()||{};
+    const entries=Object.entries(data).sort((a,b)=>b[1]-a[1]);
+    document.getElementById('voteList').innerHTML=entries.length?entries.map(([k,v])=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0.4rem 0.6rem;background:var(--card2);border:1px solid var(--border);border-radius:8px;margin-bottom:0.3rem;">
+        <span style="font-weight:700;font-size:0.82rem;">${escHtml(k)}</span>
+        <span style="font-family:'Press Start 2P';font-size:0.45rem;color:var(--accent);">${v} votes</span>
+      </div>`).join(''):`<div class="empty"><span class="empty-icon">🗳️</span><div class="empty-text">Keine Votes</div></div>`;
+  }catch(e){toast('❌ '+e.message,'error');}
+}
+function loadVotePersonSelect(){
+  const sel=document.getElementById('votePersonSel');if(!sel)return;
+  sel.innerHTML=HOF_MEMBERS_DEFAULT.map(m=>`<option value="${escHtml(m.name)}">${escHtml(m.name)}</option>`).join('');
+}
+async function giveVotes(dir){
+  const person=document.getElementById('votePersonSel').value;
+  const amount=(parseInt(document.getElementById('voteAmount').value)||1)*dir;
+  const el=document.getElementById('voteMsg');
+  if(!person){setMsg('voteMsg','⚠️ Person auswählen!!');return;}
+  setMsg('voteMsg','⏳...');
+  const k=voteKey(person);
+  await fbDb.ref('votes7d/'+k).transaction(cur=>{const n=(cur||0)+amount;return n<0?0:n;});
+  setMsg('voteMsg',(dir>0?'✅ +'+Math.abs(amount):' ➖ '+Math.abs(amount))+' votes für '+person+'!!');
+  toast((dir>0?'✅ ':'➖ ')+Math.abs(amount)+' Votes für '+person);
+  loadVotes();
+}
+async function resetVotes(){
+  if(!confirm('ALLE VOTES WIRKLICH LÖSCHEN?? Auch User-Vote-Status?'))return;
+  await fbDb.ref('votes7d').remove();
+  const snap=await fbDb.ref('users').once('value');
+  const users=snap.val()||{};
+  const week=getWeekKey();
+  await Promise.all(Object.keys(users).map(uid=>fbDb.ref('users/'+uid+'/voted/'+week).remove()));
+  toast('🗑️ Alle Votes resettet!!','warn');
+  loadVotes();
+}
+async function resetUserVote(){
+  const uname=document.getElementById('voteResetUser').value.trim().toLowerCase();
+  if(!uname){toast('⚠️ Username eingeben!!','warn');return;}
+  if(!cachedUsers){const s=await fbDb.ref('users').once('value');allUsers=s.val()||{};cachedUsers=allUsers;}
+  const uid=uidFromUsername(uname);
+  if(!uid){toast('❌ User nicht gefunden!!','error');return;}
+  const week=getWeekKey();
+  await fbDb.ref('users/'+uid+'/voted/'+week).remove();
+  toast('✅ Vote-Status von '+uname+' resettet!!');
+  setMsg('voteMsg','✅ Vote von '+uname+' resettet!!');
+}
+
+// ===== HOF EDITOR =====
+function renderHofEditor(){
+  const ml=document.getElementById('hofMemberList');
+  ml.innerHTML=hofMembers.map((m,i)=>`
+    <div class="hof-item">
+      <div class="hof-emoji">${m.emoji||'👤'}</div>
+      <div class="hof-info">
+        <div class="hof-name-text">${escHtml(m.name)}</div>
+        <div class="hof-title-text">${escHtml(m.title)}</div>
+      </div>
+      <button class="btn xs red" onclick="removeHofMember(${i})">✕</button>
+    </div>`).join('');
+  const ql=document.getElementById('hofQuoteList');
+  ql.innerHTML=hofQuotes.map((q,i)=>`
+    <div style="padding:0.6rem 0.7rem;background:var(--card2);border:1px solid var(--border);border-radius:10px;margin-bottom:0.35rem;">
+      <div style="font-size:0.82rem;font-style:italic;margin-bottom:0.2rem;">"${escHtml(q.text)}"</div>
+      <div style="font-size:0.7rem;color:var(--text2);">${escHtml(q.author)}</div>
+      <button class="btn xs red" onclick="removeHofQuote(${i})" style="margin-top:0.3rem;">✕</button>
+    </div>`).join('');
+}
+function addHofMember(){
+  const name=document.getElementById('hofNewName').value.trim();
+  const title=document.getElementById('hofNewTitle').value.trim()||'Klassen-Mitglied';
+  const emoji=document.getElementById('hofNewEmoji').value.trim()||'⭐';
+  if(!name){toast('⚠️ Name eingeben!!','warn');return;}
+  hofMembers.push({name,title,emoji});
+  document.getElementById('hofNewName').value='';document.getElementById('hofNewTitle').value='';document.getElementById('hofNewEmoji').value='';
+  renderHofEditor();toast('✅ Mitglied hinzugefügt: '+name);
+}
+function removeHofMember(i){hofMembers.splice(i,1);renderHofEditor();toast('✅ Mitglied entfernt!!','warn');}
+function addHofQuote(){
+  const text=document.getElementById('hofNewQuote').value.trim();
+  const author=document.getElementById('hofNewAuthor').value.trim()||'— Unbekannt';
+  if(!text){toast('⚠️ Zitat eingeben!!','warn');return;}
+  hofQuotes.push({text,author});
+  document.getElementById('hofNewQuote').value='';document.getElementById('hofNewAuthor').value='';
+  renderHofEditor();toast('✅ Zitat hinzugefügt!!');
+}
+function removeHofQuote(i){hofQuotes.splice(i,1);renderHofEditor();toast('✅ Zitat entfernt!!','warn');}
+async function saveHofToFirebase(){
+  setMsg('hofMsg','⏳ Speichern...');
+  try{
+    await fbDb.ref('hofConfig').set({members:hofMembers,quotes:hofQuotes,updatedBy:adminUser.username,updatedAt:Date.now()});
+    setMsg('hofMsg','✅ Gespeichert!!');
+    toast('💾 HoF in Firebase gespeichert!!');
+  }catch(e){setMsg('hofMsg','❌ Fehler: '+e.message);}
+}
+async function loadHofFromFirebase(){
+  setMsg('hofMsg','⏳ Laden...');
+  try{
+    const snap=await fbDb.ref('hofConfig').once('value');
+    const data=snap.val();
+    if(data&&data.members)hofMembers=data.members;
+    if(data&&data.quotes)hofQuotes=data.quotes;
+    renderHofEditor();
+    setMsg('hofMsg','✅ Aus Datenbank geladen!!');
+    toast('🔄 HoF geladen!!');
+  }catch(e){setMsg('hofMsg','❌ Fehler: '+e.message);}
+}
+
+// ===== CHALLENGES =====
+function loadChallengesDefs(){
+  const el=document.getElementById('challengeDefs');
+  if(!el)return;
+  el.innerHTML=CHALLENGE_DEFS.map(c=>`
+    <div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:1.2rem;">${c.icon}</span>
+      <div style="flex:1;">
+        <div style="font-weight:900;font-size:0.8rem;">${escHtml(c.title)}</div>
+        <div style="font-size:0.7rem;color:var(--text2);">${escHtml(c.desc)}</div>
+      </div>
+      <span style="font-family:'Press Start 2P';font-size:0.4rem;color:var(--accent);">+${c.xp}XP</span>
+    </div>`).join('');
+}
+async function resetUserChallenges(){
+  const uname=document.getElementById('chUser').value.trim().toLowerCase();
+  const date=document.getElementById('chDate').value||getTodayStr();
+  if(!uname){setMsg('chMsg','⚠️ Username eingeben!!');return;}
+  if(!cachedUsers){const s=await fbDb.ref('users').once('value');allUsers=s.val()||{};cachedUsers=allUsers;}
+  const uid=uidFromUsername(uname);
+  if(!uid){setMsg('chMsg','❌ User nicht gefunden!!');return;}
+  if(!confirm(`Challenges von "${uname}" am ${date} resetten?`))return;
+  await fbDb.ref('users/'+uid+'/challenges/'+date).remove();
+  setMsg('chMsg','✅ Challenges von '+uname+' resettet!!');
+  toast('✅ Challenges resettet!!');
+}
+async function resetTodayChallengeAll(){
+  if(!confirm('Tägliche Challenges für ALLE User resetten??'))return;
+  const today=getTodayStr();
+  const snap=await fbDb.ref('users').once('value');
+  const users=snap.val()||{};
+  await Promise.all(Object.keys(users).map(uid=>fbDb.ref('users/'+uid+'/challenges/'+today).remove()));
+  setMsg('chMsg','✅ Challenges für alle User resettet!!');
+  toast('✅ Challenges für alle resettet!!','warn');
+}
+
+// ===== CONFIG =====
+function loadXPLevelTable(){
+  const el=document.getElementById('xpLevelTable');if(!el)return;
+  el.innerHTML=`<table class="data-table" style="width:100%;">
+    <thead><tr><th>LEVEL</th><th>TITLE</th><th>XP REQ</th><th>EMOJI</th></tr></thead>
+    <tbody>${XP_LEVELS.map((xp,i)=>`<tr>
+      <td><span class="xp-badge-big">Lv${i+1}</span></td>
+      <td style="font-size:0.78rem;">${LEVEL_TITLES[i]||'–'}</td>
+      <td style="font-family:'Press Start 2P';font-size:0.42rem;color:var(--accent);">${xp.toLocaleString()}</td>
+      <td style="font-size:1.1rem;">${LEVEL_EMOJIS[i]||'–'}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+async function nukeChat(){
+  if(!confirm('KOMPLETTEN CHAT LÖSCHEN? Nicht rückgängig machbar!!'))return;
+  await fbDb.ref('chat7d').remove();
+  toast('🗑️ Chat geleert!!','warn');setMsg('configMsg','🗑️ Chat geleert!!');
+}
+async function nukeAnnouncements(){
+  if(!confirm('ALLE ANKÜNDIGUNGEN LÖSCHEN?'))return;
+  await fbDb.ref('announcements7d').remove();
+  toast('🗑️ Ankündigungen gelöscht!!','warn');setMsg('configMsg','🗑️ Ankündigungen geleert!!');
+}
+async function nukeVotes(){
+  if(!confirm('ALLE VOTES LÖSCHEN?'))return;
+  await fbDb.ref('votes7d').remove();
+  toast('🗑️ Votes geleert!!','warn');setMsg('configMsg','🗑️ Votes geleert!!');
+}
+async function exportData(){
+  setMsg('configMsg','⏳ Exportiere...');
+  try{
+    const [usersSnap,chatSnap,annSnap,votesSnap]=await Promise.all([fbDb.ref('users').once('value'),fbDb.ref('chat7d').once('value'),fbDb.ref('announcements7d').once('value'),fbDb.ref('votes7d').once('value')]);
+    const data={users:usersSnap.val(),chat:chatSnap.val(),announcements:annSnap.val(),votes:votesSnap.val(),exportedAt:new Date().toISOString(),exportedBy:adminUser.username};
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='7dzone-export-'+getTodayStr()+'.json';a.click();
+    setMsg('configMsg','✅ Exportiert!!');toast('📤 Daten exportiert!!');
+  }catch(e){setMsg('configMsg','❌ Fehler: '+e.message);}
+}
+
+// ===== LOAD FIREBASE ON PAGE LOAD =====
+window.addEventListener('load',async()=>{
+  try{await loadFirebase();}catch(e){document.getElementById('loginMsg').textContent='❌ Firebase konnte nicht geladen werden!!';}
+});
 </script>
 </body>
 </html>
