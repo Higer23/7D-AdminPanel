@@ -1,1817 +1,967 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>7D ZONE — FIREBASE ADMIN 👑</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>7D ZONE ADMIN v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #020408;
-    --bg2: #060d14;
-    --card: #0a1520;
-    --card2: #0d1e30;
-    --border: #0f2a40;
-    --border2: #1a3a55;
-    --accent: #00ff88;
-    --accent2: #00ccff;
-    --accent3: #ff6600;
-    --danger: #ff3355;
-    --warn: #ffcc00;
-    --purple: #aa44ff;
-    --text: #d0e8f0;
-    --text2: #5a8aa0;
-    --text3: #2a5570;
-    --glow: rgba(0,255,136,0.15);
-    --glow2: rgba(0,204,255,0.15);
-    --font-mono: 'Share Tech Mono', monospace;
-    --font-display: 'Orbitron', sans-serif;
-    --font-body: 'Rajdhani', sans-serif;
-  }
-
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ── GRID BACKGROUND ── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  body::after {
-    content: '';
-    position: fixed; inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,100,60,0.08) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ── SCANLINE ── */
-  .scanline {
-    position: fixed; inset: 0;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 3px,
-      rgba(0,0,0,0.08) 3px,
-      rgba(0,0,0,0.08) 4px
-    );
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.4;
-  }
-
-  /* ── LAYOUT ── */
-  #app { position: relative; z-index: 2; display: flex; flex-direction: column; min-height: 100vh; }
-
-  /* ── TOPBAR ── */
-  #topbar {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(2,4,8,0.96);
-    border-bottom: 1px solid var(--border2);
-    backdrop-filter: blur(20px);
-    padding: 0 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 64px;
-    box-shadow: 0 0 40px rgba(0,0,0,0.8), 0 1px 0 rgba(0,255,136,0.1);
-  }
-
-  .logo-area { display: flex; align-items: center; gap: 14px; }
-  .logo-icon { font-size: 24px; }
-  .logo-text {
-    font-family: var(--font-display);
-    font-size: 0.85rem;
-    font-weight: 900;
-    color: var(--accent);
-    letter-spacing: 0.15em;
-    text-shadow: 0 0 20px var(--accent);
-    line-height: 1.2;
-  }
-  .logo-sub { font-family: var(--font-mono); font-size: 0.55rem; color: var(--text2); letter-spacing: 0.2em; }
-
-  .topbar-right { display: flex; align-items: center; gap: 12px; }
-
-  .status-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 10px var(--accent);
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
-
-  .status-text { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text2); }
-
-  .btn-reload {
-    padding: 8px 18px;
-    background: transparent;
-    border: 1px solid var(--border2);
-    border-radius: 6px;
-    color: var(--text2);
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.1em;
-  }
-  .btn-reload:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 12px var(--glow); }
-
-  /* ── SIDENAV ── */
-  #sidenav {
-    position: fixed; left: 0; top: 64px; bottom: 0;
-    width: 220px;
-    background: rgba(2,4,8,0.98);
-    border-right: 1px solid var(--border);
-    z-index: 50;
-    display: flex; flex-direction: column;
-    padding: 20px 0;
-    overflow-y: auto;
-  }
-
-  .nav-section-label {
-    font-family: var(--font-mono);
-    font-size: 0.5rem;
-    color: var(--text3);
-    letter-spacing: 0.25em;
-    padding: 0 20px;
-    margin-bottom: 8px;
-    margin-top: 16px;
-  }
-  .nav-section-label:first-child { margin-top: 0; }
-
-  .nav-btn {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 20px;
-    background: transparent;
-    border: none; border-left: 2px solid transparent;
-    color: var(--text2);
-    font-family: var(--font-body);
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: left;
-    width: 100%;
-    letter-spacing: 0.05em;
-  }
-  .nav-btn:hover { color: var(--text); background: rgba(0,255,136,0.04); }
-  .nav-btn.active {
-    color: var(--accent);
-    border-left-color: var(--accent);
-    background: rgba(0,255,136,0.06);
-    text-shadow: 0 0 10px var(--glow);
-  }
-  .nav-btn .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
-  .nav-badge {
-    margin-left: auto;
-    background: var(--accent);
-    color: #000;
-    font-size: 0.6rem;
-    font-weight: 700;
-    padding: 1px 6px;
-    border-radius: 100px;
-    font-family: var(--font-mono);
-    min-width: 20px;
-    text-align: center;
-  }
-  .nav-badge.red { background: var(--danger); color: #fff; }
-  .nav-badge.yellow { background: var(--warn); color: #000; }
-
-  .nav-divider { height: 1px; background: var(--border); margin: 10px 20px; }
-
-  /* ── MAIN CONTENT ── */
-  #main {
-    margin-left: 220px;
-    padding: 28px;
-    flex: 1;
-    min-height: calc(100vh - 64px);
-  }
-
-  /* ── PAGE ── */
-  .page { display: none; animation: fadeIn 0.25s ease; }
-  .page.active { display: block; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
-
-  /* ── PAGE HEADER ── */
-  .page-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
-  }
-  .page-title {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.1em;
-  }
-  .page-subtitle { font-size: 0.85rem; color: var(--text2); margin-top: 2px; font-family: var(--font-mono); }
-
-  /* ── STATS ROW ── */
-  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
-
-  .stat-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 20px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-  .stat-card:hover { border-color: var(--border2); }
-  .stat-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: var(--accent);
-    opacity: 0.6;
-  }
-  .stat-card.blue::before { background: var(--accent2); }
-  .stat-card.orange::before { background: var(--accent3); }
-  .stat-card.red::before { background: var(--danger); }
-  .stat-card.purple::before { background: var(--purple); }
-  .stat-card.yellow::before { background: var(--warn); }
-
-  .stat-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text2); letter-spacing: 0.15em; margin-bottom: 8px; }
-  .stat-value { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--text); line-height: 1; }
-  .stat-value.green { color: var(--accent); text-shadow: 0 0 20px var(--glow); }
-  .stat-value.blue { color: var(--accent2); }
-  .stat-value.orange { color: var(--accent3); }
-  .stat-value.red { color: var(--danger); }
-  .stat-value.yellow { color: var(--warn); }
-  .stat-sub { font-size: 0.75rem; color: var(--text3); margin-top: 4px; }
-
-  /* ── CARD ── */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-bottom: 18px;
-    transition: border-color 0.2s;
-  }
-  .card:hover { border-color: var(--border2); }
-  .card-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
-  }
-  .card-title {
-    font-family: var(--font-display);
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--accent2);
-    letter-spacing: 0.15em;
-  }
-
-  /* ── BUTTONS ── */
-  .btn {
-    padding: 8px 18px;
-    border-radius: 7px;
-    border: 1px solid var(--accent);
-    background: transparent;
-    color: var(--accent);
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.08em;
-    white-space: nowrap;
-  }
-  .btn:hover { background: rgba(0,255,136,0.1); box-shadow: 0 0 14px var(--glow); }
-  .btn:active { transform: scale(0.97); }
-
-  .btn.blue { border-color: var(--accent2); color: var(--accent2); }
-  .btn.blue:hover { background: rgba(0,204,255,0.1); box-shadow: 0 0 14px var(--glow2); }
-
-  .btn.red { border-color: var(--danger); color: var(--danger); }
-  .btn.red:hover { background: rgba(255,51,85,0.1); }
-
-  .btn.orange { border-color: var(--accent3); color: var(--accent3); }
-  .btn.orange:hover { background: rgba(255,102,0,0.1); }
-
-  .btn.yellow { border-color: var(--warn); color: var(--warn); }
-  .btn.yellow:hover { background: rgba(255,204,0,0.1); }
-
-  .btn.purple { border-color: var(--purple); color: var(--purple); }
-  .btn.purple:hover { background: rgba(170,68,255,0.1); }
-
-  .btn.solid { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
-  .btn.solid:hover { background: #00ffaa; box-shadow: 0 0 20px var(--glow); }
-
-  .btn.solid-red { background: var(--danger); color: #fff; border-color: var(--danger); font-weight: 700; }
-  .btn.solid-red:hover { background: #ff5577; }
-
-  .btn.big { padding: 12px 24px; font-size: 0.72rem; }
-  .btn.sm { padding: 5px 12px; font-size: 0.58rem; }
-
-  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-
-  /* ── INPUT ── */
-  .input {
-    background: var(--bg2);
-    border: 1px solid var(--border2);
-    border-radius: 7px;
-    padding: 9px 14px;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .input:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--glow); }
-  .input::placeholder { color: var(--text3); }
-
-  label.lbl { font-family: var(--font-mono); font-size: 0.58rem; color: var(--text2); letter-spacing: 0.12em; display: block; margin-bottom: 5px; }
-
-  /* ── VOTE BAR ── */
-  .vote-item {
-    display: grid;
-    grid-template-columns: 2.5rem 1fr auto auto;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 16px;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    margin-bottom: 8px;
-    transition: border-color 0.2s;
-  }
-  .vote-item:hover { border-color: var(--border2); }
-
-  .vote-rank { font-family: var(--font-display); font-size: 0.85rem; text-align: center; }
-  .vote-info { min-width: 0; }
-  .vote-name { font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .vote-bar-wrap { height: 6px; background: var(--border); border-radius: 100px; overflow: hidden; }
-  .vote-bar-fill { height: 100%; border-radius: 100px; transition: width 0.6s cubic-bezier(.4,0,.2,1); }
-
-  .vote-count { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--accent); min-width: 3rem; text-align: right; }
-  .vote-actions { display: flex; gap: 5px; }
-
-  /* ── USER CARD ── */
-  .user-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 10px;
-    transition: border-color 0.2s;
-  }
-  .user-card:hover { border-color: var(--border2); }
-  .user-card.admin-card { border-color: rgba(255,204,0,0.3); }
-
-  .user-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-  .user-name-wrap { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .user-name { font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: var(--text); }
-  .badge {
-    padding: 2px 8px; border-radius: 4px;
-    font-family: var(--font-mono); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em;
-  }
-  .badge.admin { background: var(--warn); color: #000; }
-  .badge.voted { background: rgba(0,255,136,0.15); color: var(--accent); border: 1px solid rgba(0,255,136,0.3); }
-  .badge.not-voted { background: rgba(255,51,85,0.1); color: var(--danger); border: 1px solid rgba(255,51,85,0.3); }
-
-  .user-uid { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text3); margin-top: 2px; }
-  .user-vote-info { font-size: 0.8rem; color: var(--text2); margin-top: 4px; }
-
-  .user-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-  .user-edit-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
-
-  /* ── RAW JSON ── */
-  .json-viewer {
-    background: #020c10;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    line-height: 1.7;
-    white-space: pre-wrap;
-    word-break: break-all;
-    color: #7af0c8;
-    max-height: 600px;
-    overflow-y: auto;
-  }
-  .json-key { color: #00ccff; }
-  .json-str { color: #ffcc66; }
-  .json-num { color: #ff9944; }
-  .json-bool { color: #aa44ff; }
-  .json-null { color: #ff3355; }
-
-  /* ── TOOLS ── */
-  .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
-
-  .tool-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    transition: border-color 0.2s;
-  }
-  .tool-card:hover { border-color: var(--border2); }
-  .tool-card-title {
-    font-family: var(--font-display);
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    margin-bottom: 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
-  }
-  .tool-card-title.green { color: var(--accent); }
-  .tool-card-title.blue { color: var(--accent2); }
-  .tool-card-title.red { color: var(--danger); }
-  .tool-card-title.orange { color: var(--accent3); }
-  .tool-card-title.yellow { color: var(--warn); }
-  .tool-card-title.purple { color: var(--purple); }
-
-  .tool-desc { font-size: 0.8rem; color: var(--text2); margin-bottom: 14px; line-height: 1.6; }
-  .tool-row { display: flex; flex-direction: column; gap: 8px; }
-  .tool-inline { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
-  .field-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 100px; }
-
-  /* ── CONSOLE LOG ── */
-  #consoleBox {
-    position: fixed; bottom: 0; left: 220px; right: 0;
-    height: 0; background: rgba(2,4,8,0.98);
-    border-top: 1px solid var(--border);
-    overflow: hidden;
-    transition: height 0.3s ease;
-    z-index: 60;
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-  }
-  #consoleBox.open { height: 180px; }
-  #consoleToggle {
-    position: fixed; bottom: 0; right: 20px;
-    z-index: 61;
-    padding: 4px 14px;
-    background: rgba(2,4,8,0.98);
-    border: 1px solid var(--border2);
-    border-bottom: none;
-    border-radius: 6px 6px 0 0;
-    color: var(--text2);
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.1em;
-  }
-  #consoleToggle:hover { color: var(--accent); border-color: var(--accent); }
-
-  #consoleInner { height: 100%; padding: 8px 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
-  .log-line { display: flex; gap: 8px; }
-  .log-time { color: var(--text3); flex-shrink: 0; }
-  .log-msg { color: var(--accent); }
-  .log-msg.error { color: var(--danger); }
-  .log-msg.warn { color: var(--warn); }
-  .log-msg.info { color: var(--accent2); }
-
-  /* ── TOAST ── */
-  #toastContainer { position: fixed; top: 76px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-  .toast {
-    padding: 12px 20px;
-    border-radius: 9px;
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    border-left: 3px solid var(--accent);
-    background: rgba(6,13,20,0.98);
-    color: var(--accent);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 20px var(--glow);
-    animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
-    max-width: 320px;
-  }
-  .toast.error { border-left-color: var(--danger); color: var(--danger); box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-  .toast.warn { border-left-color: var(--warn); color: var(--warn); }
-  .toast.info { border-left-color: var(--accent2); color: var(--accent2); }
-  @keyframes slideIn { from{opacity:0;transform:translateX(20px);} to{opacity:1;transform:translateX(0);} }
-  @keyframes fadeOut { from{opacity:1;} to{opacity:0;transform:translateX(20px);} }
-
-  /* ── MODAL ── */
-  #modal {
-    position: fixed; inset: 0; z-index: 500;
-    background: rgba(0,0,0,0);
-    display: flex; align-items: center; justify-content: center;
-    pointer-events: none; transition: background 0.3s;
-  }
-  #modal.open { background: rgba(0,0,0,0.85); pointer-events: all; }
-  #modal-box {
-    background: var(--card);
-    border: 1px solid var(--border2);
-    border-radius: 16px;
-    padding: 28px 32px;
-    max-width: 480px; width: 95%;
-    box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 40px rgba(0,255,136,0.05);
-    transform: scale(0.9); opacity: 0;
-    transition: all 0.3s cubic-bezier(.34,1.56,.64,1);
-  }
-  #modal.open #modal-box { transform: scale(1); opacity: 1; }
-  .modal-title { font-family: var(--font-display); font-size: 0.85rem; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 14px; }
-  .modal-body { font-size: 0.9rem; color: var(--text2); line-height: 1.7; margin-bottom: 20px; }
-  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
-
-  /* ── SEARCH ── */
-  .search-bar { position: relative; margin-bottom: 18px; }
-  .search-input { width: 100%; padding: 10px 14px 10px 38px; }
-  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 0.9rem; pointer-events: none; }
-
-  /* ── TABLE ── */
-  .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
-  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-  th { background: var(--card2); padding: 10px 16px; text-align: left; font-family: var(--font-mono); font-size: 0.58rem; color: var(--text2); letter-spacing: 0.15em; border-bottom: 1px solid var(--border); }
-  td { padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--text); }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(0,255,136,0.02); }
-
-  /* ── EMPTY STATE ── */
-  .empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
-  .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
-  .empty-text { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; }
-
-  /* ── LOADING ── */
-  .loading { display: flex; align-items: center; gap: 10px; color: var(--text2); font-family: var(--font-mono); font-size: 0.72rem; padding: 20px; }
-  .spinner { width: 16px; height: 16px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
-  @keyframes spin { to{transform:rotate(360deg);} }
-
-  /* ── SELECT ── */
-  select.input { cursor: pointer; }
-
-  /* ── TEXTAREA ── */
-  textarea.input { resize: vertical; min-height: 80px; }
-
-  /* ── HIGHLIGHT COLORS ── */
-  .c-green { color: var(--accent); }
-  .c-blue { color: var(--accent2); }
-  .c-orange { color: var(--accent3); }
-  .c-red { color: var(--danger); }
-  .c-yellow { color: var(--warn); }
-  .c-purple { color: var(--purple); }
-
-  /* ── BOT STATUS ── */
-  .bot-status {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 4px 12px; border-radius: 100px;
-    font-family: var(--font-mono); font-size: 0.6rem;
-    background: rgba(255,51,85,0.1); border: 1px solid rgba(255,51,85,0.3); color: var(--danger);
-    margin-top: 10px;
-  }
-  .bot-status.active { background: rgba(0,255,136,0.1); border-color: rgba(0,255,136,0.3); color: var(--accent); }
-  .bot-status .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 1.5s infinite; }
-
-  /* ── WEEK DISPLAY ── */
-  .week-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 4px 12px; border-radius: 6px;
-    font-family: var(--font-mono); font-size: 0.6rem;
-    background: rgba(0,204,255,0.08); border: 1px solid rgba(0,204,255,0.2); color: var(--accent2);
-  }
-
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 100px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 768px) {
-    #sidenav { display: none; }
-    #main { margin-left: 0; padding: 16px; }
-    #consoleBox { left: 0; }
-    .stats-row { grid-template-columns: repeat(2,1fr); }
-    .tools-grid { grid-template-columns: 1fr; }
-  }
-
-  /* ── SEPARATOR ── */
-  hr.sep { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
-
-  /* ── DIFF VIEW ── */
-  .diff-before { color: var(--danger); }
-  .diff-after { color: var(--accent); }
-
-  /* ── TOGGLE SWITCH ── */
-  .toggle-wrap { display: flex; align-items: center; gap: 10px; }
-  .toggle { position: relative; width: 36px; height: 20px; }
-  .toggle input { opacity: 0; width: 0; height: 0; }
-  .toggle-slider {
-    position: absolute; inset: 0;
-    background: var(--border2); border-radius: 100px; cursor: pointer;
-    transition: 0.2s;
-  }
-  .toggle-slider:before {
-    content: ''; position: absolute;
-    width: 14px; height: 14px;
-    left: 3px; top: 3px;
-    background: var(--text2); border-radius: 50%;
-    transition: 0.2s;
-  }
-  .toggle input:checked + .toggle-slider { background: rgba(0,255,136,0.3); }
-  .toggle input:checked + .toggle-slider:before { transform: translateX(16px); background: var(--accent); }
-  .toggle-label { font-size: 0.82rem; color: var(--text2); }
+:root{--bg:#03060a;--bg2:#07101a;--card:#0b1825;--b1:#0e2233;--b2:#183348;--g:#00ff88;--b:#00ccff;--o:#ff7700;--r:#ff2255;--y:#ffcc00;--p:#bb44ff;--t:#c8e8f4;--t2:#4a7a94;--t3:#1e4060;--mono:'Share Tech Mono',monospace;--disp:'Orbitron',sans-serif;--body:'Rajdhani',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}html,body{background:var(--bg);color:var(--t);font-family:var(--body);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.025) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;z-index:0}
+#app{position:relative;z-index:1;min-height:100vh}
+#top{position:sticky;top:0;z-index:200;height:56px;background:rgba(3,6,10,.97);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 16px;gap:12px;backdrop-filter:blur(20px)}
+.logo{font-family:var(--disp);font-size:.8rem;font-weight:900;color:var(--g);text-shadow:0 0 20px var(--g);letter-spacing:.1em;white-space:nowrap}
+.top-sep{flex:1}
+#wkBadge{font-family:var(--mono);font-size:.58rem;color:var(--b);background:rgba(0,204,255,.07);border:1px solid rgba(0,204,255,.2);padding:3px 10px;border-radius:4px;white-space:nowrap}
+#connDot{width:8px;height:8px;border-radius:50%;background:var(--r);box-shadow:0 0 8px var(--r);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+#connTxt{font-family:var(--mono);font-size:.58rem;color:var(--t2);white-space:nowrap}
+.tbtn{padding:6px 14px;background:transparent;border:1px solid var(--b1);border-radius:5px;color:var(--t2);font-family:var(--mono);font-size:.58rem;cursor:pointer;transition:.15s;letter-spacing:.08em}
+.tbtn:hover{border-color:var(--g);color:var(--g)}
+#tabs{display:flex;background:rgba(3,6,10,.98);border-bottom:1px solid var(--b1);overflow-x:auto;padding:0 16px;gap:2px;position:sticky;top:56px;z-index:190}
+#tabs::-webkit-scrollbar{height:3px}#tabs::-webkit-scrollbar-thumb{background:var(--b2)}
+.tab{padding:10px 18px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--t2);font-family:var(--body);font-weight:700;font-size:.82rem;cursor:pointer;white-space:nowrap;transition:.15s;letter-spacing:.04em}
+.tab:hover{color:var(--t)}.tab.on{color:var(--g);border-bottom-color:var(--g)}
+#main{padding:20px;max-width:1400px;margin:0 auto}
+.page{display:none;animation:fi .2s ease}.page.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:18px;margin-bottom:16px;transition:border-color .2s}.card:hover{border-color:var(--b2)}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.ct{font-family:var(--disp);font-size:.65rem;font-weight:700;letter-spacing:.15em}
+.ct.g{color:var(--g)}.ct.b{color:var(--b)}.ct.o{color:var(--o)}.ct.r{color:var(--r)}.ct.y{color:var(--y)}.ct.p{color:var(--p)}
+.btn{padding:7px 16px;border-radius:6px;border:1px solid var(--g);background:transparent;color:var(--g);font-family:var(--mono);font-size:.6rem;cursor:pointer;transition:.15s;letter-spacing:.07em;white-space:nowrap}
+.btn:hover{background:rgba(0,255,136,.1);box-shadow:0 0 12px rgba(0,255,136,.2)}.btn:active{transform:scale(.97)}
+.btn.b{border-color:var(--b);color:var(--b)}.btn.b:hover{background:rgba(0,204,255,.1)}
+.btn.o{border-color:var(--o);color:var(--o)}.btn.o:hover{background:rgba(255,119,0,.1)}
+.btn.r{border-color:var(--r);color:var(--r)}.btn.r:hover{background:rgba(255,34,85,.1)}
+.btn.y{border-color:var(--y);color:var(--y)}.btn.y:hover{background:rgba(255,204,0,.1)}
+.btn.p{border-color:var(--p);color:var(--p)}.btn.p:hover{background:rgba(187,68,255,.1)}
+.btn.solid{background:var(--g);color:#000;font-weight:700;border-color:var(--g)}.btn.solid:hover{background:#00ffaa;box-shadow:0 0 18px rgba(0,255,136,.4)}
+.btn.solid-r{background:var(--r);color:#fff;border-color:var(--r)}.btn.solid-r:hover{background:#ff4477}
+.btn.sm{padding:4px 10px;font-size:.55rem}.btn.big{padding:10px 22px;font-size:.68rem}
+.brow{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.inp{background:var(--bg2);border:1px solid var(--b2);border-radius:6px;padding:8px 12px;color:var(--t);font-family:var(--mono);font-size:.72rem;outline:none;transition:.2s}
+.inp:focus{border-color:var(--g);box-shadow:0 0 8px rgba(0,255,136,.15)}.inp::placeholder{color:var(--t3)}
+.inp.sm{padding:5px 9px;font-size:.65rem}select.inp{cursor:pointer}
+.lbl{font-family:var(--mono);font-size:.53rem;color:var(--t2);letter-spacing:.12em;display:block;margin-bottom:4px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.gap{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.vh{display:grid;grid-template-columns:38px 24px 1fr 110px 150px 70px 180px;align-items:center;gap:10px;padding:8px 14px;font-family:var(--mono);font-size:.52rem;color:var(--t3);letter-spacing:.12em;border-bottom:1px solid var(--b1)}
+.vr{display:grid;grid-template-columns:38px 24px 1fr 110px 150px 70px 180px;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--b1);transition:background .15s}
+.vr:hover{background:rgba(0,255,136,.025)}.vr.selected{background:rgba(0,255,136,.04);border-left:2px solid var(--g)}
+.vrank{font-family:var(--disp);font-size:.8rem;text-align:center}
+.vcheck{width:15px;height:15px;cursor:pointer;accent-color:var(--g)}
+.vname{font-weight:700;font-size:.9rem;color:var(--t)}
+.vval{font-family:var(--disp);font-size:1.1rem;font-weight:700;cursor:pointer}
+.vval-edit{background:var(--bg2);border:1px solid var(--g);border-radius:5px;color:var(--g);font-family:var(--disp);font-size:.9rem;font-weight:700;outline:none;width:100%;padding:4px 8px;text-align:center}
+.vname-edit{background:transparent;border:none;border-bottom:1px solid var(--g);color:var(--t);font-family:var(--body);font-size:.9rem;font-weight:700;outline:none;width:130px;padding:2px 4px}
+.vbarwrap{display:flex;align-items:center;gap:6px}
+.vbar{height:5px;background:var(--b1);border-radius:100px;overflow:hidden;flex:1}
+.vfill{height:100%;border-radius:100px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.vpct{font-family:var(--mono);font-size:.55rem;color:var(--t3);text-align:right;min-width:32px}
+.vact{display:flex;gap:3px;justify-content:flex-end}
+.inlineHint{cursor:pointer;border-bottom:1px dashed var(--t3);transition:.15s}.inlineHint:hover{border-bottom-color:var(--g);color:var(--g)}
+#selbar{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:8px;padding:10px 16px;margin-bottom:12px;display:none;align-items:center;gap:10px;flex-wrap:wrap;animation:fi .2s ease}
+#selbar.on{display:flex}#selCount{font-family:var(--mono);font-size:.68rem;color:var(--g)}
+.bs{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:100px;font-family:var(--mono);font-size:.58rem;background:rgba(255,34,85,.08);border:1px solid rgba(255,34,85,.2);color:var(--r)}
+.bs.on{background:rgba(0,255,136,.08);border-color:rgba(0,255,136,.25);color:var(--g)}
+.bs .d{width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse 1.5s infinite}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}
+.tc{background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:18px;transition:border-color .2s}.tc:hover{border-color:var(--b2)}
+.ttl{font-family:var(--disp);font-size:.6rem;font-weight:700;letter-spacing:.15em;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--b1)}
+.tdesc{font-size:.78rem;color:var(--t2);margin-bottom:12px;line-height:1.6}
+.uc{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:14px 18px;margin-bottom:9px;transition:border-color .2s}.uc:hover{border-color:var(--b2)}.uc.adm{border-color:rgba(255,204,0,.25)}
+.badge{padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:.5rem;font-weight:700;letter-spacing:.08em}
+.badge.adm{background:var(--y);color:#000}.badge.yes{background:rgba(0,255,136,.1);color:var(--g);border:1px solid rgba(0,255,136,.2)}.badge.no{background:rgba(255,34,85,.08);color:var(--r);border:1px solid rgba(255,34,85,.2)}
+#logBox{position:fixed;bottom:28px;left:0;right:0;height:0;background:rgba(3,6,10,.98);border-top:1px solid var(--b1);overflow:hidden;transition:height .25s;z-index:180;font-family:var(--mono);font-size:.62rem}
+#logBox.on{height:150px}#logInner{height:100%;padding:8px 16px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.ll{display:flex;gap:8px}.lt{color:var(--t3);flex-shrink:0}.lm{color:var(--g)}.lm.e{color:var(--r)}.lm.w{color:var(--y)}.lm.i{color:var(--b)}
+#logToggle{position:fixed;bottom:0;right:16px;z-index:181;padding:3px 12px;background:rgba(3,6,10,.98);border:1px solid var(--b1);border-bottom:none;border-radius:5px 5px 0 0;color:var(--t2);font-family:var(--mono);font-size:.56rem;cursor:pointer;transition:.2s}
+#logToggle:hover{color:var(--g);border-color:var(--g)}
+#tc{position:fixed;top:70px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:7px}
+.toast{padding:10px 18px;border-radius:8px;font-family:var(--mono);font-size:.64rem;border-left:3px solid var(--g);background:rgba(7,16,26,.98);color:var(--g);backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(0,0,0,.5);animation:ti .25s ease,to .3s ease 2.7s forwards;max-width:300px}
+.toast.e{border-color:var(--r);color:var(--r)}.toast.w{border-color:var(--y);color:var(--y)}.toast.i{border-color:var(--b);color:var(--b)}
+@keyframes ti{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes to{from{opacity:1}to{opacity:0;transform:translateX(16px)}}
+#modal{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;pointer-events:none;transition:background .25s}
+#modal.on{background:rgba(0,0,0,.88);pointer-events:all}
+#mbox{background:var(--card);border:1px solid var(--b2);border-radius:14px;padding:26px 30px;max-width:460px;width:95%;transform:scale(.9);opacity:0;transition:all .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 60px rgba(0,0,0,.8)}
+#modal.on #mbox{transform:scale(1);opacity:1}
+.mt{font-family:var(--disp);font-size:.82rem;color:var(--g);letter-spacing:.1em;margin-bottom:12px}
+.mb{font-size:.88rem;color:var(--t2);line-height:1.7;margin-bottom:18px}
+.ma{display:flex;gap:8px;justify-content:flex-end}
+.json{background:#020c10;border:1px solid var(--b1);border-radius:8px;padding:16px;font-family:var(--mono);font-size:.65rem;line-height:1.7;white-space:pre-wrap;word-break:break-all;color:#7af0c8;max-height:500px;overflow-y:auto}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:100px}
+.empty{text-align:center;padding:40px;color:var(--t3);font-family:var(--mono);font-size:.7rem}
+.phints{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
+.phint{padding:7px 11px;background:var(--bg2);border:1px solid var(--b1);border-radius:7px;cursor:pointer;font-family:var(--mono);font-size:.65rem;color:var(--b);transition:border-color .2s}
+.phint:hover{border-color:var(--b)}
 </style>
 </head>
 <body>
-<div class="scanline"></div>
 <div id="app">
+<div id="top">
+  <span class="logo">🔥 7D ADMIN v3</span>
+  <div class="top-sep"></div>
+  <span id="wkBadge">📅 —</span>
+  <div id="connDot"></div>
+  <span id="connTxt">BAĞLANIYOR</span>
+  <button class="tbtn" onclick="R()">↻ YENİLE</button>
+</div>
 
-  <!-- TOPBAR -->
-  <div id="topbar">
-    <div class="logo-area">
-      <span class="logo-icon">🔥</span>
-      <div>
-        <div class="logo-text">7D ZONE ADMIN</div>
-        <div class="logo-sub">FIREBASE CONTROL PANEL v2.0</div>
-      </div>
-    </div>
-    <div class="topbar-right">
-      <span class="week-badge">📅 <span id="weekDisplay">HAFTA YÜKLENİYOR</span></span>
-      <div class="status-dot" id="statusDot"></div>
-      <span class="status-text" id="statusText">BAĞLANIYOR...</span>
-      <button class="btn-reload" onclick="fullReload()">↻ YENİLE</button>
+<div id="tabs">
+  <button class="tab on"  onclick="T('votes',this)">⭐ OY TABLOSU</button>
+  <button class="tab"     onclick="T('multi',this)">⚡ ÇİFT HEDEF</button>
+  <button class="tab"     onclick="T('bots',this)">🤖 BOTLAR</button>
+  <button class="tab"     onclick="T('users',this)">👥 KULLANICILAR</button>
+  <button class="tab"     onclick="T('tools',this)">🛠️ ARAÇLAR</button>
+  <button class="tab"     onclick="T('raw',this)">📄 RAW JSON</button>
+  <button class="tab"     onclick="T('writer',this)">✏️ DB YAZICI</button>
+  <button class="tab" style="color:var(--r)" onclick="T('danger',this)">⚠️ NUKE</button>
+</div>
+
+<div id="main">
+
+<!-- ══════════ VOTES ══════════ -->
+<div class="page on" id="p-votes">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+    <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g)">⭐ OY TABLOSU</div>
+    <div class="brow">
+      <button class="btn sm"     onclick="selAll()">☑ TÜMÜNÜ SEÇ</button>
+      <button class="btn sm b"   onclick="selNone()">☐ SEÇİMİ KALDIR</button>
+      <button class="btn sm o"   onclick="addNewVote()">➕ KİŞİ EKLE</button>
+      <button class="btn solid"  onclick="R()">↻ YENİLE</button>
+      <button class="btn r"      onclick="cfDelAll()">🗑️ TÜMÜNÜ SİL</button>
     </div>
   </div>
 
-  <!-- SIDENAV -->
-  <nav id="sidenav">
-    <div class="nav-section-label">GENEL BAKIŞ</div>
-    <button class="nav-btn active" onclick="switchPage('dashboard',this)" data-page="dashboard">
-      <span class="nav-icon">📊</span> Dashboard
-      <span class="nav-badge" id="nb-dashboard">—</span>
-    </button>
-
-    <div class="nav-section-label">VERİ</div>
-    <button class="nav-btn" onclick="switchPage('votes',this)" data-page="votes">
-      <span class="nav-icon">⭐</span> Votes
-      <span class="nav-badge" id="nb-votes">0</span>
-    </button>
-    <button class="nav-btn" onclick="switchPage('users',this)" data-page="users">
-      <span class="nav-icon">👥</span> Kullanıcılar
-      <span class="nav-badge blue" id="nb-users">0</span>
-    </button>
-
-    <div class="nav-section-label">ARAÇLAR</div>
-    <button class="nav-btn" onclick="switchPage('tools',this)" data-page="tools">
-      <span class="nav-icon">🛠️</span> Araçlar
-    </button>
-    <button class="nav-btn" onclick="switchPage('raw',this)" data-page="raw">
-      <span class="nav-icon">📄</span> Raw JSON
-    </button>
-    <button class="nav-btn" onclick="switchPage('writer',this)" data-page="writer">
-      <span class="nav-icon">✏️</span> DB Yazıcı
-    </button>
-
-    <div class="nav-divider"></div>
-    <div class="nav-section-label">TEHLİKELİ</div>
-    <button class="nav-btn" onclick="switchPage('danger',this)" data-page="danger">
-      <span class="nav-icon">⚠️</span> Temizleme
-      <span class="nav-badge red">!</span>
-    </button>
-  </nav>
-
-  <!-- MAIN -->
-  <div id="main">
-
-    <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
-      <div class="page-header">
-        <div>
-          <div class="page-title">📊 DASHBOARD</div>
-          <div class="page-subtitle" id="lastRefreshText">SON GÜNCELLEME: —</div>
-        </div>
-        <div class="btn-row">
-          <button class="btn solid" onclick="fullReload()">↻ TÜM VERİYİ YENİLE</button>
-        </div>
+  <div class="card" style="padding:12px 16px;margin-bottom:10px">
+    <div class="gap">
+      <div class="fg"><label class="lbl">ARAMA</label><input id="vsearch" class="inp sm" placeholder="ara..." oninput="renderVotes()" style="width:150px"></div>
+      <div class="fg"><label class="lbl">SIRA</label>
+        <select id="vsort" class="inp sm" onchange="renderVotes()">
+          <option value="desc">Yüksek→Düşük</option><option value="asc">Düşük→Yüksek</option>
+          <option value="az">A→Z</option><option value="za">Z→A</option>
+        </select>
       </div>
-
-      <div class="stats-row" id="statsRow">
-        <div class="stat-card"><div class="stat-label">TOPLAM KULLANICI</div><div class="stat-value green" id="stat-users">—</div><div class="stat-sub">kayıtlı hesap</div></div>
-        <div class="stat-card blue"><div class="stat-label">TOPLAM VOTE</div><div class="stat-value blue" id="stat-totalvotes">—</div><div class="stat-sub">bu hafta</div></div>
-        <div class="stat-card orange"><div class="stat-label">OY VEREN</div><div class="stat-value orange" id="stat-voted">—</div><div class="stat-sub">kullanıcı</div></div>
-        <div class="stat-card purple"><div class="stat-label">ADMİN SAYISI</div><div class="stat-value purple" id="stat-admins">—</div><div class="stat-sub">yetkili hesap</div></div>
-        <div class="stat-card yellow"><div class="stat-label">VOTE LİDERİ</div><div class="stat-value yellow" id="stat-leader" style="font-size:0.9rem;">—</div><div class="stat-sub" id="stat-leader-votes">—</div></div>
-        <div class="stat-card red"><div class="stat-label">OY VERMEYENLEr</div><div class="stat-value red" id="stat-notvoted">—</div><div class="stat-sub">kullanıcı</div></div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;flex-wrap:wrap;">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">🏆 TOP 5 OY</div>
-            <button class="btn sm" onclick="switchPage('votes', document.querySelector('[data-page=votes]'))">TÜMÜNÜ GÖR →</button>
-          </div>
-          <div id="dash-top5"><div class="loading"><div class="spinner"></div>Yükleniyor...</div></div>
-        </div>
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">👥 SON KAYIT</div>
-            <button class="btn sm blue" onclick="switchPage('users', document.querySelector('[data-page=users]'))">TÜMÜNÜ GÖR →</button>
-          </div>
-          <div id="dash-users"><div class="loading"><div class="spinner"></div>Yükleniyor...</div></div>
-        </div>
+      <div class="fg"><label class="lbl">GÖSTER</label>
+        <select id="vshow" class="inp sm" onchange="renderVotes()">
+          <option value="0">Tümü</option><option value="5">Top 5</option>
+          <option value="10">Top 10</option><option value="3">Top 3</option>
+        </select>
       </div>
     </div>
+  </div>
 
-    <!-- VOTES -->
-    <div class="page" id="page-votes">
-      <div class="page-header">
-        <div>
-          <div class="page-title">⭐ VOTE TABLOSU</div>
-          <div class="page-subtitle">Haftalık oy sıralaması ve yönetimi</div>
-        </div>
-        <div class="btn-row">
-          <button class="btn solid" onclick="fullReload()">↻ YENİLE</button>
-          <button class="btn red" onclick="confirmDeleteAllVotes()">🗑️ TÜM VOTLARI SİL</button>
-        </div>
-      </div>
+  <div id="selbar">
+    <span id="selCount">0 seçili</span>
+    <div class="fg"><label class="lbl">MİKTAR / METİN</label><input id="selAmt" class="inp sm" value="100" style="width:120px" title="Sayı ya da herhangi bir metin girebilirsin"></div>
+    <button class="btn sm solid" onclick="bulkAdd()">✅ EKLE</button>
+    <button class="btn sm o"     onclick="bulkRemove()">➖ ÇIKAR</button>
+    <button class="btn sm b"     onclick="bulkSet()">📌 SET</button>
+    <button class="btn sm r"     onclick="bulkDelete()">🗑️ SİL</button>
+    <button class="btn sm y"     onclick="bulkMultiply()">✖ ÇARP</button>
+    <button class="btn sm p"     onclick="bulkCustomText()">✏️ ÖZEL METİN</button>
+  </div>
 
-      <div class="card">
-        <div class="card-header"><div class="card-title">➕ VOTE DÜZENLEME</div></div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
-          <div class="field-group">
-            <label class="lbl">HEDEF İSİM</label>
-            <input id="vi-name" class="input" placeholder="halil" style="width:160px;" value="halil"/>
-          </div>
-          <div class="field-group">
-            <label class="lbl">MİKTAR</label>
-            <input id="vi-amount" type="number" class="input" value="100" style="width:100px;"/>
-          </div>
-          <button class="btn solid" onclick="voteAdd()">✅ EKLE</button>
-          <button class="btn orange" onclick="voteRemove()">➖ ÇIKAR</button>
-          <button class="btn blue" onclick="voteSet()">📌 SET ET</button>
-          <button class="btn red" onclick="voteDeleteOne()">🗑️ SİL</button>
-        </div>
-      </div>
-
-      <div id="votesList"><div class="loading"><div class="spinner"></div>Yükleniyor...</div></div>
-    </div>
-
-    <!-- USERS -->
-    <div class="page" id="page-users">
-      <div class="page-header">
-        <div>
-          <div class="page-title">👥 KULLANICI YÖNETİMİ</div>
-          <div class="page-subtitle" id="users-subtitle">Tüm kayıtlı hesaplar</div>
-        </div>
-        <div class="btn-row">
-          <button class="btn solid" onclick="fullReload()">↻ YENİLE</button>
-          <button class="btn orange" onclick="resetAllVotedFlags()">🔄 TÜM OY KAYITLARINI SİL</button>
-        </div>
-      </div>
-
-      <div class="card" style="padding:14px 20px;">
-        <div class="search-bar" style="margin:0;">
-          <span class="search-icon">🔍</span>
-          <input id="userSearch" class="input search-input" placeholder="kullanıcı ara..." oninput="filterUsers()"/>
-        </div>
-      </div>
-
-      <div id="usersList"><div class="loading"><div class="spinner"></div>Yükleniyor...</div></div>
-    </div>
-
-    <!-- TOOLS -->
-    <div class="page" id="page-tools">
-      <div class="page-header">
-        <div>
-          <div class="page-title">🛠️ ARAÇLAR</div>
-          <div class="page-subtitle">Vote botları, koruma araçları ve toplu işlemler</div>
-        </div>
-      </div>
-
-      <div class="tools-grid">
-
-        <div class="tool-card">
-          <div class="tool-card-title green">🐱 HALİL VOTE BOMBA</div>
-          <div class="tool-desc">Halil'e istediğin kadar oy ekle. Mevcut oya eklenir.</div>
-          <div class="tool-row">
-            <div class="field-group">
-              <label class="lbl">EKLENECEK OY MİKTARI</label>
-              <input id="t-halilAmt" type="number" class="input" value="999"/>
-            </div>
-            <button class="btn solid big" onclick="halilBomb()">🚀 HALİL'E EKLE</button>
-          </div>
-          <div id="t-halilResult" style="margin-top:10px;font-family:var(--font-mono);font-size:0.7rem;color:var(--accent);min-height:20px;"></div>
-        </div>
-
-        <div class="tool-card">
-          <div class="tool-card-title blue">🛡️ KORUMA BOTU</div>
-          <div class="tool-desc">Her N saniyede Halil'in votunu kontrol eder. Minimum altına düşerse otomatik düzeltir.</div>
-          <div class="tool-row">
-            <div class="tool-inline">
-              <div class="field-group">
-                <label class="lbl">MİNİMUM OY</label>
-                <input id="t-lockMin" type="number" class="input" value="500"/>
-              </div>
-              <div class="field-group">
-                <label class="lbl">KONTROL ARALIĞI (SN)</label>
-                <input id="t-lockInterval" type="number" class="input" value="5"/>
-              </div>
-            </div>
-            <div class="btn-row">
-              <button class="btn solid" onclick="lockStart()">▶ BAŞLAT</button>
-              <button class="btn red" onclick="lockStop()">⏹ DURDUR</button>
-            </div>
-          </div>
-          <div class="bot-status" id="lockStatus"><div class="dot"></div> BOT: KAPALI</div>
-        </div>
-
-        <div class="tool-card">
-          <div class="tool-card-title orange">⚡ OTO VOTE BOTU</div>
-          <div class="tool-desc">Belirli aralıklarla otomatik oy ekler. Arka planda çalışır.</div>
-          <div class="tool-row">
-            <div class="tool-inline">
-              <div class="field-group">
-                <label class="lbl">HEDEF</label>
-                <input id="t-autoTarget" class="input" value="halil"/>
-              </div>
-              <div class="field-group">
-                <label class="lbl">HER N SANIYEDE</label>
-                <input id="t-autoInterval" type="number" class="input" value="10"/>
-              </div>
-              <div class="field-group">
-                <label class="lbl">KAÇ OY EKLE</label>
-                <input id="t-autoAmount" type="number" class="input" value="5"/>
-              </div>
-            </div>
-            <div class="btn-row">
-              <button class="btn solid" onclick="autoVoteStart()">▶ BAŞLAT</button>
-              <button class="btn red" onclick="autoVoteStop()">⏹ DURDUR</button>
-            </div>
-          </div>
-          <div class="bot-status" id="autoVoteStatus"><div class="dot"></div> BOT: KAPALI</div>
-          <div id="t-autoLog" style="margin-top:8px;font-family:var(--font-mono);font-size:0.65rem;color:var(--text3);max-height:60px;overflow-y:auto;"></div>
-        </div>
-
-        <div class="tool-card">
-          <div class="tool-card-title yellow">🏆 SADECE HALİL KALS</div>
-          <div class="tool-desc">Tüm oyları siler, sadece Halil'e istediğin skoru yazar.</div>
-          <div class="tool-row">
-            <div class="field-group">
-              <label class="lbl">HALİL'E VERİLECEK OY</label>
-              <input id="t-onlyHalilAmt" type="number" class="input" value="9999"/>
-            </div>
-            <button class="btn yellow" onclick="onlyHalil()">⚡ UYGULA</button>
-          </div>
-        </div>
-
-        <div class="tool-card">
-          <div class="tool-card-title purple">👤 TOPLU OY KAYDI SİL</div>
-          <div class="tool-desc">Tüm kullanıcıların bu haftaki oy kaydını siler. Herkes tekrar oy verebilir.</div>
-          <div class="tool-row">
-            <button class="btn purple big" onclick="resetAllVotedFlags()">🔄 TÜM OY KAYITLARINI SİL</button>
-          </div>
-        </div>
-
-        <div class="tool-card">
-          <div class="tool-card-title red">🔓 YETKİ VER</div>
-          <div class="tool-desc">Belirli bir kullanıcıya admin yetkisi ver ya da al.</div>
-          <div class="tool-row">
-            <div class="tool-inline">
-              <div class="field-group">
-                <label class="lbl">USERNAME</label>
-                <input id="t-adminTarget" class="input" placeholder="roman"/>
-              </div>
-              <div class="field-group">
-                <label class="lbl">İŞLEM</label>
-                <select id="t-adminAction" class="input">
-                  <option value="give">Admin Ver</option>
-                  <option value="remove">Admin Al</option>
-                </select>
-              </div>
-            </div>
-            <button class="btn red" onclick="toggleAdminByName()">⚡ UYGULA</button>
-          </div>
-          <div id="t-adminResult" style="margin-top:8px;font-family:var(--font-mono);font-size:0.65rem;color:var(--accent);min-height:18px;"></div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- RAW JSON -->
-    <div class="page" id="page-raw">
-      <div class="page-header">
-        <div>
-          <div class="page-title">📄 RAW JSON VERİSİ</div>
-          <div class="page-subtitle">Firebase'deki tüm ham veri</div>
-        </div>
-        <div class="btn-row">
-          <select id="rawSection" class="input" onchange="renderRaw()">
-            <option value="all">TÜM VERİ</option>
-            <option value="votes7d">Sadece VOTES</option>
-            <option value="users">Sadece USERS</option>
-          </select>
-          <button class="btn solid" onclick="fullReload()">↻ YENİLE</button>
-          <button class="btn blue" onclick="copyRaw()">📋 KOPYALA</button>
-          <button class="btn" onclick="downloadRaw()">💾 İNDİR</button>
-        </div>
-      </div>
-      <div id="rawContent"><div class="loading"><div class="spinner"></div>Yükleniyor...</div></div>
-    </div>
-
-    <!-- DB YAZICI -->
-    <div class="page" id="page-writer">
-      <div class="page-header">
-        <div>
-          <div class="page-title">✏️ DATABASE YAZICI</div>
-          <div class="page-subtitle">İstediğin path'e direkt oku/yaz/sil</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header"><div class="card-title">📍 PATH & DEĞER</div></div>
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div class="field-group">
-            <label class="lbl">DATABASE PATH</label>
-            <input id="w-path" class="input" placeholder="/votes7d/halil veya /users/UID/username" style="width:100%;"/>
-          </div>
-          <div class="field-group">
-            <label class="lbl">DEĞER (sayı, "metin", {"json":"obje"}, null)</label>
-            <textarea id="w-value" class="input" placeholder='999 veya "merhaba" veya {"key":"value"}'></textarea>
-          </div>
-          <div class="btn-row">
-            <button class="btn solid" onclick="writerSet()">📌 YAZ (PUT)</button>
-            <button class="btn blue" onclick="writerGet()">👁️ OKU (GET)</button>
-            <button class="btn orange" onclick="writerUpdate()">🔄 GÜNCELLE (PATCH)</button>
-            <button class="btn red" onclick="writerDelete()">🗑️ SİL (DELETE)</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" id="writerResult" style="display:none;">
-        <div class="card-header"><div class="card-title">📤 SONUÇ</div></div>
-        <div class="json-viewer" id="writerResultContent"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-header"><div class="card-title">📚 YARDIMCI PATH LİSTESİ</div></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;">
-          <div onclick="document.getElementById('w-path').value='/votes7d'" style="padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;color:var(--accent2);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">/votes7d → Tüm oylar</div>
-          <div onclick="document.getElementById('w-path').value='/votes7d/halil'" style="padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;color:var(--accent2);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">/votes7d/halil → Halil'in oyu</div>
-          <div onclick="document.getElementById('w-path').value='/users'" style="padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;color:var(--accent2);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">/users → Tüm kullanıcılar</div>
-          <div onclick="document.getElementById('w-path').value='/usernames'" style="padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;color:var(--accent2);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">/usernames → Username→UID eşleşmesi</div>
-          <div onclick="document.getElementById('w-path').value='/voteWeekMarker'" style="padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;color:var(--accent2);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">/voteWeekMarker → Hafta işaretleyici</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- DANGER -->
-    <div class="page" id="page-danger">
-      <div class="page-header">
-        <div>
-          <div class="page-title" style="color:var(--danger);">⚠️ TEHLİKELİ BÖLGE</div>
-          <div class="page-subtitle">Bu işlemler geri alınamaz! Dikkatli kullan.</div>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;">
-
-        <div class="card" style="border-color:rgba(255,51,85,0.3);">
-          <div class="card-header"><div class="card-title" style="color:var(--danger);">🗑️ TÜM VOTE'LARI SİL</div></div>
-          <p style="color:var(--text2);font-size:0.85rem;margin-bottom:16px;line-height:1.6;">votes7d path'indeki tüm veri silinir. Liderboard tamamen sıfırlanır.</p>
-          <button class="btn solid-red big" onclick="confirmDeleteAllVotes()">🗑️ TÜM VOTE'LARI SİL</button>
-        </div>
-
-        <div class="card" style="border-color:rgba(255,102,0,0.3);">
-          <div class="card-header"><div class="card-title" style="color:var(--accent3);">🔄 OY KAYITLARINI SİFIRLA</div></div>
-          <p style="color:var(--text2);font-size:0.85rem;margin-bottom:16px;line-height:1.6;">Tüm kullanıcıların "voted" flagını temizler. Herkes bu hafta tekrar oy verebilir hale gelir.</p>
-          <button class="btn orange big" onclick="resetAllVotedFlags()">🔄 HERKES TEKRAR OY VEREBİLSİN</button>
-        </div>
-
-        <div class="card" style="border-color:rgba(255,51,85,0.3);">
-          <div class="card-header"><div class="card-title" style="color:var(--danger);">💣 TÜM HAFTA VERİSİNİ SİL</div></div>
-          <p style="color:var(--text2);font-size:0.85rem;margin-bottom:16px;line-height:1.6;">Hem votes7d hem de tüm kullanıcıların voted kayıtları silinir. Tam sıfırlama.</p>
-          <button class="btn solid-red big" onclick="confirmNuke()">💣 TAM NUKE</button>
-        </div>
-
-        <div class="card" style="border-color:rgba(170,68,255,0.3);">
-          <div class="card-header"><div class="card-title" style="color:var(--purple);">🗓️ HAFTA MARKER'I SİFIRLA</div></div>
-          <p style="color:var(--text2);font-size:0.85rem;margin-bottom:16px;line-height:1.6;">voteWeekMarker'ı siler. Site bir sonraki açılışta haftalık sıfırlama yapar.</p>
-          <button class="btn purple big" onclick="resetWeekMarker()">🗓️ MARKER'I SİL</button>
-        </div>
-
-        <div class="card" style="border-color:rgba(255,51,85,0.3);">
-          <div class="card-header"><div class="card-title" style="color:var(--danger);">👤 TEK KULLANICI SİL</div></div>
-          <p style="color:var(--text2);font-size:0.85rem;margin-bottom:12px;line-height:1.6;">Belirli bir kullanıcıyı UID ile sil.</p>
-          <div class="field-group" style="margin-bottom:10px;">
-            <label class="lbl">KULLANICI UID</label>
-            <input id="d-deleteUid" class="input" placeholder="UID buraya..." style="width:100%;"/>
-          </div>
-          <button class="btn solid-red" onclick="deleteUserByUid()">🗑️ KULLANICIYI SİL</button>
-        </div>
-
-      </div>
-    </div>
-
-  </div><!-- /main -->
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="vh"><span>SIRA</span><span>☑</span><span>İSİM (çift tık=düzenle)</span><span>OY (çift tık=düzenle)</span><span>ÇUBUK</span><span>%</span><span>İŞLEMLER</span></div>
+    <div id="voteRows"></div>
+  </div>
+  <div id="voteEmpty" class="empty" style="display:none">📭 OY KAYDI YOK</div>
 </div>
 
-<!-- CONSOLE -->
-<button id="consoleToggle" onclick="toggleConsole()">▲ LOG (0)</button>
-<div id="consoleBox">
-  <div id="consoleInner"></div>
+<!-- ══════════ MULTI ══════════ -->
+<div class="page" id="p-multi">
+  <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g);margin-bottom:14px">⚡ ÇİFT HEDEF</div>
+  <div class="tgrid">
+
+    <div class="tc">
+      <div class="ttl b">👥 AYNI ANDA İKİ KİŞİYE OY</div>
+      <div class="tdesc">Seçilen iki kişiye aynı anda işlem yap. Miktar sayı ya da metin olabilir.</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="gap">
+          <div class="fg"><label class="lbl">1. KİŞİ</label><select id="m-t1" class="inp" style="width:150px"><option value="">Seç...</option></select></div>
+          <div class="fg"><label class="lbl">2. KİŞİ</label><select id="m-t2" class="inp" style="width:150px"><option value="">Seç...</option></select></div>
+        </div>
+        <div class="fg"><label class="lbl">MİKTAR / METİN (örn: 500 veya "lieber")</label><input id="m-amt" class="inp" value="100" style="width:100%"></div>
+        <div class="brow">
+          <button class="btn solid big" onclick="dualAdd()">✅ İKİSİNE EKLE</button>
+          <button class="btn o"         onclick="dualRemove()">➖ İKİSİNDEN ÇIKAR</button>
+          <button class="btn b"         onclick="dualSet()">📌 İKİSİNE SET</button>
+          <button class="btn r"         onclick="dualDelete()">🗑️ İKİSİNİ SİL</button>
+        </div>
+        <div id="m-res" style="font-family:var(--mono);font-size:.65rem;color:var(--g);min-height:18px"></div>
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="ttl o">⇄ OY TAKASI</div>
+      <div class="tdesc">İki kişinin oy değerini birbiriyle takas et.</div>
+      <div class="gap" style="margin-bottom:12px">
+        <div class="fg"><label class="lbl">1. KİŞİ</label><select id="sw-t1" class="inp" style="width:140px"></select></div>
+        <div class="fg"><label class="lbl">2. KİŞİ</label><select id="sw-t2" class="inp" style="width:140px"></select></div>
+      </div>
+      <button class="btn o big" onclick="swapVotes()">⇄ TAKAS ET</button>
+    </div>
+
+    <div class="tc">
+      <div class="ttl p">📋 OY KOPYALA</div>
+      <div class="tdesc">Birinin oy değerini diğerine kopyala.</div>
+      <div class="gap" style="margin-bottom:12px">
+        <div class="fg"><label class="lbl">KAYNAK</label><select id="cp-src" class="inp" style="width:140px"></select></div>
+        <div class="fg"><label class="lbl">HEDEF</label><select id="cp-dst" class="inp" style="width:140px"></select></div>
+      </div>
+      <button class="btn p big" onclick="copyVotes()">📋 KOPYALA</button>
+    </div>
+
+    <div class="tc">
+      <div class="ttl y">✖ TOPLU ÇARP</div>
+      <div class="tdesc">Tüm sayısal oyları bir sayıyla çarp.</div>
+      <div class="fg" style="margin-bottom:12px"><label class="lbl">ÇARPAN</label><input id="mul-x" class="inp" value="2" type="number" step="0.1" style="width:100px"></div>
+      <button class="btn y big" onclick="multiplyAll()">✖ TÜMÜNÜ ÇARP</button>
+    </div>
+
+  </div>
 </div>
 
-<!-- TOAST -->
-<div id="toastContainer"></div>
+<!-- ══════════ BOTS ══════════ -->
+<div class="page" id="p-bots">
+  <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g);margin-bottom:14px">🤖 BOTLAR</div>
+  <div class="tgrid">
 
-<!-- MODAL -->
+    <div class="tc">
+      <div class="ttl g">🛡️ KORUMA BOTU</div>
+      <div class="tdesc">Oy min değerin altına düşerse otomatik düzeltir.</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="fg"><label class="lbl">HEDEF KİŞİ</label><select id="lb-t" class="inp"></select></div>
+        <div class="gap">
+          <div class="fg"><label class="lbl">MİNİMUM</label><input id="lb-min" class="inp" value="500" type="number" style="width:90px"></div>
+          <div class="fg"><label class="lbl">ARALIK (SN)</label><input id="lb-int" class="inp" value="5" type="number" style="width:90px"></div>
+        </div>
+        <div class="fg"><label class="lbl">KORUMA DEĞERİ (min altındaysa set edilecek)</label><input id="lb-set" class="inp" value="999" placeholder="999 veya 'lieber'"></div>
+        <div class="brow"><button class="btn solid" onclick="lockStart()">▶ BAŞLAT</button><button class="btn r" onclick="lockStop()">⏹ DURDUR</button></div>
+        <div class="bs" id="lb-status"><div class="d"></div>KAPALI</div>
+        <div id="lb-log" style="font-family:var(--mono);font-size:.56rem;color:var(--t3);max-height:48px;overflow-y:auto;margin-top:3px"></div>
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="ttl b">⚡ OTO OY EKLEME</div>
+      <div class="tdesc">Her N saniyede seçilen kişiye X oy ekler.</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="fg"><label class="lbl">HEDEF</label><select id="ab-t" class="inp"></select></div>
+        <div class="gap">
+          <div class="fg"><label class="lbl">EKLE</label><input id="ab-amt" class="inp" value="10" type="number" style="width:80px"></div>
+          <div class="fg"><label class="lbl">ARALIK (SN)</label><input id="ab-int" class="inp" value="10" type="number" style="width:80px"></div>
+          <div class="fg"><label class="lbl">MAX (0=∞)</label><input id="ab-max" class="inp" value="0" type="number" style="width:80px"></div>
+        </div>
+        <div class="brow"><button class="btn solid" onclick="autoAddStart()">▶ BAŞLAT</button><button class="btn r" onclick="autoAddStop()">⏹ DURDUR</button></div>
+        <div class="bs" id="ab-status"><div class="d"></div>KAPALI</div>
+        <div id="ab-log" style="font-family:var(--mono);font-size:.56rem;color:var(--t3);max-height:48px;overflow-y:auto;margin-top:3px"></div>
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="ttl r">🔻 OTO OY SİLME</div>
+      <div class="tdesc">Her N saniyede seçilen kişiden X oy çıkarır.</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="fg"><label class="lbl">HEDEF</label><select id="rb-t" class="inp"></select></div>
+        <div class="gap">
+          <div class="fg"><label class="lbl">ÇIKAR</label><input id="rb-amt" class="inp" value="10" type="number" style="width:80px"></div>
+          <div class="fg"><label class="lbl">ARALIK (SN)</label><input id="rb-int" class="inp" value="10" type="number" style="width:80px"></div>
+          <div class="fg"><label class="lbl">MİN SINIR</label><input id="rb-min" class="inp" value="0" type="number" style="width:80px"></div>
+        </div>
+        <div class="brow"><button class="btn solid-r" onclick="autoRemStart()">▶ BAŞLAT</button><button class="btn r" onclick="autoRemStop()">⏹ DURDUR</button></div>
+        <div class="bs" id="rb-status"><div class="d"></div>KAPALI</div>
+        <div id="rb-log" style="font-family:var(--mono);font-size:.56rem;color:var(--t3);max-height:48px;overflow-y:auto;margin-top:3px"></div>
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="ttl o">🚀 ÇOKLU HEDEF BOTU</div>
+      <div class="tdesc">Birden fazla kişiye aynı anda oto oy ekler.</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="fg"><label class="lbl">HEDEFLER (virgülle)</label><input id="mb-t" class="inp" value="halil" placeholder="halil,roman"></div>
+        <div class="gap">
+          <div class="fg"><label class="lbl">OY/KİŞİ</label><input id="mb-amt" class="inp" value="5" type="number" style="width:80px"></div>
+          <div class="fg"><label class="lbl">ARALIK (SN)</label><input id="mb-int" class="inp" value="15" type="number" style="width:80px"></div>
+        </div>
+        <div class="brow"><button class="btn solid" onclick="multiStart()">▶ BAŞLAT</button><button class="btn r" onclick="multiStop()">⏹ DURDUR</button></div>
+        <div class="bs" id="mb-status"><div class="d"></div>KAPALI</div>
+        <div id="mb-log" style="font-family:var(--mono);font-size:.56rem;color:var(--t3);max-height:48px;overflow-y:auto;margin-top:3px"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ USERS ══════════ -->
+<div class="page" id="p-users">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+    <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g)">👥 KULLANICILAR</div>
+    <div class="brow">
+      <input id="usearch" class="inp sm" placeholder="🔍 ara..." oninput="renderUsers()" style="width:160px">
+      <button class="btn sm o" onclick="resetAllVoted()">🔄 TÜM OY KAYDI SİL</button>
+      <button class="btn solid" onclick="R()">↻ YENİLE</button>
+    </div>
+  </div>
+  <div id="userList"><div class="empty">Yükleniyor...</div></div>
+</div>
+
+<!-- ══════════ TOOLS ══════════ -->
+<div class="page" id="p-tools">
+  <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g);margin-bottom:14px">🛠️ ARAÇLAR</div>
+  <div class="tgrid">
+
+    <div class="tc">
+      <div class="ttl g">🐱 HALİL VOTE BOMBA</div>
+      <div class="tdesc">Halil'e hızlıca istediğin kadar oy ekle.</div>
+      <div class="fg" style="margin-bottom:10px"><label class="lbl">MİKTAR</label><input id="t-hamt" class="inp" value="999" type="number"></div>
+      <button class="btn solid big" onclick="halilBomb()">🚀 EKLE</button>
+      <div id="t-hres" style="margin-top:8px;font-family:var(--mono);font-size:.65rem;color:var(--g);min-height:18px"></div>
+    </div>
+
+    <div class="tc">
+      <div class="ttl y">🏆 SADECE HALİL</div>
+      <div class="tdesc">Tüm oyları sil, yalnızca Halil'e set et.</div>
+      <div class="fg" style="margin-bottom:10px"><label class="lbl">HALİL OY</label><input id="t-ohamt" class="inp" value="9999" type="number"></div>
+      <button class="btn y big" onclick="onlyHalil()">⚡ UYGULA</button>
+    </div>
+
+    <div class="tc">
+      <div class="ttl b">📊 OY NORMALIZE</div>
+      <div class="tdesc">Tüm sayısal oyları 0-100 arasına normalize et.</div>
+      <button class="btn b big" onclick="normalizeVotes()">📊 NORMALİZE ET</button>
+    </div>
+
+    <div class="tc">
+      <div class="ttl o">🎲 RASTGELE OY</div>
+      <div class="tdesc">Tüm kişilere rastgele oy ata.</div>
+      <div class="gap" style="margin-bottom:10px">
+        <div class="fg"><label class="lbl">MİN</label><input id="t-rmin" class="inp" value="1" type="number" style="width:80px"></div>
+        <div class="fg"><label class="lbl">MAX</label><input id="t-rmax" class="inp" value="1000" type="number" style="width:80px"></div>
+      </div>
+      <button class="btn o big" onclick="randomizeAll()">🎲 UYGULA</button>
+    </div>
+
+    <div class="tc">
+      <div class="ttl p">⬆ HERKESE SET</div>
+      <div class="tdesc">Herkese aynı değeri set et (metin de olabilir).</div>
+      <div class="fg" style="margin-bottom:10px"><label class="lbl">DEĞER / METİN</label><input id="t-setall" class="inp" value="100" placeholder='100 veya "lieber"'></div>
+      <button class="btn p big" onclick="setAll()">📌 HERKESE SET</button>
+    </div>
+
+    <div class="tc">
+      <div class="ttl r">➕ HERKESE EKLE</div>
+      <div class="tdesc">Herkese aynı miktarda oy ekle.</div>
+      <div class="fg" style="margin-bottom:10px"><label class="lbl">MİKTAR</label><input id="t-addall" class="inp" value="100" type="number"></div>
+      <button class="btn r big" onclick="addAll()">➕ HERKESE EKLE</button>
+    </div>
+
+    <div class="tc">
+      <div class="ttl g">💾 JSON İMPORT</div>
+      <div class="tdesc">votes7d formatında JSON veri yükle.</div>
+      <textarea id="t-import" class="inp" style="width:100%;min-height:70px;resize:vertical" placeholder='{"halil":100,"roman":50}'></textarea>
+      <button class="btn solid" style="margin-top:8px" onclick="importJSON()">📥 İMPORT</button>
+    </div>
+
+    <div class="tc">
+      <div class="ttl b">💾 JSON EXPORT</div>
+      <div class="tdesc">Vote verisini kopyala veya dosya olarak indir.</div>
+      <div class="brow">
+        <button class="btn b big" onclick="copyVoteJSON()">📋 KOPYALA</button>
+        <button class="btn big" onclick="downloadJSON()">💾 İNDİR</button>
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="ttl y">🔓 ADMİN VER/AL</div>
+      <div class="tdesc">Kullanıcı adıyla admin yetkisi yönet.</div>
+      <div class="gap" style="margin-bottom:10px">
+        <div class="fg"><label class="lbl">USERNAME</label><input id="t-admu" class="inp" placeholder="roman" style="width:130px"></div>
+        <div class="fg"><label class="lbl">İŞLEM</label>
+          <select id="t-adma" class="inp" style="width:110px"><option value="1">Admin Ver</option><option value="0">Admin Al</option></select>
+        </div>
+      </div>
+      <button class="btn y big" onclick="toggleAdmin()">⚡ UYGULA</button>
+      <div id="t-admres" style="margin-top:8px;font-family:var(--mono);font-size:.63rem;color:var(--g);min-height:18px"></div>
+    </div>
+
+    <div class="tc">
+      <div class="ttl o">🔢 İSTATİSTİKLER</div>
+      <div id="t-stats" style="font-family:var(--mono);font-size:.65rem;color:var(--t2);line-height:1.9"></div>
+      <button class="btn o" style="margin-top:10px" onclick="calcStats()">📊 HESAPLA</button>
+    </div>
+
+    <div class="tc">
+      <div class="ttl p">🗓️ HAFTA MARKER</div>
+      <div class="tdesc">voteWeekMarker oku veya sil.</div>
+      <div class="brow" style="margin-bottom:8px">
+        <button class="btn b" onclick="readWM()">👁️ OKU</button>
+        <button class="btn r" onclick="delWM()">🗑️ SİL</button>
+      </div>
+      <div id="t-wkres" style="font-family:var(--mono);font-size:.63rem;color:var(--t2);min-height:18px"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ RAW ══════════ -->
+<div class="page" id="p-raw">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+    <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g)">📄 RAW JSON</div>
+    <div class="brow">
+      <select id="rs" class="inp sm" onchange="renderRaw()">
+        <option value="all">TÜM VERİ</option><option value="votes7d">Votes</option>
+        <option value="users">Users</option><option value="usernames">Usernames</option>
+      </select>
+      <button class="btn sm solid" onclick="R()">↻ YENİLE</button>
+      <button class="btn sm b" onclick="copyRaw()">📋 KOPYALA</button>
+      <button class="btn sm"   onclick="dlRaw()">💾 İNDİR</button>
+    </div>
+  </div>
+  <div id="rawBox" class="json">Yükleniyor...</div>
+</div>
+
+<!-- ══════════ WRITER ══════════ -->
+<div class="page" id="p-writer">
+  <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--g);margin-bottom:14px">✏️ DB YAZICI</div>
+  <div class="card">
+    <div class="ch"><div class="ct b">📍 PATH & DEĞER</div></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="fg"><label class="lbl">PATH</label><input id="w-path" class="inp" placeholder="/votes7d/halil" style="width:100%"></div>
+      <div class="fg"><label class="lbl">DEĞER (sayı, "metin", veya JSON)</label>
+        <textarea id="w-val" class="inp" style="width:100%;min-height:70px;resize:vertical" placeholder='999 veya "lieber" veya {"key":"val"}'></textarea>
+      </div>
+      <div class="brow">
+        <button class="btn solid" onclick="wSet()">📌 YAZ (PUT)</button>
+        <button class="btn b"     onclick="wGet()">👁️ OKU (GET)</button>
+        <button class="btn o"     onclick="wPatch()">🔄 PATCH</button>
+        <button class="btn r"     onclick="wDel()">🗑️ SİL</button>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="wRes" style="display:none">
+    <div class="ch"><div class="ct g">📤 SONUÇ</div></div>
+    <div class="json" id="wResContent"></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct y">📚 HIZLI PATH'LER</div></div>
+    <div class="phints" id="pathHints"></div>
+  </div>
+</div>
+
+<!-- ══════════ DANGER ══════════ -->
+<div class="page" id="p-danger">
+  <div style="font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--r);margin-bottom:14px">⚠️ TEHLİKELİ — GERİ ALINAMAZ</div>
+  <div class="tgrid">
+    <div class="tc" style="border-color:rgba(255,34,85,.25)">
+      <div class="ttl r">🗑️ TÜM VOTE SİL</div>
+      <p class="tdesc">votes7d tamamen silinir.</p>
+      <button class="btn solid-r big" onclick="cfDelAll()">🗑️ SİL</button>
+    </div>
+    <div class="tc" style="border-color:rgba(255,119,0,.25)">
+      <div class="ttl o">🔄 OY KAYITLARINI SİFIRLA</div>
+      <p class="tdesc">Tüm users voted flag silinir, herkes tekrar oy verebilir.</p>
+      <button class="btn o big" onclick="resetAllVoted()">🔄 SIFIRLA</button>
+    </div>
+    <div class="tc" style="border-color:rgba(255,34,85,.4)">
+      <div class="ttl r">💣 TAM NUKE</div>
+      <p class="tdesc">votes7d + voted kayıtları + weekMarker silinir.</p>
+      <button class="btn solid-r big" onclick="nuke()">💣 NUKE</button>
+    </div>
+    <div class="tc" style="border-color:rgba(187,68,255,.25)">
+      <div class="ttl p">📭 HERKESE 0 YAZ</div>
+      <p class="tdesc">Tüm oy değerleri sıfır yapılır, isimler korunur.</p>
+      <button class="btn p big" onclick="zeroAll()">📭 SIFIRLA</button>
+    </div>
+    <div class="tc" style="border-color:rgba(255,34,85,.25)">
+      <div class="ttl r">👤 UID İLE KULLANICI SİL</div>
+      <div class="fg" style="margin-bottom:10px"><label class="lbl">UID</label><input id="d-uid" class="inp" placeholder="Firebase UID"></div>
+      <button class="btn solid-r" onclick="delByUid()">🗑️ SİL</button>
+    </div>
+    <div class="tc" style="border-color:rgba(255,204,0,.25)">
+      <div class="ttl y">🗓️ HAFTA MARKER SİL</div>
+      <p class="tdesc">Site bir sonraki açılışta sıfırlama yapar.</p>
+      <button class="btn y big" onclick="delWM()">🗓️ SİL</button>
+    </div>
+  </div>
+</div>
+
+</div></div>
+
+<button id="logToggle" onclick="toggleLog()">▲ LOG (0)</button>
+<div id="logBox"><div id="logInner"></div></div>
+<div id="tc"></div>
 <div id="modal">
-  <div id="modal-box">
-    <div class="modal-title" id="modal-title">ONAY GEREKLİ</div>
-    <div class="modal-body" id="modal-body">Bu işlemi yapmak istediğinden emin misin?</div>
-    <div class="modal-actions">
-      <button class="btn" onclick="closeModal()">İPTAL</button>
-      <button class="btn solid-red" id="modal-confirm">ONAYLA</button>
-    </div>
+  <div id="mbox">
+    <div class="mt" id="mt">ONAY</div>
+    <div class="mb" id="mb">Emin misin?</div>
+    <div class="ma"><button class="btn" onclick="cModal()">İPTAL</button><button class="btn solid-r" id="mok">ONAYLA</button></div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════
-//  GLOBALS
-// ═══════════════════════════════════════════════════
-const BASE = 'https://dzone-9946c-default-rtdb.europe-west1.firebasedatabase.app';
-let DB = { users: {}, votes: {}, usernames: {} };
-let logCount = 0;
-let lockBot = null, autoBot = null;
-let currentPage = 'dashboard';
+const BASE='https://dzone-9946c-default-rtdb.europe-west1.firebasedatabase.app';
+let DB={votes:{},users:{},usernames:{}};
+let SEL=new Set(),logN=0,mcb=null;
+let lockBot=null,addBot=null,remBot=null,mulBot=null;
 
-// ─── WEEK KEY ───────────────────────────────────────
-function getWeekKey() {
-  const d = new Date();
-  const day = d.getDay();
-  const mondayOffset = day === 0 ? -6 : 1 - day;
-  const mon = new Date(d.getFullYear(), d.getMonth(), d.getDate() + mondayOffset);
-  return mon.getFullYear() + '-' + String(mon.getMonth()+1).padStart(2,'0') + '-' + String(mon.getDate()).padStart(2,'0');
+// ─ Firebase REST ─
+async function fbGet(p){try{const r=await fetch(BASE+p+'.json');if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}catch(e){log('GET ERR '+p+': '+e.message,'e');return null;}}
+async function fbSet(p,v){try{const r=await fetch(BASE+p+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)});if(!r.ok)throw new Error('HTTP '+r.status);log('SET '+p);return await r.json();}catch(e){log('SET ERR '+p+': '+e.message,'e');return null;}}
+async function fbPatch(p,v){try{const r=await fetch(BASE+p+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}catch(e){log('PATCH ERR '+p+': '+e.message,'e');return null;}}
+async function fbDel(p){try{const r=await fetch(BASE+p+'.json',{method:'DELETE'});if(!r.ok)throw new Error('HTTP '+r.status);log('DEL '+p,'w');return true;}catch(e){log('DEL ERR '+p+': '+e.message,'e');return false;}}
+
+// ─ Parse val ─
+function parseVal(s){s=s.trim();try{return JSON.parse(s);}catch{return s;}}
+function numVal(v){const n=parseFloat(v);return isNaN(n)?0:n;}
+
+// ─ Week key ─
+function wk(){const d=new Date(),day=d.getDay(),off=day===0?-6:1-day,m=new Date(d.getFullYear(),d.getMonth(),d.getDate()+off);return m.getFullYear()+'-'+String(m.getMonth()+1).padStart(2,'0')+'-'+String(m.getDate()).padStart(2,'0');}
+
+// ─ Load all ─
+async function R(){
+  setConn(null);toast('↻ Yükleniyor...','i');
+  const[v,u,un]=await Promise.all([fbGet('/votes7d'),fbGet('/users'),fbGet('/usernames')]);
+  DB.votes=v||{};DB.users=u||{};DB.usernames=un||{};
+  setConn(true);
+  document.getElementById('wkBadge').textContent='📅 '+wk();
+  renderVotes();renderUsers();fillSelects();renderRaw();calcStats();buildPathHints();
+  toast('✅ Yüklendi: '+Object.keys(DB.votes).length+' vote, '+Object.keys(DB.users).length+' kullanıcı');
+  log('Veri yüklendi','i');
 }
 
-// ═══════════════════════════════════════════════════
-//  FIREBASE REST
-// ═══════════════════════════════════════════════════
-async function fbGet(path) {
-  try {
-    const r = await fetch(BASE + path + '.json');
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return await r.json();
-  } catch(e) {
-    addLog('GET HATA: ' + path + ' — ' + e.message, 'error');
-    return null;
-  }
+function setConn(ok){
+  const d=document.getElementById('connDot'),t=document.getElementById('connTxt');
+  if(ok===null){d.style.background='var(--y)';d.style.boxShadow='0 0 8px var(--y)';t.textContent='YÜKLENİYOR';}
+  else if(ok){d.style.background='var(--g)';d.style.boxShadow='0 0 8px var(--g)';t.textContent='BAĞLI';}
+  else{d.style.background='var(--r)';d.style.boxShadow='0 0 8px var(--r)';t.textContent='HATA';}
 }
 
-async function fbSet(path, val) {
-  try {
-    const r = await fetch(BASE + path + '.json', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(val)
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    addLog('SET: ' + path + ' = ' + JSON.stringify(val));
-    return await r.json();
-  } catch(e) {
-    addLog('SET HATA: ' + path + ' — ' + e.message, 'error');
-    return null;
-  }
+// ─ Votes render ─
+function getEntries(){
+  let e=Object.entries(DB.votes);
+  const q=(document.getElementById('vsearch')||{}).value||'';
+  if(q)e=e.filter(([k])=>k.toLowerCase().includes(q.toLowerCase()));
+  const s=(document.getElementById('vsort')||{}).value||'desc';
+  if(s==='desc')e.sort((a,b)=>numVal(b[1])-numVal(a[1]));
+  else if(s==='asc')e.sort((a,b)=>numVal(a[1])-numVal(b[1]));
+  else if(s==='az')e.sort((a,b)=>a[0].localeCompare(b[0]));
+  else e.sort((a,b)=>b[0].localeCompare(a[0]));
+  const sh=parseInt((document.getElementById('vshow')||{}).value||'0');
+  if(sh>0)e=e.slice(0,sh);
+  return e;
 }
 
-async function fbPatch(path, val) {
-  try {
-    const r = await fetch(BASE + path + '.json', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(val)
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    addLog('PATCH: ' + path);
-    return await r.json();
-  } catch(e) {
-    addLog('PATCH HATA: ' + path + ' — ' + e.message, 'error');
-    return null;
-  }
-}
-
-async function fbDelete(path) {
-  try {
-    const r = await fetch(BASE + path + '.json', { method: 'DELETE' });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    addLog('DELETE: ' + path, 'warn');
-    return true;
-  } catch(e) {
-    addLog('DELETE HATA: ' + path + ' — ' + e.message, 'error');
-    return false;
-  }
-}
-
-// ═══════════════════════════════════════════════════
-//  DATA LOADING
-// ═══════════════════════════════════════════════════
-async function loadAllData() {
-  setStatus('YÜKLENİYOR...', false);
-  addLog('Tüm veriler çekiliyor...', 'info');
-  try {
-    const [users, votes, usernames] = await Promise.all([
-      fbGet('/users'),
-      fbGet('/votes7d'),
-      fbGet('/usernames')
-    ]);
-    DB.users = users || {};
-    DB.votes = votes || {};
-    DB.usernames = usernames || {};
-    const week = getWeekKey();
-    document.getElementById('weekDisplay').textContent = week;
-    updateBadges();
-    setStatus('BAĞLANDI', true);
-    document.getElementById('lastRefreshText').textContent = 'SON GÜNCELLEME: ' + new Date().toLocaleTimeString('tr-TR');
-    addLog('Veriler yüklendi. ' + Object.keys(DB.users).length + ' kullanıcı, ' + Object.keys(DB.votes).length + ' vote kaydı.', 'info');
-    renderCurrentPage();
-  } catch(e) {
-    setStatus('HATA!', false);
-    addLog('Veri yükleme hatası: ' + e.message, 'error');
-  }
-}
-
-function fullReload() {
-  loadAllData();
-  toast('↻ Veriler yenileniyor...', 'info');
-}
-
-function renderCurrentPage() {
-  if (currentPage === 'dashboard') renderDashboard();
-  else if (currentPage === 'votes') renderVotesPage();
-  else if (currentPage === 'users') renderUsersPage();
-  else if (currentPage === 'raw') renderRaw();
-  else if (currentPage === 'tools') { /* static */ }
-  else if (currentPage === 'writer') { /* static */ }
-  else if (currentPage === 'danger') { /* static */ }
-}
-
-// ═══════════════════════════════════════════════════
-//  STATUS & BADGES
-// ═══════════════════════════════════════════════════
-function setStatus(text, ok) {
-  document.getElementById('statusText').textContent = text;
-  const dot = document.getElementById('statusDot');
-  dot.style.background = ok ? 'var(--accent)' : 'var(--danger)';
-  dot.style.boxShadow = '0 0 10px ' + (ok ? 'var(--accent)' : 'var(--danger)');
-}
-
-function updateBadges() {
-  const userCount = Object.keys(DB.users).length;
-  const voteCount = Object.keys(DB.votes).length;
-  const totalVotes = Object.values(DB.votes).reduce((a, b) => a + (b || 0), 0);
-  const week = getWeekKey();
-  const votedCount = Object.values(DB.users).filter(u => u && u.voted && u.voted[week]).length;
-  const adminCount = Object.values(DB.users).filter(u => u && u.admin).length;
-
-  document.getElementById('nb-dashboard').textContent = userCount + ' U';
-  document.getElementById('nb-votes').textContent = voteCount;
-  document.getElementById('nb-users').textContent = userCount;
-
-  document.getElementById('stat-users').textContent = userCount;
-  document.getElementById('stat-totalvotes').textContent = totalVotes;
-  document.getElementById('stat-voted').textContent = votedCount;
-  document.getElementById('stat-admins').textContent = adminCount;
-  document.getElementById('stat-notvoted').textContent = userCount - votedCount;
-
-  const sorted = Object.entries(DB.votes).sort((a, b) => b[1] - a[1]);
-  if (sorted.length > 0) {
-    document.getElementById('stat-leader').textContent = sorted[0][0];
-    document.getElementById('stat-leader-votes').textContent = sorted[0][1] + ' oy';
-  } else {
-    document.getElementById('stat-leader').textContent = '—';
-    document.getElementById('stat-leader-votes').textContent = '—';
-  }
-}
-
-// ═══════════════════════════════════════════════════
-//  DASHBOARD
-// ═══════════════════════════════════════════════════
-function renderDashboard() {
-  updateBadges();
-  renderDashVotes();
-  renderDashUsers();
-}
-
-function renderDashVotes() {
-  const el = document.getElementById('dash-top5');
-  const sorted = Object.entries(DB.votes).sort((a, b) => b[1] - a[1]).slice(0, 5);
-  const maxV = sorted[0] ? sorted[0][1] : 1;
-  if (sorted.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">HENÜZ OY YOK</div></div>';
-    return;
-  }
-  const medals = ['🥇','🥈','🥉','#4','#5'];
-  const colors = ['#ffd700','#c0c0c0','#cd7f32','var(--accent)','var(--accent)'];
-  el.innerHTML = sorted.map(([key, val], i) => {
-    const pct = Math.round((val / maxV) * 100);
-    return `<div style="display:grid;grid-template-columns:2rem 1fr auto;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
-      <div style="font-size:1.1rem;text-align:center;">${medals[i]}</div>
-      <div>
-        <div style="font-weight:700;font-size:0.9rem;color:var(--text);margin-bottom:4px;">${key}</div>
-        <div style="background:var(--border);height:5px;border-radius:100px;overflow:hidden;">
-          <div style="height:100%;width:${pct}%;background:${colors[i]};border-radius:100px;"></div>
-        </div>
-      </div>
-      <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:${colors[i]};">${val}</div>
-    </div>`;
+function renderVotes(){
+  const rows=document.getElementById('voteRows');
+  const empty=document.getElementById('voteEmpty');
+  const entries=getEntries();
+  if(!entries.length){rows.innerHTML='';empty.style.display='block';updateSelBar();return;}
+  empty.style.display='none';
+  const numEntries=entries.filter(([,v])=>!isNaN(parseFloat(v)));
+  const maxV=numEntries.length?Math.max(...numEntries.map(([,v])=>numVal(v)),1):1;
+  const medals=['🥇','🥈','🥉'];
+  const cols=['#ffd700','#c0c0c0','#cd7f32','var(--g)'];
+  rows.innerHTML=entries.map(([key,val],i)=>{
+    const nv=numVal(val),isText=isNaN(parseFloat(val));
+    const pct=isText?0:Math.round((nv/maxV)*100);
+    const col=i<3?cols[i]:'var(--g)';
+    const medal=i<3?medals[i]:`<span style="font-size:.7rem;color:var(--t3)">#${i+1}</span>`;
+    return`<div class="vr${SEL.has(key)?' selected':''}" id="vr-${key}">
+<div class="vrank" style="color:${col}">${medal}</div>
+<input type="checkbox" class="vcheck" ${SEL.has(key)?'checked':''} onchange="toggleSel('${key}',this.checked)">
+<div class="vname"><span class="inlineHint" title="Çift tık = İsmi değiştir" ondblclick="startRenameVote(this,'${key}')">${key}</span></div>
+<div><span class="vval inlineHint" style="color:${col}" title="Çift tık = Değeri düzenle (metin/sayı girebilirsin)" ondblclick="startEditVal(this,'${key}','${val}')">${val}</span></div>
+<div class="vbarwrap"><div class="vbar"><div class="vfill" style="width:${pct}%;background:${col}"></div></div></div>
+<div class="vpct">${isText?'—':pct+'%'}</div>
+<div class="vact">
+  <button class="btn sm" onclick="qAdd('${key}',1)">+1</button>
+  <button class="btn sm" onclick="qAdd('${key}',10)">+10</button>
+  <button class="btn sm" onclick="qAdd('${key}',100)">+100</button>
+  <button class="btn sm r" onclick="qDel('${key}')">🗑</button>
+</div>
+</div>`;
   }).join('');
+  updateSelBar();
 }
 
-function renderDashUsers() {
-  const el = document.getElementById('dash-users');
-  const users = Object.entries(DB.users).slice(0, 6);
-  const week = getWeekKey();
-  if (users.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">👤</div><div class="empty-text">HİÇ KULLANICI YOK</div></div>';
-    return;
-  }
-  el.innerHTML = users.map(([uid, u]) => {
-    if (!u) return '';
-    const voted = u.voted && u.voted[week];
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:1rem;">${u.admin ? '👑' : '👤'}</span>
-        <span style="font-weight:700;font-size:0.88rem;">${u.username || '???'}</span>
-        ${u.admin ? '<span class="badge admin">ADMIN</span>' : ''}
-      </div>
-      <span class="badge ${voted ? 'voted' : 'not-voted'}">${voted ? '✅ OY VERDİ' : '❌ OY VERMEDI'}</span>
-    </div>`;
-  }).join('');
+function startEditVal(el,key,cur){
+  const inp=document.createElement('input');
+  inp.className='vval-edit';inp.value=cur;inp.style.width='100px';
+  el.replaceWith(inp);inp.focus();inp.select();
+  const save=async()=>{
+    const raw=inp.value.trim();if(raw===''){renderVotes();return;}
+    const v=parseVal(raw);
+    await fbSet('/votes7d/'+key,v);DB.votes[key]=v;
+    renderVotes();fillSelects();toast(`📌 ${key} = ${raw}`);
+  };
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')save();if(e.key==='Escape')renderVotes();});
+  inp.addEventListener('blur',save);
 }
 
-// ═══════════════════════════════════════════════════
-//  VOTES PAGE
-// ═══════════════════════════════════════════════════
-function renderVotesPage() {
-  const el = document.getElementById('votesList');
-  const sorted = Object.entries(DB.votes).sort((a, b) => b[1] - a[1]);
-  const maxV = sorted[0] ? sorted[0][1] : 1;
-  const totalVotes = sorted.reduce((a, b) => a + b[1], 0);
+function startRenameVote(el,key){
+  const inp=document.createElement('input');
+  inp.className='vname-edit';inp.value=key;
+  el.replaceWith(inp);inp.focus();inp.select();
+  const save=async()=>{
+    const nk=inp.value.trim().toLowerCase().replace(/\s+/g,'');
+    if(!nk||nk===key){renderVotes();return;}
+    const v=DB.votes[key];
+    await fbSet('/votes7d/'+nk,v);await fbDel('/votes7d/'+key);
+    DB.votes[nk]=v;delete DB.votes[key];SEL.delete(key);
+    renderVotes();fillSelects();toast(`✏️ ${key} → ${nk}`);
+  };
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')save();if(e.key==='Escape')renderVotes();});
+  inp.addEventListener('blur',save);
+}
 
-  if (sorted.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">HENÜZ OY YOK</div></div>';
-    return;
+// ─ Selection ─
+function toggleSel(key,on){on?SEL.add(key):SEL.delete(key);updateSelBar();}
+function selAll(){getEntries().forEach(([k])=>SEL.add(k));renderVotes();}
+function selNone(){SEL.clear();renderVotes();}
+function updateSelBar(){
+  const sb=document.getElementById('selbar');
+  const sc=document.getElementById('selCount');
+  if(SEL.size>0){sb.classList.add('on');sc.textContent=SEL.size+' kişi seçili: '+[...SEL].join(', ');}
+  else sb.classList.remove('on');
+}
+
+async function bulkAdd(){
+  const raw=document.getElementById('selAmt').value.trim();
+  const v=parseVal(raw);const isNum=typeof v==='number';
+  for(const k of SEL){const cur=isNum?numVal(DB.votes[k]||0)+v:v;await fbSet('/votes7d/'+k,cur);DB.votes[k]=cur;}
+  toast(`✅ ${SEL.size} kişiye +${raw}`);SEL.clear();renderVotes();fillSelects();
+}
+async function bulkRemove(){
+  const a=parseFloat(document.getElementById('selAmt').value)||0;
+  for(const k of SEL){const nv=Math.max(0,numVal(DB.votes[k]||0)-a);await fbSet('/votes7d/'+k,nv);DB.votes[k]=nv;}
+  toast(`➖ ${SEL.size} kişiden -${a}`,'w');SEL.clear();renderVotes();fillSelects();
+}
+async function bulkSet(){
+  const raw=document.getElementById('selAmt').value.trim();
+  const v=parseVal(raw);
+  for(const k of SEL){await fbSet('/votes7d/'+k,v);DB.votes[k]=v;}
+  toast(`📌 ${SEL.size} kişiye set: ${raw}`);SEL.clear();renderVotes();fillSelects();
+}
+async function bulkDelete(){
+  showModal('TOPLU SİL',`${SEL.size} kişinin oyu silinsin mi?`,async()=>{
+    for(const k of SEL){await fbDel('/votes7d/'+k);delete DB.votes[k];}
+    toast(`🗑️ ${SEL.size} kişi silindi`,'w');SEL.clear();renderVotes();fillSelects();
+  });
+}
+async function bulkMultiply(){
+  const x=parseFloat(document.getElementById('selAmt').value)||1;
+  for(const k of SEL){const nv=Math.round(numVal(DB.votes[k]||0)*x);await fbSet('/votes7d/'+k,nv);DB.votes[k]=nv;}
+  toast(`✖ ${SEL.size} kişi × ${x}`);SEL.clear();renderVotes();fillSelects();
+}
+async function bulkCustomText(){
+  const txt=prompt('Seçili herkese yazılacak metin/değer:');
+  if(txt===null)return;
+  const v=parseVal(txt);
+  for(const k of SEL){await fbSet('/votes7d/'+k,v);DB.votes[k]=v;}
+  toast(`✏️ ${SEL.size} kişiye: ${txt}`);SEL.clear();renderVotes();fillSelects();
+}
+
+// ─ Quick ops ─
+async function qAdd(k,n){const nv=numVal(DB.votes[k]||0)+n;await fbSet('/votes7d/'+k,nv);DB.votes[k]=nv;renderVotes();toast(`+${n} → ${k}: ${nv}`);}
+async function qDel(k){showModal('SİL',`"${k}" silinsin mi?`,async()=>{await fbDel('/votes7d/'+k);delete DB.votes[k];SEL.delete(k);renderVotes();fillSelects();toast(`🗑️ ${k}`,'w');});}
+async function addNewVote(){
+  const name=prompt('Yeni kişi adı:');if(!name)return;
+  const val=prompt('Oy değeri (sayı veya metin):','0');if(val===null)return;
+  const v=parseVal(val);const key=name.toLowerCase().trim().replace(/\s+/g,'');
+  await fbSet('/votes7d/'+key,v);DB.votes[key]=v;renderVotes();fillSelects();toast(`➕ ${key} eklendi`);
+}
+async function cfDelAll(){showModal('TÜM VOTE SİL','Tüm oy verileri silinecek!',async()=>{await fbDel('/votes7d');DB.votes={};SEL.clear();renderVotes();fillSelects();toast('🗑️ Tümü silindi','w');});}
+
+// ─ Fill selects ─
+function fillSelects(){
+  const keys=Object.keys(DB.votes);
+  const ids=['m-t1','m-t2','sw-t1','sw-t2','cp-src','cp-dst','lb-t','ab-t','rb-t'];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;
+    el.innerHTML='<option value="">Seç...</option>'+keys.map(k=>`<option value="${k}">${k}</option>`).join('');
+    if(cur&&keys.includes(cur))el.value=cur;else if(keys.includes('halil'))el.value='halil';
+  });
+}
+
+// ─ Dual target ─
+async function dualAdd(){
+  const t1=document.getElementById('m-t1').value,t2=document.getElementById('m-t2').value;
+  const raw=document.getElementById('m-amt').value.trim();
+  const v=parseVal(raw);const isNum=typeof v==='number';
+  const res=[];
+  for(const t of[t1,t2].filter(Boolean)){
+    const nv=isNum?numVal(DB.votes[t]||0)+v:v;
+    await fbSet('/votes7d/'+t,nv);DB.votes[t]=nv;res.push(`${t}→${nv}`);
   }
+  const r=document.getElementById('m-res');r.style.color='var(--g)';
+  r.textContent=res.length?'✅ '+res.join('  |  '):'⚠️ Hedef seçmedin!';
+  renderVotes();fillSelects();if(res.length)toast('⚡ '+res.join(' | '));
+}
+async function dualRemove(){
+  const t1=document.getElementById('m-t1').value,t2=document.getElementById('m-t2').value;
+  const a=parseFloat(document.getElementById('m-amt').value)||0;
+  const res=[];
+  for(const t of[t1,t2].filter(Boolean)){
+    const nv=Math.max(0,numVal(DB.votes[t]||0)-a);await fbSet('/votes7d/'+t,nv);DB.votes[t]=nv;res.push(`${t}→${nv}`);
+  }
+  const r=document.getElementById('m-res');r.style.color='var(--o)';r.textContent='➖ '+(res.length?res.join(' | '):'Hedef yok');
+  renderVotes();fillSelects();
+}
+async function dualSet(){
+  const t1=document.getElementById('m-t1').value,t2=document.getElementById('m-t2').value;
+  const raw=document.getElementById('m-amt').value.trim();const v=parseVal(raw);
+  for(const t of[t1,t2].filter(Boolean)){await fbSet('/votes7d/'+t,v);DB.votes[t]=v;}
+  document.getElementById('m-res').textContent='📌 Set: '+raw;renderVotes();fillSelects();toast('📌 Çift set: '+raw);
+}
+async function dualDelete(){
+  const t1=document.getElementById('m-t1').value,t2=document.getElementById('m-t2').value;
+  const targets=[t1,t2].filter(Boolean);
+  if(!targets.length){toast('Hedef seç!','e');return;}
+  showModal('ÇİFT SİL',`${targets.join(' ve ')} silinsin mi?`,async()=>{
+    for(const t of targets){await fbDel('/votes7d/'+t);delete DB.votes[t];}
+    renderVotes();fillSelects();toast('🗑️ Silindi','w');
+  });
+}
+async function swapVotes(){
+  const t1=document.getElementById('sw-t1').value,t2=document.getElementById('sw-t2').value;
+  if(!t1||!t2||t1===t2){toast('2 farklı kişi seç!','e');return;}
+  const v1=DB.votes[t1],v2=DB.votes[t2];
+  await fbSet('/votes7d/'+t1,v2);await fbSet('/votes7d/'+t2,v1);
+  DB.votes[t1]=v2;DB.votes[t2]=v1;
+  renderVotes();toast(`⇄ Takas: ${t1}(${v1}) ↔ ${t2}(${v2})`);
+}
+async function copyVotes(){
+  const src=document.getElementById('cp-src').value,dst=document.getElementById('cp-dst').value;
+  if(!src||!dst){toast('Seç!','e');return;}
+  const v=DB.votes[src];await fbSet('/votes7d/'+dst,v);DB.votes[dst]=v;
+  renderVotes();toast(`📋 ${src}→${dst}: ${v}`);
+}
+async function multiplyAll(){
+  const x=parseFloat(document.getElementById('mul-x').value)||1;
+  for(const[k,v]of Object.entries(DB.votes)){if(!isNaN(parseFloat(v))){const nv=Math.round(numVal(v)*x);await fbSet('/votes7d/'+k,nv);DB.votes[k]=nv;}}
+  renderVotes();toast(`✖ Tümü × ${x}`);
+}
 
-  const medals = ['🥇','🥈','🥉'];
-  const barColors = ['#ffd700','#c0c0c0','#cd7f32'];
+// ─ Bots ─
+function bLog(id,msg){const el=document.getElementById(id);if(el){el.innerHTML=`[${new Date().toLocaleTimeString('tr')}] ${msg}<br>`+el.innerHTML;}}
 
-  el.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-      <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text2);">${sorted.length} KİŞİ · TOPLAM ${totalVotes} OY</span>
+function lockStart(){
+  if(lockBot)clearInterval(lockBot);
+  const t=document.getElementById('lb-t').value||'halil';
+  const mn=parseFloat(document.getElementById('lb-min').value)||500;
+  const iv=parseInt(document.getElementById('lb-int').value)||5;
+  const sv=parseVal(document.getElementById('lb-set').value||'999');
+  const el=document.getElementById('lb-status');el.className='bs on';el.innerHTML=`<div class="d"></div>AKTİF → ${t} min:${mn} @${iv}sn`;
+  log(`Koruma botu: ${t} min=${mn}`,'i');
+  lockBot=setInterval(async()=>{
+    const cur=await fbGet('/votes7d/'+t);
+    if(cur===null||numVal(cur)<mn){await fbSet('/votes7d/'+t,sv);DB.votes[t]=sv;renderVotes();bLog('lb-log',`🛡️→${sv}`);log(`Koruma: ${t}→${sv}`);}
+  },iv*1000);
+}
+function lockStop(){if(lockBot){clearInterval(lockBot);lockBot=null;}const el=document.getElementById('lb-status');el.className='bs';el.innerHTML='<div class="d"></div>KAPALI';toast('⏹ Koruma durduruldu','w');}
+
+function autoAddStart(){
+  if(addBot)clearInterval(addBot);
+  const t=document.getElementById('ab-t').value||'halil';
+  const a=parseFloat(document.getElementById('ab-amt').value)||10;
+  const iv=parseInt(document.getElementById('ab-int').value)||10;
+  const mx=parseInt(document.getElementById('ab-max').value)||0;
+  const el=document.getElementById('ab-status');el.className='bs on';el.innerHTML=`<div class="d"></div>AKTİF +${a}/${iv}sn`;
+  addBot=setInterval(async()=>{
+    const cur=numVal(DB.votes[t]||0);
+    if(mx>0&&cur>=mx){autoAddStop();toast('Max oya ulaşıldı','i');return;}
+    const nv=cur+a;await fbSet('/votes7d/'+t,nv);DB.votes[t]=nv;renderVotes();bLog('ab-log',`+${a}→${nv}`);
+  },iv*1000);
+}
+function autoAddStop(){if(addBot){clearInterval(addBot);addBot=null;}const el=document.getElementById('ab-status');el.className='bs';el.innerHTML='<div class="d"></div>KAPALI';toast('⏹ Oto ekleme durduruldu','w');}
+
+function autoRemStart(){
+  if(remBot)clearInterval(remBot);
+  const t=document.getElementById('rb-t').value||'halil';
+  const a=parseFloat(document.getElementById('rb-amt').value)||10;
+  const iv=parseInt(document.getElementById('rb-int').value)||10;
+  const mn=parseFloat(document.getElementById('rb-min').value)||0;
+  const el=document.getElementById('rb-status');el.className='bs on';el.innerHTML=`<div class="d"></div>AKTİF -${a}/${iv}sn`;
+  remBot=setInterval(async()=>{
+    const cur=numVal(DB.votes[t]||0);
+    if(cur<=mn){autoRemStop();return;}
+    const nv=Math.max(mn,cur-a);await fbSet('/votes7d/'+t,nv);DB.votes[t]=nv;renderVotes();bLog('rb-log',`-${a}→${nv}`);
+  },iv*1000);
+}
+function autoRemStop(){if(remBot){clearInterval(remBot);remBot=null;}const el=document.getElementById('rb-status');el.className='bs';el.innerHTML='<div class="d"></div>KAPALI';toast('⏹ Oto silme durduruldu','w');}
+
+function multiStart(){
+  if(mulBot)clearInterval(mulBot);
+  const targets=document.getElementById('mb-t').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const a=parseFloat(document.getElementById('mb-amt').value)||5;
+  const iv=parseInt(document.getElementById('mb-int').value)||15;
+  const el=document.getElementById('mb-status');el.className='bs on';el.innerHTML=`<div class="d"></div>AKTİF [${targets.join(',')}] +${a}/${iv}sn`;
+  mulBot=setInterval(async()=>{
+    for(const t of targets){const nv=numVal(DB.votes[t]||0)+a;await fbSet('/votes7d/'+t,nv);DB.votes[t]=nv;}
+    renderVotes();bLog('mb-log',`+${a}→[${targets.join(',')}]`);
+  },iv*1000);
+}
+function multiStop(){if(mulBot){clearInterval(mulBot);mulBot=null;}const el=document.getElementById('mb-status');el.className='bs';el.innerHTML='<div class="d"></div>KAPALI';toast('⏹ Çoklu bot durduruldu','w');}
+
+// ─ Tools ─
+async function halilBomb(){
+  const a=parseInt(document.getElementById('t-hamt').value)||999;
+  const cur=numVal(DB.votes['halil']||0),nv=cur+a;
+  await fbSet('/votes7d/halil',nv);DB.votes['halil']=nv;
+  document.getElementById('t-hres').textContent=`🐱 ${cur}+${a}=${nv}`;
+  renderVotes();fillSelects();toast(`🐱 Halil: ${nv}`);
+}
+async function onlyHalil(){
+  const a=parseInt(document.getElementById('t-ohamt').value)||9999;
+  showModal('SADECE HALİL',`Tüm oylar silinecek, Halil=${a} yazılacak.`,async()=>{
+    await fbDel('/votes7d');await fbSet('/votes7d/halil',a);DB.votes={halil:a};renderVotes();fillSelects();toast(`⭐ Sadece Halil: ${a}`);
+  });
+}
+async function normalizeVotes(){
+  const e=Object.entries(DB.votes).filter(([,v])=>!isNaN(parseFloat(v)));
+  const mx=Math.max(...e.map(([,v])=>numVal(v)),1);
+  for(const[k,v]of e){const nv=Math.round((numVal(v)/mx)*100);await fbSet('/votes7d/'+k,nv);DB.votes[k]=nv;}
+  renderVotes();toast('📊 Normalize edildi (0-100)');
+}
+async function randomizeAll(){
+  const mn=parseInt(document.getElementById('t-rmin').value)||1,mx=parseInt(document.getElementById('t-rmax').value)||1000;
+  for(const k of Object.keys(DB.votes)){const v=Math.floor(Math.random()*(mx-mn+1))+mn;await fbSet('/votes7d/'+k,v);DB.votes[k]=v;}
+  renderVotes();toast('🎲 Rastgele oy atandı');
+}
+async function setAll(){
+  const raw=document.getElementById('t-setall').value.trim();const v=parseVal(raw);
+  for(const k of Object.keys(DB.votes)){await fbSet('/votes7d/'+k,v);DB.votes[k]=v;}
+  renderVotes();toast(`📌 Herkese: ${raw}`);
+}
+async function addAll(){
+  const a=parseFloat(document.getElementById('t-addall').value)||100;
+  for(const[k,v]of Object.entries(DB.votes)){const nv=numVal(v)+a;await fbSet('/votes7d/'+k,nv);DB.votes[k]=nv;}
+  renderVotes();toast(`➕ Herkese +${a}`);
+}
+function importJSON(){
+  const txt=document.getElementById('t-import').value.trim();
+  try{const d=JSON.parse(txt);showModal('JSON İMPORT','Mevcut veri ezilecek!',async()=>{await fbSet('/votes7d',d);DB.votes=d;renderVotes();fillSelects();toast('📥 İmport tamam');});}
+  catch{toast('Geçersiz JSON!','e');}
+}
+function copyVoteJSON(){navigator.clipboard.writeText(JSON.stringify(DB.votes,null,2)).then(()=>toast('📋 Kopyalandı')).catch(()=>toast('Hata','e'));}
+function downloadJSON(){const b=new Blob([JSON.stringify(DB.votes,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`votes-${Date.now()}.json`;a.click();URL.revokeObjectURL(u);toast('💾 İndiriliyor');}
+async function toggleAdmin(){
+  const un=document.getElementById('t-admu').value.trim().toLowerCase();
+  const give=document.getElementById('t-adma').value==='1';
+  const res=document.getElementById('t-admres');
+  if(!un){res.textContent='⚠️ Username gir!';return;}
+  const uid=DB.usernames[un];
+  if(!uid){res.style.color='var(--r)';res.textContent=`❌ "${un}" bulunamadı!`;return;}
+  await fbSet('/users/'+uid+'/admin',give);if(DB.users[uid])DB.users[uid].admin=give;
+  res.style.color='var(--g)';res.textContent=give?`👑 ${un} admin!`:`❌ ${un} admin değil`;
+  renderUsers();toast(give?`👑 ${un} admin!`:`❌ ${un} admin değil`);
+}
+function calcStats(){
+  const vals=Object.values(DB.votes).map(v=>numVal(v));
+  const total=vals.reduce((a,b)=>a+b,0),avg=vals.length?Math.round(total/vals.length):0;
+  const mx=vals.length?Math.max(...vals):0,mn=vals.length?Math.min(...vals):0;
+  const txtCount=Object.values(DB.votes).filter(v=>isNaN(parseFloat(v))).length;
+  const el=document.getElementById('t-stats');if(!el)return;
+  el.innerHTML=`TOPLAM OY: <span style="color:var(--g)">${total}</span><br>KİŞİ: <span style="color:var(--b)">${vals.length}</span><br>ORTALAMA: <span style="color:var(--y)">${avg}</span><br>MAX: <span style="color:var(--g)">${mx}</span><br>MİN: <span style="color:var(--r)">${mn}</span><br>METİN DEĞER: <span style="color:var(--o)">${txtCount}</span><br>KULLANICI: <span style="color:var(--p)">${Object.keys(DB.users).length}</span>`;
+}
+async function readWM(){const v=await fbGet('/voteWeekMarker');document.getElementById('t-wkres').textContent=v?'Marker: '+JSON.stringify(v):'Bulunamadı';}
+async function delWM(){showModal('MARKER SİL','voteWeekMarker silinsin mi?',async()=>{await fbDel('/voteWeekMarker');document.getElementById('t-wkres').textContent='Silindi ✓';toast('Marker silindi','w');});}
+
+// ─ Users ─
+function renderUsers(){
+  const el=document.getElementById('userList');
+  const week=wk();
+  const q=(document.getElementById('usearch')||{}).value||'';
+  let entries=Object.entries(DB.users).filter(([,u])=>u);
+  if(q)entries=entries.filter(([uid,u])=>(u.username||'').toLowerCase().includes(q.toLowerCase())||uid.includes(q));
+  if(!entries.length){el.innerHTML='<div class="empty">KULLANICI BULUNAMADI</div>';return;}
+  el.innerHTML=entries.map(([uid,u])=>{
+    const un=u.username||'???',isAdmin=u.admin===true,voted=u.voted&&u.voted[week];
+    let vd='❌ Oy vermedi';if(voted){try{const a=JSON.parse(voted);vd='✅ '+(Array.isArray(a)?a.join(', '):voted);}catch{vd='✅ '+voted;}}
+    return`<div class="uc${isAdmin?' adm':''}">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+  <div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
+      <span style="font-family:var(--disp);font-size:.85rem;font-weight:700">${isAdmin?'👑':'👤'} ${un}</span>
+      ${isAdmin?'<span class="badge adm">ADMIN</span>':''}
+      <span class="badge ${voted?'yes':'no'}">${voted?'OY VERDİ':'OY VERMEDİ'}</span>
     </div>
-    ${sorted.map(([key, val], i) => {
-      const pct = Math.round((val / maxV) * 100);
-      const medal = i < 3 ? medals[i] : `<span style="font-size:0.7rem;color:var(--text3);">#${i+1}</span>`;
-      const barColor = i < 3 ? barColors[i] : 'var(--accent)';
-      const rankColor = i < 3 ? barColors[i] : 'var(--text)';
-      return `<div class="vote-item">
-        <div class="vote-rank" style="color:${rankColor};">${medal}</div>
-        <div class="vote-info">
-          <div class="vote-name">${key}</div>
-          <div class="vote-bar-wrap">
-            <div class="vote-bar-fill" style="width:${pct}%;background:${barColor};"></div>
-          </div>
-        </div>
-        <div class="vote-count" style="color:${barColor};">${val}</div>
-        <div class="vote-actions">
-          <button class="btn sm" onclick="quickAdd('${key}', 1)" title="+1">+1</button>
-          <button class="btn sm orange" onclick="quickAdd('${key}', -1)" title="-1">-1</button>
-          <button class="btn sm red" onclick="quickDelete('${key}')" title="Sil">🗑️</button>
-        </div>
-      </div>`;
-    }).join('')}
-  `;
-}
-
-async function quickAdd(key, amt) {
-  const cur = DB.votes[key] || 0;
-  const newVal = Math.max(0, cur + amt);
-  await fbSet('/votes7d/' + key, newVal);
-  DB.votes[key] = newVal;
-  renderVotesPage();
-  renderDashVotes();
-  updateBadges();
-  toast(amt > 0 ? `✅ ${key} +${amt}` : `➖ ${key} ${amt}`);
-}
-
-async function quickDelete(key) {
-  showModal('VOTE SİL', `"${key}" adlı kişinin tüm oyu silinsin mi?`, async () => {
-    await fbDelete('/votes7d/' + key);
-    delete DB.votes[key];
-    renderVotesPage();
-    updateBadges();
-    toast(`🗑️ ${key} silindi!`, 'warn');
-  });
-}
-
-async function voteAdd() {
-  const name = document.getElementById('vi-name').value.trim().toLowerCase();
-  const amt = parseInt(document.getElementById('vi-amount').value) || 0;
-  if (!name) { toast('İsim gir!', 'error'); return; }
-  const cur = DB.votes[name] || 0;
-  const newVal = cur + amt;
-  await fbSet('/votes7d/' + name, newVal);
-  DB.votes[name] = newVal;
-  renderVotesPage(); renderDashVotes(); updateBadges();
-  toast(`✅ ${name} → +${amt} (toplam: ${newVal})`);
-}
-
-async function voteRemove() {
-  const name = document.getElementById('vi-name').value.trim().toLowerCase();
-  const amt = parseInt(document.getElementById('vi-amount').value) || 0;
-  if (!name) { toast('İsim gir!', 'error'); return; }
-  const cur = DB.votes[name] || 0;
-  const newVal = Math.max(0, cur - amt);
-  await fbSet('/votes7d/' + name, newVal);
-  DB.votes[name] = newVal;
-  renderVotesPage(); renderDashVotes(); updateBadges();
-  toast(`➖ ${name} → -${amt} (toplam: ${newVal})`, 'warn');
-}
-
-async function voteSet() {
-  const name = document.getElementById('vi-name').value.trim().toLowerCase();
-  const amt = parseInt(document.getElementById('vi-amount').value) || 0;
-  if (!name) { toast('İsim gir!', 'error'); return; }
-  await fbSet('/votes7d/' + name, amt);
-  DB.votes[name] = amt;
-  renderVotesPage(); renderDashVotes(); updateBadges();
-  toast(`📌 ${name} = ${amt}`);
-}
-
-async function voteDeleteOne() {
-  const name = document.getElementById('vi-name').value.trim().toLowerCase();
-  if (!name) { toast('İsim gir!', 'error'); return; }
-  showModal('OY SİL', `"${name}" kişisinin oyu silinsin mi?`, async () => {
-    await fbDelete('/votes7d/' + name);
-    delete DB.votes[name];
-    renderVotesPage(); updateBadges();
-    toast(`🗑️ ${name} vote silindi!`, 'warn');
-  });
-}
-
-async function confirmDeleteAllVotes() {
-  showModal('⚠️ TÜM VOTE\'LARI SİL', 'Bu işlem geri alınamaz! Tüm oylar silinecek. Devam?', async () => {
-    await fbDelete('/votes7d');
-    DB.votes = {};
-    renderVotesPage(); renderDashVotes(); updateBadges();
-    toast('🗑️ Tüm votlar silindi!', 'warn');
-  });
-}
-
-// ═══════════════════════════════════════════════════
-//  USERS PAGE
-// ═══════════════════════════════════════════════════
-function renderUsersPage(filter) {
-  const el = document.getElementById('usersList');
-  const week = getWeekKey();
-  let entries = Object.entries(DB.users).filter(([_, u]) => u);
-
-  if (filter) {
-    const q = filter.toLowerCase();
-    entries = entries.filter(([uid, u]) =>
-      (u.username || '').toLowerCase().includes(q) || uid.toLowerCase().includes(q)
-    );
-  }
-
-  document.getElementById('users-subtitle').textContent = `${entries.length} hesap listeleniyor · Hafta: ${week}`;
-
-  if (entries.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">KULLANICI BULUNAMADI</div></div>';
-    return;
-  }
-
-  el.innerHTML = entries.map(([uid, u]) => {
-    const uname = u.username || '???';
-    const isAdmin = u.admin === true;
-    const voted = u.voted && u.voted[week];
-    let votedDisplay = '❌ Oy vermedi';
-    if (voted) {
-      try {
-        const a = JSON.parse(voted);
-        votedDisplay = '✅ ' + (Array.isArray(a) ? a.join(', ') : voted);
-      } catch { votedDisplay = '✅ ' + voted; }
-    }
-
-    return `<div class="user-card ${isAdmin ? 'admin-card' : ''}">
-      <div class="user-top">
-        <div>
-          <div class="user-name-wrap">
-            <div class="user-name">${isAdmin ? '👑' : '👤'} ${uname}</div>
-            ${isAdmin ? '<span class="badge admin">ADMIN</span>' : ''}
-            <span class="badge ${voted ? 'voted' : 'not-voted'}">${voted ? 'OY VERDİ' : 'OY VERMEDİ'}</span>
-          </div>
-          <div class="user-uid">UID: ${uid}</div>
-          <div class="user-vote-info">${votedDisplay}</div>
-        </div>
-        <div class="user-actions">
-          <button class="btn sm ${isAdmin ? 'red' : 'yellow'}" onclick="toggleAdminUser('${uid}', ${isAdmin})">
-            ${isAdmin ? '❌ ADMİN AL' : '👑 ADMİN VER'}
-          </button>
-          <button class="btn sm orange" onclick="resetUserVote('${uid}')">🔄 OY KAYDINI SİL</button>
-          <button class="btn sm red" onclick="deleteUserConfirm('${uid}', '${uname}')">🗑️ SİL</button>
-        </div>
-      </div>
-      <div class="user-edit-row">
-        <div class="field-group" style="min-width:150px;">
-          <label class="lbl">YENİ KULLANICI ADI</label>
-          <input id="un-${uid}" class="input" value="${uname}" style="width:100%;"/>
-        </div>
-        <button class="btn sm" onclick="renameUser('${uid}')">✏️ KAYDET</button>
-        <div class="field-group" style="min-width:180px;">
-          <label class="lbl">OY KAYDI YAZ</label>
-          <input id="uv-${uid}" class="input" placeholder='["Halil","Roman"]' style="width:100%;"/>
-        </div>
-        <button class="btn sm blue" onclick="setUserVoteRecord('${uid}')">📌 YAZ</button>
-      </div>
-    </div>`;
+    <div style="font-family:var(--mono);font-size:.52rem;color:var(--t3);margin-bottom:2px">UID: ${uid}</div>
+    <div style="font-size:.78rem;color:var(--t2)">${vd}</div>
+  </div>
+  <div class="brow">
+    <button class="btn sm ${isAdmin?'r':'y'}" onclick="toggleAdminUID('${uid}',${isAdmin})">${isAdmin?'❌ ADMİN AL':'👑 VER'}</button>
+    <button class="btn sm o" onclick="resetUserVote('${uid}')">🔄 OY KAYDI SİL</button>
+    <button class="btn sm r" onclick="delUser('${uid}','${un}')">🗑️ SİL</button>
+  </div>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+  <div class="fg"><label class="lbl">YENİ İSİM</label><input id="un-${uid}" class="inp sm" value="${un}" style="width:140px"></div>
+  <button class="btn sm" onclick="renameUser('${uid}')">✏️ KAYDET</button>
+  <div class="fg"><label class="lbl">OY KAYDI YAZ</label><input id="uv-${uid}" class="inp sm" placeholder='["Halil"]' style="width:160px"></div>
+  <button class="btn sm b" onclick="setUserVoteRec('${uid}')">📌 YAZ</button>
+</div>
+</div>`;
   }).join('');
 }
+async function toggleAdminUID(uid,isAdmin){await fbSet('/users/'+uid+'/admin',!isAdmin);if(DB.users[uid])DB.users[uid].admin=!isAdmin;renderUsers();toast(isAdmin?'❌ Admin alındı':'👑 Admin verildi');}
+async function resetUserVote(uid){const week=wk();await fbDel('/users/'+uid+'/voted/'+week);if(DB.users[uid]&&DB.users[uid].voted)delete DB.users[uid].voted[week];renderUsers();toast('🔄 Oy kaydı silindi');}
+async function delUser(uid,un){showModal('SİL',`"${un}" silinsin mi?`,async()=>{await fbDel('/users/'+uid);await fbDel('/usernames/'+un.toLowerCase());delete DB.users[uid];renderUsers();toast(`🗑️ ${un}`,'w');});}
+async function renameUser(uid){const nn=document.getElementById('un-'+uid).value.trim();if(!nn){toast('İsim gir!','e');return;}const old=DB.users[uid]?DB.users[uid].username:null;await fbSet('/users/'+uid+'/username',nn);if(old)await fbDel('/usernames/'+old.toLowerCase());await fbSet('/usernames/'+nn.toLowerCase(),uid);if(DB.users[uid])DB.users[uid].username=nn;renderUsers();toast(`✏️ ${old}→${nn}`);}
+async function setUserVoteRec(uid){const val=document.getElementById('uv-'+uid).value.trim();if(!val){toast('Değer gir!','e');return;}const week=wk();await fbSet('/users/'+uid+'/voted/'+week,val);if(DB.users[uid]){if(!DB.users[uid].voted)DB.users[uid].voted={};DB.users[uid].voted[week]=val;}renderUsers();toast('📌 Oy kaydı yazıldı');}
+async function resetAllVoted(){showModal('TOPLU SIFIRLA','Tüm kullanıcıların oy kaydı silinsin mi?',async()=>{const week=wk();await Promise.all(Object.keys(DB.users).map(uid=>{if(DB.users[uid]&&DB.users[uid].voted&&DB.users[uid].voted[week]){delete DB.users[uid].voted[week];return fbDel('/users/'+uid+'/voted/'+week);}return Promise.resolve();}));renderUsers();toast('🔄 Tüm oy kayıtları silindi','w');});}
 
-function filterUsers() {
-  const q = document.getElementById('userSearch').value;
-  renderUsersPage(q);
+// ─ Raw ─
+function renderRaw(){
+  const s=(document.getElementById('rs')||{}).value||'all';
+  let d;if(s==='votes7d')d=DB.votes;else if(s==='users')d=DB.users;else if(s==='usernames')d=DB.usernames;else d=DB;
+  const box=document.getElementById('rawBox');if(box)box.textContent=JSON.stringify(d,null,2);
+}
+function copyRaw(){const s=document.getElementById('rs').value;let d;if(s==='votes7d')d=DB.votes;else if(s==='users')d=DB.users;else if(s==='usernames')d=DB.usernames;else d=DB;navigator.clipboard.writeText(JSON.stringify(d,null,2)).then(()=>toast('📋 Kopyalandı'));}
+function dlRaw(){const s=document.getElementById('rs').value;let d;if(s==='votes7d')d=DB.votes;else if(s==='users')d=DB.users;else if(s==='usernames')d=DB.usernames;else d=DB;const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`7dzone-${s}-${Date.now()}.json`;a.click();URL.revokeObjectURL(u);toast('💾 İndiriliyor');}
+
+// ─ Writer ─
+async function wGet(){const p=document.getElementById('w-path').value.trim();if(!p){toast('Path gir!','e');return;}const d=await fbGet(p);showWRes(d);toast('👁️ Okundu','i');}
+async function wSet(){const p=document.getElementById('w-path').value.trim();let v=document.getElementById('w-val').value.trim();if(!p){toast('Path gir!','e');return;}v=parseVal(v);const r=await fbSet(p,v);showWRes(r);toast('📌 Yazıldı');R();}
+async function wPatch(){const p=document.getElementById('w-path').value.trim();let v=document.getElementById('w-val').value.trim();if(!p){toast('Path gir!','e');return;}try{v=JSON.parse(v);}catch{toast('Geçersiz JSON!','e');return;}const r=await fbPatch(p,v);showWRes(r);toast('🔄 Güncellendi');R();}
+async function wDel(){const p=document.getElementById('w-path').value.trim();if(!p){toast('Path gir!','e');return;}showModal('SİL',`"${p}" silinsin mi?`,async()=>{await fbDel(p);showWRes(null);toast('🗑️ Silindi','w');R();});}
+function showWRes(d){document.getElementById('wRes').style.display='block';document.getElementById('wResContent').textContent=JSON.stringify(d,null,2);}
+function buildPathHints(){
+  const ph=['/votes7d','/votes7d/halil','/users','/usernames','/voteWeekMarker'];
+  const el=document.getElementById('pathHints');if(!el)return;
+  el.innerHTML=ph.map(p=>`<div class="phint" onclick="document.getElementById('w-path').value='${p}'">${p}</div>`).join('');
 }
 
-async function toggleAdminUser(uid, isAdmin) {
-  await fbSet('/users/' + uid + '/admin', !isAdmin);
-  if (DB.users[uid]) DB.users[uid].admin = !isAdmin;
-  renderUsersPage();
-  toast(isAdmin ? '❌ Admin alındı' : '👑 Admin verildi!', isAdmin ? 'warn' : undefined);
-}
+// ─ Danger ─
+async function nuke(){showModal('💣 TAM NUKE','votes7d + voted + weekMarker SİLİNECEK!',async()=>{const week=wk();await fbDel('/votes7d');await fbDel('/voteWeekMarker');await Promise.all(Object.keys(DB.users).map(uid=>fbDel('/users/'+uid+'/voted/'+week)));DB.votes={};Object.values(DB.users).forEach(u=>{if(u&&u.voted)delete u.voted[week];});renderVotes();renderUsers();fillSelects();toast('💣 NUKE tamam','w');});}
+async function delByUid(){const uid=document.getElementById('d-uid').value.trim();if(!uid){toast('UID gir!','e');return;}showModal('SİL',`UID: "${uid}" silinsin mi?`,async()=>{await fbDel('/users/'+uid);delete DB.users[uid];renderUsers();toast('🗑️ Silindi','w');});}
+async function zeroAll(){showModal('SIFIRLA','Tüm oylar 0 yapılsın mı?',async()=>{for(const k of Object.keys(DB.votes)){await fbSet('/votes7d/'+k,0);DB.votes[k]=0;}renderVotes();toast('📭 Tümü 0','w');});}
 
-async function resetUserVote(uid) {
-  const week = getWeekKey();
-  await fbDelete('/users/' + uid + '/voted/' + week);
-  if (DB.users[uid] && DB.users[uid].voted) delete DB.users[uid].voted[week];
-  renderUsersPage();
-  updateBadges();
-  toast('🔄 Oy kaydı silindi, kullanıcı tekrar oy verebilir!');
+// ─ UI ─
+function T(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.getElementById('p-'+name).classList.add('on');
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  if(name==='raw')renderRaw();
+  if(name==='tools')calcStats();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
+function toast(msg,t){const el=document.createElement('div');el.className='toast '+(t||'');el.textContent=msg;document.getElementById('tc').appendChild(el);setTimeout(()=>{if(el.parentNode)el.parentNode.removeChild(el);},3000);}
+function log(msg,t){logN++;const l=document.createElement('div');l.className='ll';l.innerHTML=`<span class="lt">${new Date().toLocaleTimeString('tr')}</span><span class="lm ${t||''}">${msg}</span>`;const i=document.getElementById('logInner');i.appendChild(l);i.scrollTop=i.scrollHeight;document.getElementById('logToggle').textContent=`▲ LOG (${logN})`;}
+let logOpen=false;
+function toggleLog(){logOpen=!logOpen;document.getElementById('logBox').classList.toggle('on',logOpen);document.getElementById('logToggle').textContent=(logOpen?'▼':'▲')+` LOG (${logN})`;}
+function showModal(title,body,cb){document.getElementById('mt').textContent=title;document.getElementById('mb').textContent=body;document.getElementById('modal').classList.add('on');mcb=cb;}
+function cModal(){document.getElementById('modal').classList.remove('on');mcb=null;}
+document.getElementById('mok').onclick=async()=>{if(mcb)await mcb();cModal();};
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))cModal();});
 
-async function deleteUserConfirm(uid, uname) {
-  showModal('KULLANICI SİL', `"${uname}" kullanıcısını kalıcı olarak silmek istediğine emin misin?`, async () => {
-    await fbDelete('/users/' + uid);
-    const nameKey = uname.toLowerCase();
-    await fbDelete('/usernames/' + nameKey);
-    delete DB.users[uid];
-    renderUsersPage(); updateBadges();
-    toast(`🗑️ ${uname} silindi!`, 'warn');
-  });
-}
-
-async function renameUser(uid) {
-  const newName = document.getElementById('un-' + uid).value.trim();
-  if (!newName) { toast('Yeni isim gir!', 'error'); return; }
-  const oldName = DB.users[uid] ? DB.users[uid].username : null;
-  await fbSet('/users/' + uid + '/username', newName);
-  if (oldName) await fbDelete('/usernames/' + oldName.toLowerCase());
-  await fbSet('/usernames/' + newName.toLowerCase(), uid);
-  if (DB.users[uid]) DB.users[uid].username = newName;
-  renderUsersPage();
-  toast(`✏️ İsim değiştirildi: ${newName}`);
-}
-
-async function setUserVoteRecord(uid) {
-  const val = document.getElementById('uv-' + uid).value.trim();
-  if (!val) { toast('Değer gir!', 'error'); return; }
-  const week = getWeekKey();
-  await fbSet('/users/' + uid + '/voted/' + week, val);
-  if (DB.users[uid]) {
-    if (!DB.users[uid].voted) DB.users[uid].voted = {};
-    DB.users[uid].voted[week] = val;
-  }
-  renderUsersPage(); updateBadges();
-  toast('📌 Oy kaydı yazıldı!');
-}
-
-async function resetAllVotedFlags() {
-  showModal('TOPLU OY KAYDI SİL', 'Tüm kullanıcıların bu haftaki oy kaydı silinecek. Herkes tekrar oy verebilir hale gelir. Devam?', async () => {
-    const week = getWeekKey();
-    const promises = Object.keys(DB.users).map(uid => {
-      if (DB.users[uid] && DB.users[uid].voted && DB.users[uid].voted[week]) {
-        delete DB.users[uid].voted[week];
-        return fbDelete('/users/' + uid + '/voted/' + week);
-      }
-      return Promise.resolve();
-    });
-    await Promise.all(promises);
-    renderUsersPage(); updateBadges();
-    toast('🔄 Tüm oy kayıtları silindi!', 'warn');
-  });
-}
-
-// ═══════════════════════════════════════════════════
-//  TOOLS
-// ═══════════════════════════════════════════════════
-async function halilBomb() {
-  const amt = parseInt(document.getElementById('t-halilAmt').value) || 999;
-  const cur = DB.votes['halil'] || 0;
-  const newVal = cur + amt;
-  await fbSet('/votes7d/halil', newVal);
-  DB.votes['halil'] = newVal;
-  document.getElementById('t-halilResult').textContent = `🐱 Halil: ${cur} + ${amt} = ${newVal} OY!`;
-  renderDashVotes(); updateBadges();
-  if (currentPage === 'votes') renderVotesPage();
-  toast(`🐱 Halil +${amt} oy! Toplam: ${newVal}`);
-}
-
-function lockStart() {
-  if (lockBot) clearInterval(lockBot);
-  const minV = parseInt(document.getElementById('t-lockMin').value) || 500;
-  const interval = parseInt(document.getElementById('t-lockInterval').value) || 5;
-  const el = document.getElementById('lockStatus');
-  el.className = 'bot-status active';
-  el.innerHTML = `<div class="dot"></div> BOT AKTİF — MİN: ${minV} · ARALIK: ${interval}SN`;
-  addLog(`Koruma botu başlatıldı. Min: ${minV}, Aralık: ${interval}sn`, 'info');
-  lockBot = setInterval(async () => {
-    const cur = await fbGet('/votes7d/halil');
-    if (!cur || cur < minV) {
-      await fbSet('/votes7d/halil', minV);
-      DB.votes['halil'] = minV;
-      addLog(`🛡️ Halil korundu → ${minV}`);
-      toast(`🛡️ Halil korundu → ${minV}`);
-      if (currentPage === 'votes') renderVotesPage();
-      renderDashVotes(); updateBadges();
-    }
-  }, interval * 1000);
-}
-
-function lockStop() {
-  if (lockBot) { clearInterval(lockBot); lockBot = null; }
-  const el = document.getElementById('lockStatus');
-  if (el) { el.className = 'bot-status'; el.innerHTML = '<div class="dot"></div> BOT: KAPALI'; }
-  addLog('Koruma botu durduruldu.', 'warn');
-  toast('⏹ Koruma botu durduruldu', 'warn');
-}
-
-async function autoVoteStart() {
-  if (autoBot) clearInterval(autoBot);
-  const target = (document.getElementById('t-autoTarget').value || 'halil').trim().toLowerCase();
-  const interval = parseInt(document.getElementById('t-autoInterval').value) || 10;
-  const amount = parseInt(document.getElementById('t-autoAmount').value) || 5;
-  const statusEl = document.getElementById('autoVoteStatus');
-  const logEl = document.getElementById('t-autoLog');
-  statusEl.className = 'bot-status active';
-  statusEl.innerHTML = `<div class="dot"></div> AKTİF → ${target} her ${interval}sn +${amount}`;
-  addLog(`Oto vote botu: ${target} her ${interval}sn +${amount}`, 'info');
-  autoBot = setInterval(async () => {
-    const cur = await fbGet('/votes7d/' + target);
-    const newVal = (cur || 0) + amount;
-    await fbSet('/votes7d/' + target, newVal);
-    DB.votes[target] = newVal;
-    const msg = `[${new Date().toLocaleTimeString('tr-TR')}] ${target}: ${newVal}`;
-    addLog(msg);
-    logEl.innerHTML = msg + '<br>' + logEl.innerHTML;
-    if (currentPage === 'votes') renderVotesPage();
-    renderDashVotes(); updateBadges();
-  }, interval * 1000);
-}
-
-function autoVoteStop() {
-  if (autoBot) { clearInterval(autoBot); autoBot = null; }
-  const el = document.getElementById('autoVoteStatus');
-  if (el) { el.className = 'bot-status'; el.innerHTML = '<div class="dot"></div> BOT: KAPALI'; }
-  addLog('Oto vote botu durduruldu.', 'warn');
-  toast('⏹ Oto vote botu durduruldu', 'warn');
-}
-
-async function onlyHalil() {
-  const amt = parseInt(document.getElementById('t-onlyHalilAmt').value) || 9999;
-  showModal('SADECE HALİL', `Tüm oylar silinecek ve Halil'e ${amt} oy yazılacak. Emin misin?`, async () => {
-    await fbDelete('/votes7d');
-    await fbSet('/votes7d/halil', amt);
-    DB.votes = { halil: amt };
-    renderDashVotes(); updateBadges();
-    if (currentPage === 'votes') renderVotesPage();
-    toast(`⭐ Sadece Halil: ${amt} oy!`);
-  });
-}
-
-async function toggleAdminByName() {
-  const target = document.getElementById('t-adminTarget').value.trim().toLowerCase();
-  const action = document.getElementById('t-adminAction').value;
-  const result = document.getElementById('t-adminResult');
-  if (!target) { result.textContent = '⚠️ Username gir!'; return; }
-  const uid = DB.usernames[target];
-  if (!uid) { result.style.color = 'var(--danger)'; result.textContent = `❌ "${target}" bulunamadı!`; return; }
-  const val = action === 'give';
-  await fbSet('/users/' + uid + '/admin', val);
-  if (DB.users[uid]) DB.users[uid].admin = val;
-  result.style.color = 'var(--accent)';
-  result.textContent = val ? `👑 ${target} admin yapıldı!` : `❌ ${target} admin alındı!`;
-  toast(val ? `👑 ${target} admin!` : `❌ ${target} admin değil`);
-  if (currentPage === 'users') renderUsersPage();
-}
-
-// ═══════════════════════════════════════════════════
-//  RAW JSON
-// ═══════════════════════════════════════════════════
-function renderRaw() {
-  const el = document.getElementById('rawContent');
-  const section = (document.getElementById('rawSection') ? document.getElementById('rawSection').value : 'all');
-  let data;
-  if (section === 'all') data = DB;
-  else if (section === 'votes7d') data = DB.votes;
-  else if (section === 'users') data = DB.users;
-  const json = JSON.stringify(data, null, 2);
-  const highlighted = json
-    .replace(/(".*?")\s*:/g, '<span class="json-key">$1</span>:')
-    .replace(/:\s*(".*?")/g, ': <span class="json-str">$1</span>')
-    .replace(/:\s*(\d+\.?\d*)/g, ': <span class="json-num">$1</span>')
-    .replace(/:\s*(true|false)/g, ': <span class="json-bool">$1</span>')
-    .replace(/:\s*(null)/g, ': <span class="json-null">$1</span>');
-  el.innerHTML = `<div class="json-viewer">${highlighted}</div>`;
-}
-
-function copyRaw() {
-  const section = document.getElementById('rawSection').value;
-  let data;
-  if (section === 'all') data = DB;
-  else if (section === 'votes7d') data = DB.votes;
-  else if (section === 'users') data = DB.users;
-  navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => toast('📋 Kopyalandı!')).catch(() => toast('Kopyalama başarısız!', 'error'));
-}
-
-function downloadRaw() {
-  const section = document.getElementById('rawSection').value;
-  let data;
-  if (section === 'all') data = DB;
-  else if (section === 'votes7d') data = DB.votes;
-  else if (section === 'users') data = DB.users;
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = `7dzone-${section}-${Date.now()}.json`;
-  a.click(); URL.revokeObjectURL(url);
-  toast('💾 Dosya indiriliyor...');
-}
-
-// ═══════════════════════════════════════════════════
-//  DB YAZICI
-// ═══════════════════════════════════════════════════
-async function writerGet() {
-  const path = document.getElementById('w-path').value.trim();
-  if (!path) { toast('Path gir!', 'error'); return; }
-  const data = await fbGet(path);
-  showWriterResult(data);
-  toast('👁️ Okundu: ' + path, 'info');
-}
-
-async function writerSet() {
-  const path = document.getElementById('w-path').value.trim();
-  let val = document.getElementById('w-value').value.trim();
-  if (!path) { toast('Path gir!', 'error'); return; }
-  try { val = JSON.parse(val); } catch(e) { /* string */ }
-  const result = await fbSet(path, val);
-  showWriterResult(result);
-  toast('📌 Yazıldı: ' + path);
-  loadAllData();
-}
-
-async function writerUpdate() {
-  const path = document.getElementById('w-path').value.trim();
-  let val = document.getElementById('w-value').value.trim();
-  if (!path) { toast('Path gir!', 'error'); return; }
-  try { val = JSON.parse(val); } catch(e) { toast('Geçerli JSON gir!', 'error'); return; }
-  const result = await fbPatch(path, val);
-  showWriterResult(result);
-  toast('🔄 Güncellendi: ' + path);
-  loadAllData();
-}
-
-async function writerDelete() {
-  const path = document.getElementById('w-path').value.trim();
-  if (!path) { toast('Path gir!', 'error'); return; }
-  showModal('SİL', `"${path}" silinsin mi?`, async () => {
-    await fbDelete(path);
-    showWriterResult(null);
-    toast('🗑️ Silindi: ' + path, 'warn');
-    loadAllData();
-  });
-}
-
-function showWriterResult(data) {
-  const box = document.getElementById('writerResult');
-  const content = document.getElementById('writerResultContent');
-  box.style.display = 'block';
-  content.textContent = JSON.stringify(data, null, 2);
-}
-
-// ═══════════════════════════════════════════════════
-//  DANGER ZONE
-// ═══════════════════════════════════════════════════
-async function confirmNuke() {
-  showModal('⚠️ TAM NUKE', 'TÜM VOTE\'LAR ve TÜM KULLANICILARIN OY KAYITLARI silinecek. Bu geri alınamaz! Gerçekten yapmak istiyor musun?', async () => {
-    await fbDelete('/votes7d');
-    const week = getWeekKey();
-    const promises = Object.keys(DB.users).map(uid => fbDelete('/users/' + uid + '/voted/' + week));
-    await Promise.all(promises);
-    DB.votes = {};
-    Object.values(DB.users).forEach(u => { if (u && u.voted) delete u.voted[week]; });
-    updateBadges(); renderDashVotes();
-    if (currentPage === 'votes') renderVotesPage();
-    if (currentPage === 'users') renderUsersPage();
-    toast('💣 Tam nuke yapıldı!', 'warn');
-  });
-}
-
-async function resetWeekMarker() {
-  showModal('MARKER SİL', 'voteWeekMarker silinsin mi?', async () => {
-    await fbDelete('/voteWeekMarker');
-    toast('🗓️ Hafta marker\'ı silindi!', 'warn');
-  });
-}
-
-async function deleteUserByUid() {
-  const uid = document.getElementById('d-deleteUid').value.trim();
-  if (!uid) { toast('UID gir!', 'error'); return; }
-  showModal('KULLANICI SİL', `UID: "${uid}" silinsin mi?`, async () => {
-    await fbDelete('/users/' + uid);
-    delete DB.users[uid];
-    renderUsersPage(); updateBadges();
-    toast('🗑️ Kullanıcı silindi!', 'warn');
-  });
-}
-
-// ═══════════════════════════════════════════════════
-//  UI UTILITIES
-// ═══════════════════════════════════════════════════
-function switchPage(name, btn) {
-  currentPage = name;
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  renderCurrentPage();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function toast(msg, type) {
-  const el = document.createElement('div');
-  el.className = 'toast ' + (type || '');
-  el.textContent = msg;
-  document.getElementById('toastContainer').appendChild(el);
-  setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 3000);
-}
-
-function addLog(msg, type) {
-  logCount++;
-  const now = new Date().toLocaleTimeString('tr-TR');
-  const line = document.createElement('div');
-  line.className = 'log-line';
-  line.innerHTML = `<span class="log-time">${now}</span><span class="log-msg ${type || ''}">${msg}</span>`;
-  const inner = document.getElementById('consoleInner');
-  inner.appendChild(line);
-  inner.scrollTop = inner.scrollHeight;
-  const toggle = document.getElementById('consoleToggle');
-  toggle.textContent = `▲ LOG (${logCount})`;
-}
-
-function toggleConsole() {
-  const box = document.getElementById('consoleBox');
-  const toggle = document.getElementById('consoleToggle');
-  const isOpen = box.classList.contains('open');
-  box.classList.toggle('open');
-  toggle.textContent = (isOpen ? '▲' : '▼') + ` LOG (${logCount})`;
-}
-
-let modalCallback = null;
-function showModal(title, body, onConfirm) {
-  document.getElementById('modal-title').textContent = title;
-  document.getElementById('modal-body').textContent = body;
-  document.getElementById('modal').classList.add('open');
-  modalCallback = onConfirm;
-}
-function closeModal() {
-  document.getElementById('modal').classList.remove('open');
-  modalCallback = null;
-}
-document.getElementById('modal-confirm').onclick = async function() {
-  if (modalCallback) await modalCallback();
-  closeModal();
-};
-document.getElementById('modal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
-// ═══════════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════════
-loadAllData();
-addLog('7D Zone Admin Panel v2.0 başlatıldı.', 'info');
-addLog('Firebase: ' + BASE, 'info');
+R();log('7D Zone Admin v3 başlatıldı','i');
 </script>
 </body>
 </html>
